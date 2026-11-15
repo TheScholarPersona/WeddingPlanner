@@ -3054,6 +3054,234 @@
         }
       }
     },
+    "/api/v1/orgs/{org_id}/projects/{project_id}/client-access": {
+      "get": {
+        "tags": [
+          "weddings"
+        ],
+        "summary": "Get Client Access",
+        "operationId": "get_client_access_api_v1_orgs__org_id__projects__project_id__client_access_get",
+        "parameters": [
+          {
+            "name": "org_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Org Id"
+            }
+          },
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Project Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientAccessOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/orgs/{org_id}/projects/{project_id}/client-access/invitations": {
+      "post": {
+        "tags": [
+          "weddings"
+        ],
+        "summary": "Invite Couple",
+        "operationId": "invite_couple_api_v1_orgs__org_id__projects__project_id__client_access_invitations_post",
+        "parameters": [
+          {
+            "name": "org_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Org Id"
+            }
+          },
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Project Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CoupleInvitationIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientAccessOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/orgs/{org_id}/projects/{project_id}/client-access/invitations/{invitation_id}": {
+      "delete": {
+        "tags": [
+          "weddings"
+        ],
+        "summary": "Revoke Couple Invitation",
+        "operationId": "revoke_couple_invitation_api_v1_orgs__org_id__projects__project_id__client_access_invitations__invitation_id__delete",
+        "parameters": [
+          {
+            "name": "invitation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Invitation Id"
+            }
+          },
+          {
+            "name": "org_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Org Id"
+            }
+          },
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Project Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/orgs/{org_id}/projects/{project_id}/client-access/{member_id}": {
+      "delete": {
+        "tags": [
+          "weddings"
+        ],
+        "summary": "Revoke Couple Login",
+        "operationId": "revoke_couple_login_api_v1_orgs__org_id__projects__project_id__client_access__member_id__delete",
+        "parameters": [
+          {
+            "name": "member_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Member Id"
+            }
+          },
+          {
+            "name": "org_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Org Id"
+            }
+          },
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Project Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/orgs/{org_id}/tasks": {
       "get": {
         "tags": [
@@ -4288,7 +4516,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CommentIn"
+                "$ref": "#/components/schemas/app__tasks__schemas__CommentIn"
               }
             }
           }
@@ -4509,6 +4737,1223 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ActivityPageOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/orgs/{org_id}/projects/{project_id}/budget": {
+      "get": {
+        "tags": [
+          "budget"
+        ],
+        "summary": "Get Budget",
+        "operationId": "get_budget_api_v1_orgs__org_id__projects__project_id__budget_get",
+        "parameters": [
+          {
+            "name": "org_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Org Id"
+            }
+          },
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Project Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BudgetOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "budget"
+        ],
+        "summary": "Update Budget",
+        "operationId": "update_budget_api_v1_orgs__org_id__projects__project_id__budget_patch",
+        "parameters": [
+          {
+            "name": "org_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Org Id"
+            }
+          },
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Project Id"
+            }
+          },
+          {
+            "name": "if-match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "If-Match"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BudgetUpdateIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BudgetOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/orgs/{org_id}/projects/{project_id}/budget/categories": {
+      "post": {
+        "tags": [
+          "budget"
+        ],
+        "summary": "Add Category",
+        "operationId": "add_category_api_v1_orgs__org_id__projects__project_id__budget_categories_post",
+        "parameters": [
+          {
+            "name": "org_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Org Id"
+            }
+          },
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Project Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CategoryIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BudgetOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/orgs/{org_id}/projects/{project_id}/budget/categories/{category_id}": {
+      "patch": {
+        "tags": [
+          "budget"
+        ],
+        "summary": "Update Category",
+        "operationId": "update_category_api_v1_orgs__org_id__projects__project_id__budget_categories__category_id__patch",
+        "parameters": [
+          {
+            "name": "category_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Category Id"
+            }
+          },
+          {
+            "name": "org_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Org Id"
+            }
+          },
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Project Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CategoryUpdateIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BudgetOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "budget"
+        ],
+        "summary": "Delete Category",
+        "operationId": "delete_category_api_v1_orgs__org_id__projects__project_id__budget_categories__category_id__delete",
+        "parameters": [
+          {
+            "name": "category_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Category Id"
+            }
+          },
+          {
+            "name": "org_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Org Id"
+            }
+          },
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Project Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/orgs/{org_id}/projects/{project_id}/budget/items": {
+      "post": {
+        "tags": [
+          "budget"
+        ],
+        "summary": "Add Item",
+        "operationId": "add_item_api_v1_orgs__org_id__projects__project_id__budget_items_post",
+        "parameters": [
+          {
+            "name": "org_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Org Id"
+            }
+          },
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Project Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ItemIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BudgetOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/orgs/{org_id}/projects/{project_id}/budget/items/{item_id}": {
+      "patch": {
+        "tags": [
+          "budget"
+        ],
+        "summary": "Update Item",
+        "operationId": "update_item_api_v1_orgs__org_id__projects__project_id__budget_items__item_id__patch",
+        "parameters": [
+          {
+            "name": "item_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Item Id"
+            }
+          },
+          {
+            "name": "org_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Org Id"
+            }
+          },
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Project Id"
+            }
+          },
+          {
+            "name": "if-match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "If-Match"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ItemUpdateIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BudgetOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "budget"
+        ],
+        "summary": "Delete Item",
+        "operationId": "delete_item_api_v1_orgs__org_id__projects__project_id__budget_items__item_id__delete",
+        "parameters": [
+          {
+            "name": "item_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Item Id"
+            }
+          },
+          {
+            "name": "org_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Org Id"
+            }
+          },
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Project Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/orgs/{org_id}/projects/{project_id}/budget/items/{item_id}/payments": {
+      "post": {
+        "tags": [
+          "budget"
+        ],
+        "summary": "Add Payment",
+        "operationId": "add_payment_api_v1_orgs__org_id__projects__project_id__budget_items__item_id__payments_post",
+        "parameters": [
+          {
+            "name": "item_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Item Id"
+            }
+          },
+          {
+            "name": "org_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Org Id"
+            }
+          },
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Project Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaymentIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BudgetOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/orgs/{org_id}/projects/{project_id}/budget/items/{item_id}/payments/{payment_id}": {
+      "patch": {
+        "tags": [
+          "budget"
+        ],
+        "summary": "Update Payment",
+        "operationId": "update_payment_api_v1_orgs__org_id__projects__project_id__budget_items__item_id__payments__payment_id__patch",
+        "parameters": [
+          {
+            "name": "item_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Item Id"
+            }
+          },
+          {
+            "name": "payment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Payment Id"
+            }
+          },
+          {
+            "name": "org_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Org Id"
+            }
+          },
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Project Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaymentUpdateIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BudgetOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "budget"
+        ],
+        "summary": "Delete Payment",
+        "operationId": "delete_payment_api_v1_orgs__org_id__projects__project_id__budget_items__item_id__payments__payment_id__delete",
+        "parameters": [
+          {
+            "name": "item_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Item Id"
+            }
+          },
+          {
+            "name": "payment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Payment Id"
+            }
+          },
+          {
+            "name": "org_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Org Id"
+            }
+          },
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Project Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/portal/projects": {
+      "get": {
+        "tags": [
+          "portal"
+        ],
+        "summary": "Projects",
+        "operationId": "projects_api_v1_portal_projects_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PortalProjectSummary"
+                  },
+                  "type": "array",
+                  "title": "Response Projects Api V1 Portal Projects Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/portal/projects/{project_id}": {
+      "get": {
+        "tags": [
+          "portal"
+        ],
+        "summary": "Overview",
+        "operationId": "overview_api_v1_portal_projects__project_id__get",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Project Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortalOverview"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/portal/projects/{project_id}/tasks": {
+      "get": {
+        "tags": [
+          "portal"
+        ],
+        "summary": "Tasks",
+        "operationId": "tasks_api_v1_portal_projects__project_id__tasks_get",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Project Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PortalTask"
+                  },
+                  "title": "Response Tasks Api V1 Portal Projects  Project Id  Tasks Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/portal/projects/{project_id}/tasks/{task_id}/complete": {
+      "post": {
+        "tags": [
+          "portal"
+        ],
+        "summary": "Complete",
+        "operationId": "complete_api_v1_portal_projects__project_id__tasks__task_id__complete_post",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Task Id"
+            }
+          },
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Project Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PortalTask"
+                  },
+                  "title": "Response Complete Api V1 Portal Projects  Project Id  Tasks  Task Id  Complete Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/portal/projects/{project_id}/tasks/{task_id}/reopen": {
+      "post": {
+        "tags": [
+          "portal"
+        ],
+        "summary": "Reopen",
+        "operationId": "reopen_api_v1_portal_projects__project_id__tasks__task_id__reopen_post",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Task Id"
+            }
+          },
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Project Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PortalTask"
+                  },
+                  "title": "Response Reopen Api V1 Portal Projects  Project Id  Tasks  Task Id  Reopen Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/portal/projects/{project_id}/tasks/{task_id}/checklist/{item_id}": {
+      "patch": {
+        "tags": [
+          "portal"
+        ],
+        "summary": "Tick",
+        "operationId": "tick_api_v1_portal_projects__project_id__tasks__task_id__checklist__item_id__patch",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Task Id"
+            }
+          },
+          {
+            "name": "item_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Item Id"
+            }
+          },
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Project Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PortalChecklistUpdateIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PortalTask"
+                  },
+                  "title": "Response Tick Api V1 Portal Projects  Project Id  Tasks  Task Id  Checklist  Item Id  Patch"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/portal/projects/{project_id}/tasks/{task_id}/comments": {
+      "get": {
+        "tags": [
+          "portal"
+        ],
+        "summary": "Comments",
+        "operationId": "comments_api_v1_portal_projects__project_id__tasks__task_id__comments_get",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Task Id"
+            }
+          },
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Project Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PortalComment"
+                  },
+                  "title": "Response Comments Api V1 Portal Projects  Project Id  Tasks  Task Id  Comments Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "portal"
+        ],
+        "summary": "Add Comment",
+        "operationId": "add_comment_api_v1_portal_projects__project_id__tasks__task_id__comments_post",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Task Id"
+            }
+          },
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Project Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/app__portal__router__CommentIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PortalComment"
+                  },
+                  "title": "Response Add Comment Api V1 Portal Projects  Project Id  Tasks  Task Id  Comments Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/portal/projects/{project_id}/budget": {
+      "get": {
+        "tags": [
+          "portal"
+        ],
+        "summary": "Budget",
+        "operationId": "budget_api_v1_portal_projects__project_id__budget_get",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Project Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortalBudget"
                 }
               }
             }
@@ -4770,6 +6215,187 @@
         ],
         "title": "AuditPageOut"
       },
+      "BudgetOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "total_cents": {
+            "type": "integer",
+            "title": "Total Cents"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "warning_threshold_pct": {
+            "type": "integer",
+            "title": "Warning Threshold Pct"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "totals": {
+            "$ref": "#/components/schemas/Totals"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/Warning"
+            },
+            "type": "array",
+            "title": "Warnings"
+          },
+          "categories": {
+            "items": {
+              "$ref": "#/components/schemas/CategoryOut"
+            },
+            "type": "array",
+            "title": "Categories"
+          },
+          "upcoming_payments": {
+            "items": {
+              "$ref": "#/components/schemas/UpcomingPayment"
+            },
+            "type": "array",
+            "title": "Upcoming Payments"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "total_cents",
+          "currency",
+          "warning_threshold_pct",
+          "version",
+          "totals",
+          "warnings",
+          "categories",
+          "upcoming_payments"
+        ],
+        "title": "BudgetOut"
+      },
+      "BudgetUpdateIn": {
+        "properties": {
+          "total_cents": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 10000000000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Cents"
+          },
+          "warning_threshold_pct": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 100.0,
+                "minimum": 50.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Warning Threshold Pct"
+          }
+        },
+        "type": "object",
+        "title": "BudgetUpdateIn"
+      },
+      "CategoryIn": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "CategoryIn"
+      },
+      "CategoryOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "position": {
+            "type": "integer",
+            "title": "Position"
+          },
+          "planned_cents": {
+            "type": "integer",
+            "title": "Planned Cents"
+          },
+          "forecast_cents": {
+            "type": "integer",
+            "title": "Forecast Cents"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ItemOut"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "position",
+          "planned_cents",
+          "forecast_cents",
+          "items"
+        ],
+        "title": "CategoryOut"
+      },
+      "CategoryUpdateIn": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "position": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Position"
+          }
+        },
+        "type": "object",
+        "title": "CategoryUpdateIn"
+      },
       "ChangePasswordIn": {
         "properties": {
           "current_password": {
@@ -4865,6 +6491,30 @@
         },
         "type": "object",
         "title": "ChecklistItemUpdateIn"
+      },
+      "ClientAccessOut": {
+        "properties": {
+          "logins": {
+            "items": {
+              "$ref": "#/components/schemas/CoupleLoginOut"
+            },
+            "type": "array",
+            "title": "Logins"
+          },
+          "invitations": {
+            "items": {
+              "$ref": "#/components/schemas/CoupleInvitationOut"
+            },
+            "type": "array",
+            "title": "Invitations"
+          }
+        },
+        "type": "object",
+        "required": [
+          "logins",
+          "invitations"
+        ],
+        "title": "ClientAccessOut"
       },
       "ClientDetailOut": {
         "properties": {
@@ -5233,46 +6883,6 @@
         "type": "object",
         "title": "ClientUpdateIn"
       },
-      "CommentIn": {
-        "properties": {
-          "target_type": {
-            "type": "string",
-            "enum": [
-              "project",
-              "task",
-              "milestone"
-            ],
-            "title": "Target Type"
-          },
-          "target_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Target Id"
-          },
-          "body": {
-            "type": "string",
-            "maxLength": 5000,
-            "minLength": 1,
-            "title": "Body"
-          },
-          "visibility": {
-            "type": "string",
-            "enum": [
-              "internal",
-              "client"
-            ],
-            "title": "Visibility",
-            "default": "internal"
-          }
-        },
-        "type": "object",
-        "required": [
-          "target_type",
-          "target_id",
-          "body"
-        ],
-        "title": "CommentIn"
-      },
       "CommentOut": {
         "properties": {
           "id": {
@@ -5581,6 +7191,87 @@
         "type": "object",
         "title": "ContactUpdateIn"
       },
+      "CoupleInvitationIn": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email"
+        ],
+        "title": "CoupleInvitationIn"
+      },
+      "CoupleInvitationOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Expires At"
+          },
+          "expired": {
+            "type": "boolean",
+            "title": "Expired"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "email",
+          "expires_at",
+          "expired"
+        ],
+        "title": "CoupleInvitationOut"
+      },
+      "CoupleLoginOut": {
+        "properties": {
+          "project_member_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Project Member Id"
+          },
+          "full_name": {
+            "type": "string",
+            "title": "Full Name"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "last_login_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Login At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "project_member_id",
+          "full_name",
+          "email",
+          "last_login_at"
+        ],
+        "title": "CoupleLoginOut"
+      },
       "DashboardOut": {
         "properties": {
           "active_weddings": {
@@ -5791,6 +7482,387 @@
           "expires_at"
         ],
         "title": "InvitationOut"
+      },
+      "ItemIn": {
+        "properties": {
+          "category_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Category Id"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Title"
+          },
+          "vendor_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vendor Id"
+          },
+          "planned_cents": {
+            "type": "integer",
+            "maximum": 10000000000.0,
+            "minimum": 0.0,
+            "title": "Planned Cents",
+            "default": 0
+          },
+          "quoted_cents": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 10000000000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quoted Cents"
+          },
+          "contracted_cents": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 10000000000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contracted Cents"
+          },
+          "internal_cost_cents": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 10000000000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Internal Cost Cents"
+          },
+          "paid_by": {
+            "type": "string",
+            "enum": [
+              "client",
+              "planner"
+            ],
+            "title": "Paid By",
+            "default": "client"
+          },
+          "notes_internal": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 5000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes Internal"
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "internal",
+              "client"
+            ],
+            "title": "Visibility",
+            "default": "internal"
+          }
+        },
+        "type": "object",
+        "required": [
+          "category_id",
+          "title"
+        ],
+        "title": "ItemIn"
+      },
+      "ItemOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "category_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Category Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "vendor_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vendor Id"
+          },
+          "vendor_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vendor Name"
+          },
+          "planned_cents": {
+            "type": "integer",
+            "title": "Planned Cents"
+          },
+          "quoted_cents": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quoted Cents"
+          },
+          "contracted_cents": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contracted Cents"
+          },
+          "internal_cost_cents": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Internal Cost Cents"
+          },
+          "paid_by": {
+            "type": "string",
+            "title": "Paid By"
+          },
+          "notes_internal": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes Internal"
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "internal",
+              "client"
+            ],
+            "title": "Visibility"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "paid_cents": {
+            "type": "integer",
+            "title": "Paid Cents"
+          },
+          "payments": {
+            "items": {
+              "$ref": "#/components/schemas/PaymentOut"
+            },
+            "type": "array",
+            "title": "Payments"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "category_id",
+          "title",
+          "vendor_id",
+          "vendor_name",
+          "planned_cents",
+          "quoted_cents",
+          "contracted_cents",
+          "internal_cost_cents",
+          "paid_by",
+          "notes_internal",
+          "visibility",
+          "version",
+          "paid_cents",
+          "payments"
+        ],
+        "title": "ItemOut"
+      },
+      "ItemUpdateIn": {
+        "properties": {
+          "category_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category Id"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "vendor_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vendor Id"
+          },
+          "planned_cents": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 10000000000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Planned Cents"
+          },
+          "quoted_cents": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 10000000000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quoted Cents"
+          },
+          "contracted_cents": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 10000000000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contracted Cents"
+          },
+          "internal_cost_cents": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 10000000000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Internal Cost Cents"
+          },
+          "paid_by": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "client",
+                  "planner"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Paid By"
+          },
+          "notes_internal": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 5000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes Internal"
+          },
+          "visibility": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "internal",
+                  "client"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Visibility"
+          }
+        },
+        "type": "object",
+        "title": "ItemUpdateIn"
       },
       "LoginIn": {
         "properties": {
@@ -6542,6 +8614,793 @@
         },
         "type": "object",
         "title": "OrganizationUpdateIn"
+      },
+      "PaymentIn": {
+        "properties": {
+          "label": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Label"
+          },
+          "amount_cents": {
+            "type": "integer",
+            "maximum": 10000000000.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Amount Cents"
+          },
+          "due_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Due Date"
+          },
+          "paid": {
+            "type": "boolean",
+            "title": "Paid",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "label",
+          "amount_cents"
+        ],
+        "title": "PaymentIn"
+      },
+      "PaymentOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "amount_cents": {
+            "type": "integer",
+            "title": "Amount Cents"
+          },
+          "due_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Due Date"
+          },
+          "paid_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Paid At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "label",
+          "amount_cents",
+          "due_date",
+          "paid_at"
+        ],
+        "title": "PaymentOut"
+      },
+      "PaymentUpdateIn": {
+        "properties": {
+          "label": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label"
+          },
+          "amount_cents": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 10000000000.0,
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amount Cents"
+          },
+          "due_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Due Date"
+          },
+          "paid": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Paid"
+          }
+        },
+        "type": "object",
+        "title": "PaymentUpdateIn"
+      },
+      "PortalBudget": {
+        "properties": {
+          "total_cents": {
+            "type": "integer",
+            "title": "Total Cents"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "contracted_cents": {
+            "type": "integer",
+            "title": "Contracted Cents"
+          },
+          "paid_cents": {
+            "type": "integer",
+            "title": "Paid Cents"
+          },
+          "forecast_cents": {
+            "type": "integer",
+            "title": "Forecast Cents"
+          },
+          "categories": {
+            "items": {
+              "$ref": "#/components/schemas/PortalBudgetCategory"
+            },
+            "type": "array",
+            "title": "Categories"
+          },
+          "upcoming_payments": {
+            "items": {
+              "$ref": "#/components/schemas/PortalPayment"
+            },
+            "type": "array",
+            "title": "Upcoming Payments"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_cents",
+          "currency",
+          "contracted_cents",
+          "paid_cents",
+          "forecast_cents",
+          "categories",
+          "upcoming_payments"
+        ],
+        "title": "PortalBudget"
+      },
+      "PortalBudgetCategory": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/PortalBudgetItem"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "items"
+        ],
+        "title": "PortalBudgetCategory"
+      },
+      "PortalBudgetItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "planned_cents": {
+            "type": "integer",
+            "title": "Planned Cents"
+          },
+          "quoted_cents": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quoted Cents"
+          },
+          "contracted_cents": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contracted Cents"
+          },
+          "paid_cents": {
+            "type": "integer",
+            "title": "Paid Cents"
+          },
+          "stage": {
+            "type": "string",
+            "enum": [
+              "planned",
+              "quoted",
+              "booked"
+            ],
+            "title": "Stage"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "planned_cents",
+          "quoted_cents",
+          "contracted_cents",
+          "paid_cents",
+          "stage"
+        ],
+        "title": "PortalBudgetItem"
+      },
+      "PortalBudgetSummary": {
+        "properties": {
+          "total_cents": {
+            "type": "integer",
+            "title": "Total Cents"
+          },
+          "contracted_cents": {
+            "type": "integer",
+            "title": "Contracted Cents"
+          },
+          "paid_cents": {
+            "type": "integer",
+            "title": "Paid Cents"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_cents",
+          "contracted_cents",
+          "paid_cents",
+          "currency"
+        ],
+        "title": "PortalBudgetSummary"
+      },
+      "PortalChecklistItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "is_done": {
+            "type": "boolean",
+            "title": "Is Done"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "is_done"
+        ],
+        "title": "PortalChecklistItem"
+      },
+      "PortalChecklistUpdateIn": {
+        "properties": {
+          "is_done": {
+            "type": "boolean",
+            "title": "Is Done"
+          }
+        },
+        "type": "object",
+        "required": [
+          "is_done"
+        ],
+        "title": "PortalChecklistUpdateIn"
+      },
+      "PortalComment": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "author_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Author Name"
+          },
+          "is_mine": {
+            "type": "boolean",
+            "title": "Is Mine"
+          },
+          "body": {
+            "type": "string",
+            "title": "Body"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "author_name",
+          "is_mine",
+          "body",
+          "created_at"
+        ],
+        "title": "PortalComment"
+      },
+      "PortalMilestone": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "due_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Due Date"
+          },
+          "completed": {
+            "type": "boolean",
+            "title": "Completed"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "due_date",
+          "completed"
+        ],
+        "title": "PortalMilestone"
+      },
+      "PortalOrganization": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "accent_color": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accent Color"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "accent_color"
+        ],
+        "title": "PortalOrganization"
+      },
+      "PortalOverview": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "wedding_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wedding Date"
+          },
+          "days_to_go": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Days To Go"
+          },
+          "venue_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Venue Name"
+          },
+          "guest_count_planned": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Guest Count Planned"
+          },
+          "organization": {
+            "$ref": "#/components/schemas/PortalOrganization"
+          },
+          "progress": {
+            "$ref": "#/components/schemas/PortalProgress"
+          },
+          "next_steps": {
+            "items": {
+              "$ref": "#/components/schemas/PortalTask"
+            },
+            "type": "array",
+            "title": "Next Steps"
+          },
+          "milestones": {
+            "items": {
+              "$ref": "#/components/schemas/PortalMilestone"
+            },
+            "type": "array",
+            "title": "Milestones"
+          },
+          "team": {
+            "items": {
+              "$ref": "#/components/schemas/PortalTeamMember"
+            },
+            "type": "array",
+            "title": "Team"
+          },
+          "budget": {
+            "$ref": "#/components/schemas/PortalBudgetSummary"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "wedding_date",
+          "days_to_go",
+          "venue_name",
+          "guest_count_planned",
+          "organization",
+          "progress",
+          "next_steps",
+          "milestones",
+          "team",
+          "budget"
+        ],
+        "title": "PortalOverview"
+      },
+      "PortalPayment": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "item_title": {
+            "type": "string",
+            "title": "Item Title"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "amount_cents": {
+            "type": "integer",
+            "title": "Amount Cents"
+          },
+          "due_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Due Date"
+          },
+          "overdue": {
+            "type": "boolean",
+            "title": "Overdue"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "item_title",
+          "label",
+          "amount_cents",
+          "due_date",
+          "overdue"
+        ],
+        "title": "PortalPayment"
+      },
+      "PortalProgress": {
+        "properties": {
+          "done": {
+            "type": "integer",
+            "title": "Done"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "percent": {
+            "type": "integer",
+            "title": "Percent"
+          }
+        },
+        "type": "object",
+        "required": [
+          "done",
+          "total",
+          "percent"
+        ],
+        "title": "PortalProgress"
+      },
+      "PortalProjectSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "wedding_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wedding Date"
+          },
+          "organization": {
+            "$ref": "#/components/schemas/PortalOrganization"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "wedding_date",
+          "organization"
+        ],
+        "title": "PortalProjectSummary"
+      },
+      "PortalTask": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "in_progress",
+              "done",
+              "cancelled"
+            ],
+            "title": "Status"
+          },
+          "due_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Due Date"
+          },
+          "overdue": {
+            "type": "boolean",
+            "title": "Overdue"
+          },
+          "milestone_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Milestone Id"
+          },
+          "milestone_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Milestone Title"
+          },
+          "for_couple": {
+            "type": "boolean",
+            "title": "For Couple"
+          },
+          "checklist": {
+            "items": {
+              "$ref": "#/components/schemas/PortalChecklistItem"
+            },
+            "type": "array",
+            "title": "Checklist"
+          },
+          "comment_count": {
+            "type": "integer",
+            "title": "Comment Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "description",
+          "status",
+          "due_date",
+          "overdue",
+          "milestone_id",
+          "milestone_title",
+          "for_couple",
+          "checklist",
+          "comment_count"
+        ],
+        "title": "PortalTask"
+      },
+      "PortalTeamMember": {
+        "properties": {
+          "full_name": {
+            "type": "string",
+            "title": "Full Name"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "lead",
+              "planner"
+            ],
+            "title": "Role"
+          }
+        },
+        "type": "object",
+        "required": [
+          "full_name",
+          "role"
+        ],
+        "title": "PortalTeamMember"
       },
       "Progress": {
         "properties": {
@@ -8483,6 +11342,102 @@
         "type": "object",
         "title": "TemplateUpdateIn"
       },
+      "Totals": {
+        "properties": {
+          "planned_cents": {
+            "type": "integer",
+            "title": "Planned Cents"
+          },
+          "quoted_cents": {
+            "type": "integer",
+            "title": "Quoted Cents"
+          },
+          "contracted_cents": {
+            "type": "integer",
+            "title": "Contracted Cents"
+          },
+          "paid_cents": {
+            "type": "integer",
+            "title": "Paid Cents"
+          },
+          "forecast_cents": {
+            "type": "integer",
+            "title": "Forecast Cents"
+          },
+          "internal_cost_cents": {
+            "type": "integer",
+            "title": "Internal Cost Cents"
+          },
+          "unplanned_cents": {
+            "type": "integer",
+            "title": "Unplanned Cents"
+          }
+        },
+        "type": "object",
+        "required": [
+          "planned_cents",
+          "quoted_cents",
+          "contracted_cents",
+          "paid_cents",
+          "forecast_cents",
+          "internal_cost_cents",
+          "unplanned_cents"
+        ],
+        "title": "Totals"
+      },
+      "UpcomingPayment": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "item_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Item Id"
+          },
+          "item_title": {
+            "type": "string",
+            "title": "Item Title"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "amount_cents": {
+            "type": "integer",
+            "title": "Amount Cents"
+          },
+          "due_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Due Date"
+          },
+          "overdue": {
+            "type": "boolean",
+            "title": "Overdue"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "item_id",
+          "item_title",
+          "label",
+          "amount_cents",
+          "due_date",
+          "overdue"
+        ],
+        "title": "UpcomingPayment"
+      },
       "UpdateMeIn": {
         "properties": {
           "full_name": {
@@ -8888,6 +11843,108 @@
         },
         "type": "object",
         "title": "VendorUpdateIn"
+      },
+      "Warning": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "enum": [
+              "over_budget",
+              "near_budget",
+              "quote_above_plan",
+              "payment_overdue"
+            ],
+            "title": "Code"
+          },
+          "amount_cents": {
+            "type": "integer",
+            "title": "Amount Cents"
+          },
+          "item_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Item Id"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "amount_cents"
+        ],
+        "title": "Warning"
+      },
+      "app__portal__router__CommentIn": {
+        "properties": {
+          "body": {
+            "type": "string",
+            "maxLength": 5000,
+            "minLength": 1,
+            "title": "Body"
+          }
+        },
+        "type": "object",
+        "required": [
+          "body"
+        ],
+        "title": "CommentIn"
+      },
+      "app__tasks__schemas__CommentIn": {
+        "properties": {
+          "target_type": {
+            "type": "string",
+            "enum": [
+              "project",
+              "task",
+              "milestone"
+            ],
+            "title": "Target Type"
+          },
+          "target_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Target Id"
+          },
+          "body": {
+            "type": "string",
+            "maxLength": 5000,
+            "minLength": 1,
+            "title": "Body"
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "internal",
+              "client"
+            ],
+            "title": "Visibility",
+            "default": "internal"
+          }
+        },
+        "type": "object",
+        "required": [
+          "target_type",
+          "target_id",
+          "body"
+        ],
+        "title": "CommentIn"
       }
     }
   }

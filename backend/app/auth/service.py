@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 
 from fastapi import Response
-from sqlalchemy import select, text, update
+from sqlalchemy import func, select, text, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.audit import service as audit
@@ -30,6 +30,7 @@ from app.organizations.models import (
     MembershipStatus,
     Organization,
     OrganizationStatus,
+    OrgRole,
 )
 
 INVALID_CREDENTIALS = ProblemError(
@@ -249,6 +250,7 @@ class InvitationLookup:
     organization_name: str
     email: str
     role: str
+    project_id: uuid.UUID | None
 
 
 async def lookup_invitation(db: AsyncSession, token: str) -> InvitationLookup:
@@ -274,6 +276,7 @@ async def lookup_invitation(db: AsyncSession, token: str) -> InvitationLookup:
         organization_name=row["organization_name"],
         email=row["email"],
         role=row["role"],
+        project_id=row["project_id"],
     )
 
 
@@ -317,11 +320,10 @@ async def accept_invitation(
         db.add(user)
         await db.flush()
 
+    # The invitation token authorizes exactly the writes below (membership, wedding access,
+    # contact link), so they run with an administrative tenant context.
     await set_tenant_context(
-        db,
-        organization_id=invitation.organization_id,
-        user_id=user.id,
-        role=invitation.role,  # type: ignore[arg-type]
+        db, organization_id=invitation.organization_id, user_id=user.id, role="org_admin"
     )
     row = await db.get(Invitation, invitation.id, with_for_update=True)
     if row is None or row.accepted_at is not None or row.revoked_at is not None:
@@ -335,11 +337,17 @@ async def accept_invitation(
             )
         )
     ).scalar_one_or_none()
+    is_couple = invitation.project_id is not None
     if existing is not None and existing.status == MembershipStatus.ACTIVE:
-        raise ProblemError(
-            409, "already_member", "Already a member", "You already belong to this organization."
-        )
-    if existing is not None:
+        if not is_couple or existing.role != OrgRole.CLIENT:
+            raise ProblemError(
+                409,
+                "already_member",
+                "Already a member",
+                "You already belong to this organization.",
+            )
+        membership = existing
+    elif existing is not None:
         existing.status = MembershipStatus.ACTIVE
         existing.role = invitation.role
         membership = existing
@@ -351,6 +359,12 @@ async def accept_invitation(
             invited_by=row.invited_by,
         )
         db.add(membership)
+    await db.flush()
+
+    if is_couple:
+        assert invitation.project_id is not None
+        await _grant_wedding_access(db, invitation, membership, user)
+
     row.accepted_at = now
     user.email_verified_at = user.email_verified_at or now
     await db.flush()
@@ -365,3 +379,41 @@ async def accept_invitation(
         changes={"role": {"new": invitation.role}},
     )
     return user
+
+
+async def _grant_wedding_access(
+    db: AsyncSession, invitation: InvitationLookup, membership: Membership, user: User
+) -> None:
+    from app.clients.models import ClientContact
+    from app.projects.models import Project, ProjectMember, ProjectRole
+
+    project = await db.get(Project, invitation.project_id)
+    if project is None or project.deleted_at is not None:
+        raise INVITATION_INVALID
+    already = (
+        await db.execute(
+            select(ProjectMember.id).where(
+                ProjectMember.project_id == project.id,
+                ProjectMember.membership_id == membership.id,
+            )
+        )
+    ).scalar_one_or_none()
+    if already is None:
+        db.add(
+            ProjectMember(
+                organization_id=invitation.organization_id,
+                project_id=project.id,
+                membership_id=membership.id,
+                project_role=ProjectRole.CLIENT,
+            )
+        )
+    contacts = (
+        await db.execute(
+            select(ClientContact).where(
+                ClientContact.client_id == project.client_id,
+                func.lower(ClientContact.email) == user.email,
+            )
+        )
+    ).scalars()
+    for contact in contacts:
+        contact.user_id = user.id

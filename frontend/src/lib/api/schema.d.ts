@@ -637,6 +637,74 @@ export interface paths {
         patch: operations["update_vendor_api_v1_orgs__org_id__projects__project_id__vendors__link_id__patch"];
         trace?: never;
     };
+    "/api/v1/orgs/{org_id}/projects/{project_id}/client-access": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Client Access */
+        get: operations["get_client_access_api_v1_orgs__org_id__projects__project_id__client_access_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orgs/{org_id}/projects/{project_id}/client-access/invitations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Invite Couple */
+        post: operations["invite_couple_api_v1_orgs__org_id__projects__project_id__client_access_invitations_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orgs/{org_id}/projects/{project_id}/client-access/invitations/{invitation_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Revoke Couple Invitation */
+        delete: operations["revoke_couple_invitation_api_v1_orgs__org_id__projects__project_id__client_access_invitations__invitation_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orgs/{org_id}/projects/{project_id}/client-access/{member_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Revoke Couple Login */
+        delete: operations["revoke_couple_login_api_v1_orgs__org_id__projects__project_id__client_access__member_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/orgs/{org_id}/tasks": {
         parameters: {
             query?: never;
@@ -866,6 +934,266 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/orgs/{org_id}/projects/{project_id}/budget": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Budget */
+        get: operations["get_budget_api_v1_orgs__org_id__projects__project_id__budget_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Budget */
+        patch: operations["update_budget_api_v1_orgs__org_id__projects__project_id__budget_patch"];
+        trace?: never;
+    };
+    "/api/v1/orgs/{org_id}/projects/{project_id}/budget/categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add Category */
+        post: operations["add_category_api_v1_orgs__org_id__projects__project_id__budget_categories_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orgs/{org_id}/projects/{project_id}/budget/categories/{category_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Category */
+        delete: operations["delete_category_api_v1_orgs__org_id__projects__project_id__budget_categories__category_id__delete"];
+        options?: never;
+        head?: never;
+        /** Update Category */
+        patch: operations["update_category_api_v1_orgs__org_id__projects__project_id__budget_categories__category_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/orgs/{org_id}/projects/{project_id}/budget/items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add Item */
+        post: operations["add_item_api_v1_orgs__org_id__projects__project_id__budget_items_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orgs/{org_id}/projects/{project_id}/budget/items/{item_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Item */
+        delete: operations["delete_item_api_v1_orgs__org_id__projects__project_id__budget_items__item_id__delete"];
+        options?: never;
+        head?: never;
+        /** Update Item */
+        patch: operations["update_item_api_v1_orgs__org_id__projects__project_id__budget_items__item_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/orgs/{org_id}/projects/{project_id}/budget/items/{item_id}/payments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add Payment */
+        post: operations["add_payment_api_v1_orgs__org_id__projects__project_id__budget_items__item_id__payments_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orgs/{org_id}/projects/{project_id}/budget/items/{item_id}/payments/{payment_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Payment */
+        delete: operations["delete_payment_api_v1_orgs__org_id__projects__project_id__budget_items__item_id__payments__payment_id__delete"];
+        options?: never;
+        head?: never;
+        /** Update Payment */
+        patch: operations["update_payment_api_v1_orgs__org_id__projects__project_id__budget_items__item_id__payments__payment_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/portal/projects": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Projects */
+        get: operations["projects_api_v1_portal_projects_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/portal/projects/{project_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Overview */
+        get: operations["overview_api_v1_portal_projects__project_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/portal/projects/{project_id}/tasks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Tasks */
+        get: operations["tasks_api_v1_portal_projects__project_id__tasks_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/portal/projects/{project_id}/tasks/{task_id}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Complete */
+        post: operations["complete_api_v1_portal_projects__project_id__tasks__task_id__complete_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/portal/projects/{project_id}/tasks/{task_id}/reopen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reopen */
+        post: operations["reopen_api_v1_portal_projects__project_id__tasks__task_id__reopen_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/portal/projects/{project_id}/tasks/{task_id}/checklist/{item_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Tick */
+        patch: operations["tick_api_v1_portal_projects__project_id__tasks__task_id__checklist__item_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/portal/projects/{project_id}/tasks/{task_id}/comments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Comments */
+        get: operations["comments_api_v1_portal_projects__project_id__tasks__task_id__comments_get"];
+        put?: never;
+        /** Add Comment */
+        post: operations["add_comment_api_v1_portal_projects__project_id__tasks__task_id__comments_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/portal/projects/{project_id}/budget": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Budget */
+        get: operations["budget_api_v1_portal_projects__project_id__budget_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -951,6 +1279,66 @@ export interface components {
             /** Next Cursor */
             next_cursor: string | null;
         };
+        /** BudgetOut */
+        BudgetOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Total Cents */
+            total_cents: number;
+            /** Currency */
+            currency: string;
+            /** Warning Threshold Pct */
+            warning_threshold_pct: number;
+            /** Version */
+            version: number;
+            totals: components["schemas"]["Totals"];
+            /** Warnings */
+            warnings: components["schemas"]["Warning"][];
+            /** Categories */
+            categories: components["schemas"]["CategoryOut"][];
+            /** Upcoming Payments */
+            upcoming_payments: components["schemas"]["UpcomingPayment"][];
+        };
+        /** BudgetUpdateIn */
+        BudgetUpdateIn: {
+            /** Total Cents */
+            total_cents?: number | null;
+            /** Warning Threshold Pct */
+            warning_threshold_pct?: number | null;
+        };
+        /** CategoryIn */
+        CategoryIn: {
+            /** Name */
+            name: string;
+        };
+        /** CategoryOut */
+        CategoryOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Position */
+            position: number;
+            /** Planned Cents */
+            planned_cents: number;
+            /** Forecast Cents */
+            forecast_cents: number;
+            /** Items */
+            items: components["schemas"]["ItemOut"][];
+        };
+        /** CategoryUpdateIn */
+        CategoryUpdateIn: {
+            /** Name */
+            name?: string | null;
+            /** Position */
+            position?: number | null;
+        };
         /** ChangePasswordIn */
         ChangePasswordIn: {
             /** Current Password */
@@ -983,6 +1371,13 @@ export interface components {
             title?: string | null;
             /** Is Done */
             is_done?: boolean | null;
+        };
+        /** ClientAccessOut */
+        ClientAccessOut: {
+            /** Logins */
+            logins: components["schemas"]["CoupleLoginOut"][];
+            /** Invitations */
+            invitations: components["schemas"]["CoupleInvitationOut"][];
         };
         /** ClientDetailOut */
         ClientDetailOut: {
@@ -1092,27 +1487,6 @@ export interface components {
             /** Notes Internal */
             notes_internal?: string | null;
         };
-        /** CommentIn */
-        CommentIn: {
-            /**
-             * Target Type
-             * @enum {string}
-             */
-            target_type: "project" | "task" | "milestone";
-            /**
-             * Target Id
-             * Format: uuid
-             */
-            target_id: string;
-            /** Body */
-            body: string;
-            /**
-             * Visibility
-             * @default internal
-             * @enum {string}
-             */
-            visibility: "internal" | "client";
-        };
         /** CommentOut */
         CommentOut: {
             /**
@@ -1209,6 +1583,45 @@ export interface components {
             role?: ("partner" | "family" | "other") | null;
             /** Is Primary */
             is_primary?: boolean | null;
+        };
+        /** CoupleInvitationIn */
+        CoupleInvitationIn: {
+            /**
+             * Email
+             * Format: email
+             */
+            email: string;
+        };
+        /** CoupleInvitationOut */
+        CoupleInvitationOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Email */
+            email: string;
+            /**
+             * Expires At
+             * Format: date-time
+             */
+            expires_at: string;
+            /** Expired */
+            expired: boolean;
+        };
+        /** CoupleLoginOut */
+        CoupleLoginOut: {
+            /**
+             * Project Member Id
+             * Format: uuid
+             */
+            project_member_id: string;
+            /** Full Name */
+            full_name: string;
+            /** Email */
+            email: string;
+            /** Last Login At */
+            last_login_at: string | null;
         };
         /** DashboardOut */
         DashboardOut: {
@@ -1312,6 +1725,108 @@ export interface components {
              * Format: date-time
              */
             expires_at: string;
+        };
+        /** ItemIn */
+        ItemIn: {
+            /**
+             * Category Id
+             * Format: uuid
+             */
+            category_id: string;
+            /** Title */
+            title: string;
+            /** Vendor Id */
+            vendor_id?: string | null;
+            /**
+             * Planned Cents
+             * @default 0
+             */
+            planned_cents: number;
+            /** Quoted Cents */
+            quoted_cents?: number | null;
+            /** Contracted Cents */
+            contracted_cents?: number | null;
+            /** Internal Cost Cents */
+            internal_cost_cents?: number | null;
+            /**
+             * Paid By
+             * @default client
+             * @enum {string}
+             */
+            paid_by: "client" | "planner";
+            /** Notes Internal */
+            notes_internal?: string | null;
+            /**
+             * Visibility
+             * @default internal
+             * @enum {string}
+             */
+            visibility: "internal" | "client";
+        };
+        /** ItemOut */
+        ItemOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Category Id
+             * Format: uuid
+             */
+            category_id: string;
+            /** Title */
+            title: string;
+            /** Vendor Id */
+            vendor_id: string | null;
+            /** Vendor Name */
+            vendor_name: string | null;
+            /** Planned Cents */
+            planned_cents: number;
+            /** Quoted Cents */
+            quoted_cents: number | null;
+            /** Contracted Cents */
+            contracted_cents: number | null;
+            /** Internal Cost Cents */
+            internal_cost_cents: number | null;
+            /** Paid By */
+            paid_by: string;
+            /** Notes Internal */
+            notes_internal: string | null;
+            /**
+             * Visibility
+             * @enum {string}
+             */
+            visibility: "internal" | "client";
+            /** Version */
+            version: number;
+            /** Paid Cents */
+            paid_cents: number;
+            /** Payments */
+            payments: components["schemas"]["PaymentOut"][];
+        };
+        /** ItemUpdateIn */
+        ItemUpdateIn: {
+            /** Category Id */
+            category_id?: string | null;
+            /** Title */
+            title?: string | null;
+            /** Vendor Id */
+            vendor_id?: string | null;
+            /** Planned Cents */
+            planned_cents?: number | null;
+            /** Quoted Cents */
+            quoted_cents?: number | null;
+            /** Contracted Cents */
+            contracted_cents?: number | null;
+            /** Internal Cost Cents */
+            internal_cost_cents?: number | null;
+            /** Paid By */
+            paid_by?: ("client" | "planner") | null;
+            /** Notes Internal */
+            notes_internal?: string | null;
+            /** Visibility */
+            visibility?: ("internal" | "client") | null;
         };
         /** LoginIn */
         LoginIn: {
@@ -1565,6 +2080,275 @@ export interface components {
             timezone?: ("Europe/Berlin" | "Europe/Vienna" | "Europe/Zurich" | "Europe/London") | null;
             /** Client Access Days After Archive */
             client_access_days_after_archive?: number | null;
+        };
+        /** PaymentIn */
+        PaymentIn: {
+            /** Label */
+            label: string;
+            /** Amount Cents */
+            amount_cents: number;
+            /** Due Date */
+            due_date?: string | null;
+            /**
+             * Paid
+             * @default false
+             */
+            paid: boolean;
+        };
+        /** PaymentOut */
+        PaymentOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Label */
+            label: string;
+            /** Amount Cents */
+            amount_cents: number;
+            /** Due Date */
+            due_date: string | null;
+            /** Paid At */
+            paid_at: string | null;
+        };
+        /** PaymentUpdateIn */
+        PaymentUpdateIn: {
+            /** Label */
+            label?: string | null;
+            /** Amount Cents */
+            amount_cents?: number | null;
+            /** Due Date */
+            due_date?: string | null;
+            /** Paid */
+            paid?: boolean | null;
+        };
+        /** PortalBudget */
+        PortalBudget: {
+            /** Total Cents */
+            total_cents: number;
+            /** Currency */
+            currency: string;
+            /** Contracted Cents */
+            contracted_cents: number;
+            /** Paid Cents */
+            paid_cents: number;
+            /** Forecast Cents */
+            forecast_cents: number;
+            /** Categories */
+            categories: components["schemas"]["PortalBudgetCategory"][];
+            /** Upcoming Payments */
+            upcoming_payments: components["schemas"]["PortalPayment"][];
+        };
+        /** PortalBudgetCategory */
+        PortalBudgetCategory: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Items */
+            items: components["schemas"]["PortalBudgetItem"][];
+        };
+        /** PortalBudgetItem */
+        PortalBudgetItem: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Title */
+            title: string;
+            /** Planned Cents */
+            planned_cents: number;
+            /** Quoted Cents */
+            quoted_cents: number | null;
+            /** Contracted Cents */
+            contracted_cents: number | null;
+            /** Paid Cents */
+            paid_cents: number;
+            /**
+             * Stage
+             * @enum {string}
+             */
+            stage: "planned" | "quoted" | "booked";
+        };
+        /** PortalBudgetSummary */
+        PortalBudgetSummary: {
+            /** Total Cents */
+            total_cents: number;
+            /** Contracted Cents */
+            contracted_cents: number;
+            /** Paid Cents */
+            paid_cents: number;
+            /** Currency */
+            currency: string;
+        };
+        /** PortalChecklistItem */
+        PortalChecklistItem: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Title */
+            title: string;
+            /** Is Done */
+            is_done: boolean;
+        };
+        /** PortalChecklistUpdateIn */
+        PortalChecklistUpdateIn: {
+            /** Is Done */
+            is_done: boolean;
+        };
+        /** PortalComment */
+        PortalComment: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Author Name */
+            author_name: string | null;
+            /** Is Mine */
+            is_mine: boolean;
+            /** Body */
+            body: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** PortalMilestone */
+        PortalMilestone: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Title */
+            title: string;
+            /** Due Date */
+            due_date: string | null;
+            /** Completed */
+            completed: boolean;
+        };
+        /** PortalOrganization */
+        PortalOrganization: {
+            /** Name */
+            name: string;
+            /** Accent Color */
+            accent_color: string | null;
+        };
+        /** PortalOverview */
+        PortalOverview: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Title */
+            title: string;
+            /** Wedding Date */
+            wedding_date: string | null;
+            /** Days To Go */
+            days_to_go: number | null;
+            /** Venue Name */
+            venue_name: string | null;
+            /** Guest Count Planned */
+            guest_count_planned: number | null;
+            organization: components["schemas"]["PortalOrganization"];
+            progress: components["schemas"]["PortalProgress"];
+            /** Next Steps */
+            next_steps: components["schemas"]["PortalTask"][];
+            /** Milestones */
+            milestones: components["schemas"]["PortalMilestone"][];
+            /** Team */
+            team: components["schemas"]["PortalTeamMember"][];
+            budget: components["schemas"]["PortalBudgetSummary"];
+        };
+        /** PortalPayment */
+        PortalPayment: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Item Title */
+            item_title: string;
+            /** Label */
+            label: string;
+            /** Amount Cents */
+            amount_cents: number;
+            /** Due Date */
+            due_date: string | null;
+            /** Overdue */
+            overdue: boolean;
+        };
+        /** PortalProgress */
+        PortalProgress: {
+            /** Done */
+            done: number;
+            /** Total */
+            total: number;
+            /** Percent */
+            percent: number;
+        };
+        /** PortalProjectSummary */
+        PortalProjectSummary: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Title */
+            title: string;
+            /** Wedding Date */
+            wedding_date: string | null;
+            organization: components["schemas"]["PortalOrganization"];
+        };
+        /** PortalTask */
+        PortalTask: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Title */
+            title: string;
+            /** Description */
+            description: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "open" | "in_progress" | "done" | "cancelled";
+            /** Due Date */
+            due_date: string | null;
+            /** Overdue */
+            overdue: boolean;
+            /** Milestone Id */
+            milestone_id: string | null;
+            /** Milestone Title */
+            milestone_title: string | null;
+            /** For Couple */
+            for_couple: boolean;
+            /** Checklist */
+            checklist: components["schemas"]["PortalChecklistItem"][];
+            /** Comment Count */
+            comment_count: number;
+        };
+        /** PortalTeamMember */
+        PortalTeamMember: {
+            /** Full Name */
+            full_name: string;
+            /**
+             * Role
+             * @enum {string}
+             */
+            role: "lead" | "planner";
         };
         /** Progress */
         Progress: {
@@ -2152,6 +2936,46 @@ export interface components {
             /** Is Default */
             is_default?: boolean | null;
         };
+        /** Totals */
+        Totals: {
+            /** Planned Cents */
+            planned_cents: number;
+            /** Quoted Cents */
+            quoted_cents: number;
+            /** Contracted Cents */
+            contracted_cents: number;
+            /** Paid Cents */
+            paid_cents: number;
+            /** Forecast Cents */
+            forecast_cents: number;
+            /** Internal Cost Cents */
+            internal_cost_cents: number;
+            /** Unplanned Cents */
+            unplanned_cents: number;
+        };
+        /** UpcomingPayment */
+        UpcomingPayment: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Item Id
+             * Format: uuid
+             */
+            item_id: string;
+            /** Item Title */
+            item_title: string;
+            /** Label */
+            label: string;
+            /** Amount Cents */
+            amount_cents: number;
+            /** Due Date */
+            due_date: string | null;
+            /** Overdue */
+            overdue: boolean;
+        };
         /** UpdateMeIn */
         UpdateMeIn: {
             /** Full Name */
@@ -2241,6 +3065,46 @@ export interface components {
             notes_internal?: string | null;
             /** Rating */
             rating?: number | null;
+        };
+        /** Warning */
+        Warning: {
+            /**
+             * Code
+             * @enum {string}
+             */
+            code: "over_budget" | "near_budget" | "quote_above_plan" | "payment_overdue";
+            /** Amount Cents */
+            amount_cents: number;
+            /** Item Id */
+            item_id?: string | null;
+            /** Title */
+            title?: string | null;
+        };
+        /** CommentIn */
+        app__portal__router__CommentIn: {
+            /** Body */
+            body: string;
+        };
+        /** CommentIn */
+        app__tasks__schemas__CommentIn: {
+            /**
+             * Target Type
+             * @enum {string}
+             */
+            target_type: "project" | "task" | "milestone";
+            /**
+             * Target Id
+             * Format: uuid
+             */
+            target_id: string;
+            /** Body */
+            body: string;
+            /**
+             * Visibility
+             * @default internal
+             * @enum {string}
+             */
+            visibility: "internal" | "client";
         };
     };
     responses: never;
@@ -4105,6 +4969,136 @@ export interface operations {
             };
         };
     };
+    get_client_access_api_v1_orgs__org_id__projects__project_id__client_access_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                org_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientAccessOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    invite_couple_api_v1_orgs__org_id__projects__project_id__client_access_invitations_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                org_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CoupleInvitationIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientAccessOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    revoke_couple_invitation_api_v1_orgs__org_id__projects__project_id__client_access_invitations__invitation_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                invitation_id: string;
+                org_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    revoke_couple_login_api_v1_orgs__org_id__projects__project_id__client_access__member_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                member_id: string;
+                org_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     my_tasks_api_v1_orgs__org_id__tasks_get: {
         parameters: {
             query?: {
@@ -4706,7 +5700,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["CommentIn"];
+                "application/json": components["schemas"]["app__tasks__schemas__CommentIn"];
             };
         };
         responses: {
@@ -4820,6 +5814,675 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ActivityPageOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_budget_api_v1_orgs__org_id__projects__project_id__budget_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                org_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BudgetOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_budget_api_v1_orgs__org_id__projects__project_id__budget_patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                "if-match"?: string | null;
+            };
+            path: {
+                org_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BudgetUpdateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BudgetOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_category_api_v1_orgs__org_id__projects__project_id__budget_categories_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                org_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CategoryIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BudgetOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_category_api_v1_orgs__org_id__projects__project_id__budget_categories__category_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                category_id: string;
+                org_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_category_api_v1_orgs__org_id__projects__project_id__budget_categories__category_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                category_id: string;
+                org_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CategoryUpdateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BudgetOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_item_api_v1_orgs__org_id__projects__project_id__budget_items_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                org_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ItemIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BudgetOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_item_api_v1_orgs__org_id__projects__project_id__budget_items__item_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+                org_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_item_api_v1_orgs__org_id__projects__project_id__budget_items__item_id__patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                "if-match"?: string | null;
+            };
+            path: {
+                item_id: string;
+                org_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ItemUpdateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BudgetOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_payment_api_v1_orgs__org_id__projects__project_id__budget_items__item_id__payments_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+                org_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PaymentIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BudgetOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_payment_api_v1_orgs__org_id__projects__project_id__budget_items__item_id__payments__payment_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+                payment_id: string;
+                org_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_payment_api_v1_orgs__org_id__projects__project_id__budget_items__item_id__payments__payment_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+                payment_id: string;
+                org_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PaymentUpdateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BudgetOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    projects_api_v1_portal_projects_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PortalProjectSummary"][];
+                };
+            };
+        };
+    };
+    overview_api_v1_portal_projects__project_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PortalOverview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    tasks_api_v1_portal_projects__project_id__tasks_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PortalTask"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    complete_api_v1_portal_projects__project_id__tasks__task_id__complete_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                task_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PortalTask"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reopen_api_v1_portal_projects__project_id__tasks__task_id__reopen_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                task_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PortalTask"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    tick_api_v1_portal_projects__project_id__tasks__task_id__checklist__item_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                task_id: string;
+                item_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PortalChecklistUpdateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PortalTask"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    comments_api_v1_portal_projects__project_id__tasks__task_id__comments_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                task_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PortalComment"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_comment_api_v1_portal_projects__project_id__tasks__task_id__comments_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                task_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["app__portal__router__CommentIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PortalComment"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    budget_api_v1_portal_projects__project_id__budget_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PortalBudget"];
                 };
             };
             /** @description Validation Error */

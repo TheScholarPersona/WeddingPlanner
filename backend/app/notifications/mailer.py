@@ -84,3 +84,19 @@ def password_reset_email(to: str, link: str) -> Email:
             "you can ignore this email; your password stays unchanged.\n"
         ),
     )
+
+
+def couple_invitation_email(
+    to: str, organization_name: str, wedding_title: str, link: str
+) -> Email:
+    return Email(
+        to=to,
+        subject=f"Your wedding portal with {organization_name}",
+        text=(
+            f"Hello,\n\n{organization_name} invited you to the wedding portal for "
+            f"“{wedding_title}”. There you can follow your planning, tick off your tasks and "
+            f"keep an eye on your budget.\n\nCreate your access here:\n{link}\n\n"
+            "The link is valid for 7 days and can be used once. If you did not expect this "
+            "email, you can ignore it.\n"
+        ),
+    )

@@ -2,6 +2,7 @@
 
 from app.audit.models import AuditLog
 from app.auth.models import PasswordResetToken, User, UserSession
+from app.budget.models import Budget, BudgetCategory, BudgetItem, Payment
 from app.clients.models import Client, ClientContact
 from app.organizations.models import Invitation, Membership, Organization
 from app.projects.models import Project, ProjectMember, ProjectVendor
@@ -12,6 +13,9 @@ from app.vendors.models import Vendor
 __all__ = [
     "ActivityEvent",
     "AuditLog",
+    "Budget",
+    "BudgetCategory",
+    "BudgetItem",
     "Client",
     "ClientContact",
     "Comment",
@@ -20,6 +24,7 @@ __all__ = [
     "Milestone",
     "Organization",
     "PasswordResetToken",
+    "Payment",
     "Project",
     "ProjectMember",
     "ProjectTemplate",

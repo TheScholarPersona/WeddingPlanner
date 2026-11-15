@@ -70,9 +70,14 @@ export function AcceptInvitationPage() {
   return (
     <AuthLayout
       title={t('auth.invite.title')}
-      subtitle={t(existing ? 'auth.invite.subtitleExisting' : 'auth.invite.subtitleNew', {
-        organization,
-      })}
+      subtitle={t(
+        info.data.role === 'client'
+          ? 'auth.invite.subtitleCouple'
+          : existing
+            ? 'auth.invite.subtitleExisting'
+            : 'auth.invite.subtitleNew',
+        { organization },
+      )}
     >
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
         <div className="flex flex-col gap-2">
@@ -119,7 +124,9 @@ export function AcceptInvitationPage() {
           <FormMessage>{errorMessage(accept.error, t)}</FormMessage>
         )}
         <Button type="submit" disabled={accept.isPending}>
-          {t('auth.invite.submit', { organization })}
+          {info.data.role === 'client'
+            ? t('auth.invite.openPortal')
+            : t('auth.invite.submit', { organization })}
         </Button>
       </form>
     </AuthLayout>

@@ -65,16 +65,36 @@ class ProjectPerm(StrEnum):
     TASKS_READ = "tasks:read"
     TASKS_WRITE = "tasks:write"
     COMMENT = "comments:write"
+    BUDGET_READ = "budget:read"
+    BUDGET_WRITE = "budget:write"
+    BUDGET_SET_TOTAL = "budget:set_total"
+    CLIENT_ACCESS = "client_access:manage"
 
 
 # Org admins act as "admin" in every wedding: everything a lead may do, plus deleting.
 ADMIN_PROJECT_ROLE = "admin"
 
 _VIEWER = frozenset(
-    {ProjectPerm.READ, ProjectPerm.VENDORS_READ, ProjectPerm.TASKS_READ, ProjectPerm.COMMENT}
+    {
+        ProjectPerm.READ,
+        ProjectPerm.VENDORS_READ,
+        ProjectPerm.TASKS_READ,
+        ProjectPerm.COMMENT,
+        ProjectPerm.BUDGET_READ,
+    }
 )
-_PLANNER = _VIEWER | {ProjectPerm.UPDATE, ProjectPerm.VENDORS_MANAGE, ProjectPerm.TASKS_WRITE}
-_LEAD = _PLANNER | {ProjectPerm.MANAGE_TEAM, ProjectPerm.ARCHIVE}
+_PLANNER = _VIEWER | {
+    ProjectPerm.UPDATE,
+    ProjectPerm.VENDORS_MANAGE,
+    ProjectPerm.TASKS_WRITE,
+    ProjectPerm.BUDGET_WRITE,
+}
+_LEAD = _PLANNER | {
+    ProjectPerm.MANAGE_TEAM,
+    ProjectPerm.ARCHIVE,
+    ProjectPerm.BUDGET_SET_TOTAL,
+    ProjectPerm.CLIENT_ACCESS,
+}
 
 PROJECT_ROLE_PERMS: dict[str, frozenset[ProjectPerm]] = {
     ADMIN_PROJECT_ROLE: frozenset(ProjectPerm),

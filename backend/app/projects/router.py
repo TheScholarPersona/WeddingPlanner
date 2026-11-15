@@ -5,7 +5,7 @@ from fastapi import APIRouter, Header, Response, status
 
 from app.authz.deps import DbSession, OrgContext, ProjectContext, require, require_project
 from app.authz.permissions import Perm, ProjectPerm
-from app.projects import service
+from app.projects import client_access, service
 from app.projects.schemas import (
     DashboardOut,
     ProjectCreateIn,
@@ -177,3 +177,42 @@ async def remove_vendor(
     ctx: ProjectContext = require_project(ProjectPerm.VENDORS_MANAGE),
 ) -> None:
     await service.remove_vendor(db, ctx, link_id)
+
+
+@router.get(f"{P}/client-access", response_model=client_access.ClientAccessOut)
+async def get_client_access(
+    db: DbSession, ctx: ProjectContext = require_project(ProjectPerm.CLIENT_ACCESS)
+) -> client_access.ClientAccessOut:
+    return await client_access.get_access(db, ctx)
+
+
+@router.post(
+    f"{P}/client-access/invitations", response_model=client_access.ClientAccessOut, status_code=201
+)
+async def invite_couple(
+    body: client_access.CoupleInvitationIn,
+    db: DbSession,
+    ctx: ProjectContext = require_project(ProjectPerm.CLIENT_ACCESS),
+) -> client_access.ClientAccessOut:
+    await client_access.invite_couple(db, ctx, body)
+    return await client_access.get_access(db, ctx)
+
+
+@router.delete(
+    f"{P}/client-access/invitations/{{invitation_id}}", status_code=status.HTTP_204_NO_CONTENT
+)
+async def revoke_couple_invitation(
+    invitation_id: uuid.UUID,
+    db: DbSession,
+    ctx: ProjectContext = require_project(ProjectPerm.CLIENT_ACCESS),
+) -> None:
+    await client_access.revoke_invitation(db, ctx, invitation_id)
+
+
+@router.delete(f"{P}/client-access/{{member_id}}", status_code=status.HTTP_204_NO_CONTENT)
+async def revoke_couple_login(
+    member_id: uuid.UUID,
+    db: DbSession,
+    ctx: ProjectContext = require_project(ProjectPerm.CLIENT_ACCESS),
+) -> None:
+    await client_access.revoke_login(db, ctx, member_id)
