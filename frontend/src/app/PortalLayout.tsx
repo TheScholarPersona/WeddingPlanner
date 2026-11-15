@@ -23,7 +23,7 @@ export function PortalLayout() {
     <div className="mx-auto flex min-h-screen max-w-3xl flex-col bg-ground">
       <header className="flex items-center justify-between gap-4 px-5 pt-6">
         <span className="font-display text-xl font-semibold">{organization}</span>
-        <UserMenu compact />
+        <UserMenu compact settingsPath="/portal/notifications" />
       </header>
       <main id="main" className="flex-1 px-5 pt-6 pb-28">
         <Outlet />

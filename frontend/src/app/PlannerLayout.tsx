@@ -84,7 +84,7 @@ export function PlannerLayout() {
             ))}
           </div>
           <div className="border-t border-line pt-3">
-            <UserMenu />
+            <UserMenu settingsPath="/app/notifications" />
           </div>
         </div>
       </nav>

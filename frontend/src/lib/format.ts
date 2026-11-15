@@ -43,3 +43,34 @@ export function describeOffset(days: number): string {
   if (abs % 7 === 0 && abs >= 14) return `${abs / 7} weeks ${when}`;
   return `${abs} ${abs === 1 ? 'day' : 'days'} ${when}`;
 }
+
+export function formatTime(value: string, locale = DEFAULT_FORMAT_LOCALE): string {
+  return new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' }).format(
+    new Date(value),
+  );
+}
+
+/** "12 Jun" style day and month, e.g. for agenda rows. */
+export function formatDayMonth(value: string, locale = DEFAULT_FORMAT_LOCALE): string {
+  return new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short' }).format(
+    new Date(`${value}T12:00:00`),
+  );
+}
+
+export function formatFileSize(bytes: number, locale = DEFAULT_FORMAT_LOCALE): string {
+  const units = ['B', 'KB', 'MB', 'GB'];
+  let value = bytes;
+  let unit = 0;
+  while (value >= 1024 && unit < units.length - 1) {
+    value /= 1024;
+    unit += 1;
+  }
+  const digits = unit === 0 || value >= 10 ? 0 : 1;
+  return `${new Intl.NumberFormat(locale, { maximumFractionDigits: digits }).format(value)} ${units[unit]}`;
+}
+
+/** Local calendar date "YYYY-MM-DD" of a Date (no UTC shift). */
+export function isoDate(date: Date): string {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}

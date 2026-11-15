@@ -2,6 +2,8 @@ import { createBrowserRouter, Navigate, type RouteObject } from 'react-router';
 
 import { AcceptInvitationPage } from '@/features/auth/AcceptInvitationPage';
 import { BudgetPage } from '@/features/budget/BudgetPage';
+import { CalendarPage } from '@/features/calendar/CalendarPage';
+import { WeddingCalendarPage } from '@/features/calendar/WeddingCalendarPage';
 import { ForgotPasswordPage } from '@/features/auth/ForgotPasswordPage';
 import { RequireClient, RequireTeam } from '@/features/auth/guards';
 import { LoginPage } from '@/features/auth/LoginPage';
@@ -9,10 +11,14 @@ import { NoAccessPage } from '@/features/auth/NoAccessPage';
 import { ResetPasswordPage } from '@/features/auth/ResetPasswordPage';
 import { ClientPage } from '@/features/clients/ClientPage';
 import { ClientsPage } from '@/features/clients/ClientsPage';
-import { ComingSoonPage } from '@/features/planner/ComingSoonPage';
+import { DocumentsPage } from '@/features/documents/DocumentsPage';
+import { NotificationsPage } from '@/features/notifications/NotificationsPage';
 import { DashboardPage } from '@/features/planner/DashboardPage';
 import { PortalBudgetPage } from '@/features/portal/PortalBudgetPage';
+import { PortalCalendarPage } from '@/features/portal/PortalCalendarPage';
+import { PortalFilesPage } from '@/features/portal/PortalFilesPage';
 import { PortalHomePage } from '@/features/portal/PortalHomePage';
+import { PortalNotificationsPage } from '@/features/portal/PortalNotificationsPage';
 import { PortalTasksPage } from '@/features/portal/PortalTasksPage';
 import { SettingsPage } from '@/features/settings/SettingsPage';
 import { MyTasksPage } from '@/features/tasks/MyTasksPage';
@@ -28,8 +34,6 @@ import { WeddingsPage } from '@/features/weddings/WeddingsPage';
 import { NotFoundPage } from './NotFoundPage';
 import { PlannerLayout } from './PlannerLayout';
 import { PortalLayout } from './PortalLayout';
-
-const comingSoon = ['calendar'];
 
 export const routes: RouteObject[] = [
   { path: '/', element: <Navigate to="/login" replace /> },
@@ -54,13 +58,16 @@ export const routes: RouteObject[] = [
       { path: 'weddings/:id', element: <WeddingPage /> },
       { path: 'weddings/:id/tasks', element: <WeddingTasksPage /> },
       { path: 'weddings/:id/budget', element: <BudgetPage /> },
+      { path: 'weddings/:id/documents', element: <DocumentsPage /> },
+      { path: 'weddings/:id/calendar', element: <WeddingCalendarPage /> },
+      { path: 'calendar', element: <CalendarPage /> },
+      { path: 'notifications', element: <NotificationsPage /> },
       { path: 'tasks', element: <MyTasksPage /> },
       { path: 'clients', element: <ClientsPage /> },
       { path: 'clients/:id', element: <ClientPage /> },
       { path: 'vendors', element: <VendorsPage /> },
       { path: 'templates', element: <TemplatesPage /> },
       { path: 'templates/:id', element: <TemplatePage /> },
-      ...comingSoon.map((path) => ({ path, element: <ComingSoonPage /> })),
     ],
   },
   {
@@ -74,10 +81,9 @@ export const routes: RouteObject[] = [
       { index: true, element: <PortalHomePage /> },
       { path: 'tasks', element: <PortalTasksPage /> },
       { path: 'budget', element: <PortalBudgetPage /> },
-      ...['calendar', 'files'].map((path) => ({
-        path,
-        element: <ComingSoonPage />,
-      })),
+      { path: 'calendar', element: <PortalCalendarPage /> },
+      { path: 'files', element: <PortalFilesPage /> },
+      { path: 'notifications', element: <PortalNotificationsPage /> },
     ],
   },
   { path: '*', element: <NotFoundPage /> },

@@ -17,7 +17,15 @@ export function mockApi(handlers: Record<string, Handler | [number, unknown?]>) 
     const url = new URL(String(input), 'https://test');
     const method = init?.method ?? 'GET';
     const path = url.pathname.replace(/^\/api\/v1/, '');
-    const body = init?.body ? JSON.parse(String(init.body)) : undefined;
+    const raw = init?.body;
+    const body =
+      raw instanceof FormData
+        ? Object.fromEntries(
+            [...raw.entries()].map(([k, v]) => [k, typeof v === 'string' ? v : (v as File).name]),
+          )
+        : raw
+          ? JSON.parse(String(raw))
+          : undefined;
     calls.push({ method, path, body, headers: (init?.headers ?? {}) as Record<string, string> });
     const handler = handlers[`${method} ${path}${url.search}`] ?? handlers[`${method} ${path}`];
     if (!handler) throw new Error(`Unexpected request: ${method} ${path}`);
