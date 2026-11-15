@@ -1,0 +1,48 @@
+@import 'tailwindcss';
+
+/*
+ * Design tokens from the approved wireframes: warm ivory ground, sage accent,
+ * Cormorant Garamond for display type, Inter for everything else.
+ * All text/background pairs below meet WCAG 2.2 AA (4.5:1).
+ */
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Cormorant Garamond', ui-serif, Georgia, serif;
+
+  --color-ground: #faf8f5;
+  --color-surface: #ffffff;
+  --color-subtle: #f5f2ed;
+  --color-line: #e8e3dc;
+  --color-line-soft: #f0ece6;
+
+  --color-ink: #1f1d1a;
+  --color-ink-soft: #4a453f;
+  --color-muted: #6b655d;
+
+  --color-accent: #4f6354;
+  --color-accent-strong: #33443a;
+  --color-accent-soft: #eef1ec;
+  --color-accent-tint: #dce3da;
+
+  --color-warning: #8a5a00;
+  --color-warning-soft: #fbf1df;
+  --color-danger: #9b2c2c;
+  --color-danger-soft: #fbeaea;
+
+  --radius-control: 10px;
+  --radius-card: 14px;
+}
+
+@layer base {
+  html {
+    background-color: var(--color-ground);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+}

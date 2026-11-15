@@ -1,0 +1,56 @@
+{
+  "app": {
+    "name": "Wedding Planning Platform",
+    "skipToContent": "Skip to content"
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome back",
+      "subtitle": "Sign in to plan beautiful weddings.",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Sign in",
+      "forgotPassword": "Forgot password?",
+      "notAvailableYet": "Sign-in arrives with the next release. You can explore the app in the meantime.",
+      "explorePlanner": "Open planner app",
+      "explorePortal": "Open client portal"
+    }
+  },
+  "nav": {
+    "main": "Main",
+    "dashboard": "Dashboard",
+    "weddings": "Weddings",
+    "clients": "Clients",
+    "myTasks": "My tasks",
+    "calendar": "Calendar",
+    "vendors": "Vendors",
+    "templates": "Templates",
+    "team": "Team",
+    "settings": "Settings",
+    "portal": "Portal",
+    "home": "Home",
+    "tasks": "Tasks",
+    "budget": "Budget",
+    "files": "Files"
+  },
+  "planner": {
+    "dashboard": {
+      "greeting": "Good morning",
+      "emptyTitle": "Your dashboard is ready",
+      "emptyBody": "Upcoming weddings, due tasks and budget alerts will appear here once you add your first wedding."
+    }
+  },
+  "portal": {
+    "home": {
+      "greeting": "Hi there",
+      "emptyTitle": "Your wedding portal",
+      "emptyBody": "Your planner will share tasks, budget and documents with you here."
+    }
+  },
+  "errors": {
+    "notFoundTitle": "Page not found",
+    "notFoundBody": "The page you are looking for does not exist or has moved.",
+    "backHome": "Back to start",
+    "generic": "Something went wrong. Please try again."
+  }
+}
