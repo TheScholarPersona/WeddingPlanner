@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useParams } from 'react-router';
+import { Link, useParams, useSearchParams } from 'react-router';
 
 import { FormMessage } from '@/components/FormMessage';
 import { PageHeader } from '@/components/PageHeader';
@@ -48,7 +48,9 @@ export function WeddingTasksPage() {
   const { membership } = useActiveOrg();
   const org = membership.organization_id;
   const [filter, setFilter] = useState<Filter>('open');
-  const [openTask, setOpenTask] = useState<string | null>(null);
+  // Links from emails and the calendar open a task directly (?task=<id>).
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [openTask, setOpenTask] = useState<string | null>(() => searchParams.get('task'));
 
   const wedding = useQuery({
     queryKey: keys.wedding(org, id),
@@ -162,7 +164,10 @@ export function WeddingTasksPage() {
           team={wedding.data.team}
           canEdit={canEdit}
           canComment={can('comments:write')}
-          onClose={() => setOpenTask(null)}
+          onClose={() => {
+            setOpenTask(null);
+            if (searchParams.has('task')) setSearchParams({}, { replace: true });
+          }}
         />
       )}
     </div>

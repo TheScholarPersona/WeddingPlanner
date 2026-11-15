@@ -19,6 +19,7 @@ const mainNav = [
 const footerNav = [
   { to: '/app/team', key: 'nav.team' },
   { to: '/app/settings', key: 'nav.settings' },
+  { to: '/app/notifications', key: 'nav.notifications' },
 ] as const;
 
 function navClass({ isActive }: { isActive: boolean }) {

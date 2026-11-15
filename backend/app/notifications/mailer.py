@@ -100,3 +100,67 @@ def couple_invitation_email(
             "email, you can ignore it.\n"
         ),
     )
+
+
+_FOOTER = (
+    "\n—\nYou receive this email because of your notification settings. "
+    "Change them here: {settings}\n"
+)
+
+
+def _with_footer(text: str, settings_link: str) -> str:
+    return text + _FOOTER.format(settings=settings_link)
+
+
+def task_assigned_email(
+    to: str, actor: str, task_title: str, wedding_title: str, link: str, settings_link: str
+) -> Email:
+    return Email(
+        to=to,
+        subject=f"New task for you: {task_title}",
+        text=_with_footer(
+            f"Hello,\n\n{actor} assigned a task to you in “{wedding_title}”:\n\n"
+            f"  {task_title}\n\nOpen it here:\n{link}\n",
+            settings_link,
+        ),
+    )
+
+
+def comment_email(
+    to: str, actor: str, target_title: str, wedding_title: str, link: str, settings_link: str
+) -> Email:
+    # The comment itself is not copied into the email; it stays in the platform.
+    return Email(
+        to=to,
+        subject=f"New comment on “{target_title}”",
+        text=_with_footer(
+            f"Hello,\n\n{actor} commented on “{target_title}” in “{wedding_title}”.\n\n"
+            f"Read and reply here:\n{link}\n",
+            settings_link,
+        ),
+    )
+
+
+def document_email(
+    to: str, actor: str, document_title: str, wedding_title: str, link: str, settings_link: str
+) -> Email:
+    return Email(
+        to=to,
+        subject=f"New document: {document_title}",
+        text=_with_footer(
+            f"Hello,\n\n{actor} shared a document in “{wedding_title}”:\n\n"
+            f"  {document_title}\n\nOpen it here:\n{link}\n",
+            settings_link,
+        ),
+    )
+
+
+def digest_email(to: str, organization_name: str, lines: list[str], settings_link: str) -> Email:
+    body = "\n".join(lines)
+    return Email(
+        to=to,
+        subject=f"Your day ahead with {organization_name}",
+        text=_with_footer(
+            f"Good morning,\n\nhere is what is coming up:\n\n{body}\n", settings_link
+        ),
+    )

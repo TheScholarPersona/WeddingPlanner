@@ -85,7 +85,9 @@
     "budget": "Budget",
     "files": "Files",
     "signOut": "Sign out",
-    "organization": "Organization"
+    "organization": "Organization",
+    "documents": "Documents",
+    "notifications": "Notifications"
   },
   "planner": {
     "dashboard": {
@@ -103,10 +105,6 @@
       "acrossWeddings_one": "In {{count}} wedding",
       "acrossWeddings_other": "Across {{count}} weddings",
       "upcoming": "Upcoming weddings"
-    },
-    "comingSoon": {
-      "title": "Coming soon",
-      "body": "This area is part of an upcoming release."
     }
   },
   "team": {
@@ -225,7 +223,8 @@
       "comingUp": "Coming up",
       "budgetCommitted": "Budget committed",
       "budgetOf": "{{committed}} of {{total}}",
-      "yourPlanners": "Your planners at {{organization}}: {{names}}"
+      "yourPlanners": "Your planners at {{organization}}: {{names}}",
+      "appointments": "Appointments"
     },
     "tasks": {
       "title": "Your tasks",
@@ -250,6 +249,24 @@
         "quoted": "quote",
         "booked": "booked"
       }
+    },
+    "files": {
+      "title": "Your files",
+      "add": "Add a file",
+      "empty": "Your planner has not shared documents yet. You can add files like inspiration or guest lists here.",
+      "fromYou": "Added by you",
+      "deleteNamed": "Delete {{title}}",
+      "sharedHint": "Your planners will see the files you add.",
+      "privacyBadge": "Private",
+      "privacy": "Only you and your planners can open these files."
+    },
+    "calendar": {
+      "title": "Your calendar",
+      "subscribe": "Add to my calendar",
+      "empty": "Nothing scheduled yet. Appointments your planner shares with you appear here.",
+      "weddingDay": "Your wedding day",
+      "due": "Due: {{title}}",
+      "payment": "Payment {{amount}}"
     }
   },
   "errors": {
@@ -284,7 +301,14 @@
       "invalid_milestone": "Choose a milestone of this wedding.",
       "team_member": "Team members cannot be invited as the couple.",
       "category_not_empty": "Move or delete the items of this category first.",
-      "not_your_task": "Your planner takes care of this task."
+      "not_your_task": "Your planner takes care of this task.",
+      "unsupported_file": "This file type is not accepted. Upload PDF, Office, text or image files.",
+      "file_too_large": "This file is too large.",
+      "file_pending": "The file is still being checked for viruses. Try again shortly.",
+      "file_infected": "The file contained a virus and was removed.",
+      "file_failed": "The virus check failed. Please upload the file again.",
+      "too_many_versions": "This document has too many versions. Upload it as a new document.",
+      "invalid_range": "Choose a shorter date range."
     }
   },
   "weddings": {
@@ -613,5 +637,141 @@
     "emailLabel": "Email of the couple",
     "invite": "Invite",
     "sent": "Invitation sent. The link is valid for 7 days."
+  },
+  "documents": {
+    "document": "Document",
+    "upload": "Upload document",
+    "uploading": "Uploading…",
+    "file": "File",
+    "fileHint": "PDF, Word, Excel, PowerPoint, text or images, up to {{max}} MB.",
+    "tooLarge": "This file is larger than {{max}} MB.",
+    "titleLabel": "Title",
+    "titleHint": "Optional. The file name is used if you leave it empty.",
+    "category": "Category",
+    "filterCategory": "Filter by category",
+    "allCategories": "All categories",
+    "categories": {
+      "contract": "Contract",
+      "quote": "Quote",
+      "invoice": "Invoice",
+      "planning": "Planning",
+      "inspiration": "Inspiration",
+      "other": "Other"
+    },
+    "shareWithCouple": "Share with the couple",
+    "shareHint": "The couple can see and download it in their portal.",
+    "shared": "Shared with couple",
+    "fromCouple": "From the couple",
+    "download": "Download",
+    "versions": "Versions",
+    "versionCount_one": "{{count}} version",
+    "versionCount_other": "{{count}} versions",
+    "newVersion": "Upload a new version",
+    "uploadVersion": "Upload version",
+    "confirmDelete": "Delete this document and all its versions for good?",
+    "emptyTitle": "No documents yet",
+    "emptyBody": "Keep contracts, quotes, invoices and inspiration for this wedding in one place.",
+    "noneInCategory": "No documents in this category.",
+    "footnote": "Uploaded files are checked for viruses before they can be opened. Only this wedding's team, and the couple for shared documents, can download them.",
+    "scan": {
+      "pending": "Checking for viruses…",
+      "infected": "Virus found – removed",
+      "failed": "Check failed – upload again"
+    }
+  },
+  "calendar": {
+    "title": "Calendar",
+    "weddingIntro": "Appointments for this wedding: tastings, fittings, meetings and more.",
+    "newEvent": "New appointment",
+    "editEvent": "Edit appointment",
+    "addEvent": "Add appointment",
+    "eventTitle": "Title",
+    "titlePlaceholder": "e.g. Cake tasting",
+    "allDay": "All day",
+    "date": "Date",
+    "from": "From",
+    "until": "Until",
+    "start": "Start",
+    "end": "End",
+    "location": "Location",
+    "notes": "Notes",
+    "notesHint": "Notes stay in the app; they are not included in calendar subscriptions.",
+    "shareWithCouple": "Show to the couple",
+    "shareHint": "The couple sees it in their portal and calendar subscription.",
+    "shared": "Shared",
+    "endBeforeStart": "The end time is before the start time.",
+    "confirmDelete": "Delete this appointment?",
+    "upcoming": "Upcoming",
+    "noUpcoming": "No upcoming appointments.",
+    "past_one": "Past · {{count}} appointment",
+    "past_other": "Past · {{count}} appointments",
+    "emptyTitle": "No appointments yet",
+    "emptyBody": "Add tastings, fittings and meetings so the whole team knows what is coming up.",
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month",
+    "today": "Today",
+    "onlyMyTasks": "Only my tasks",
+    "more_one": "+{{count}} more",
+    "more_other": "+{{count}} more",
+    "nothingThisMonth": "Nothing scheduled this month.",
+    "legend": "Legend",
+    "legendKinds": {
+      "wedding": "Wedding day",
+      "event": "Appointment",
+      "task": "Task due",
+      "payment": "Payment due"
+    },
+    "kinds": {
+      "due": "Due: ",
+      "wedding": "Wedding: {{title}}"
+    },
+    "feed": {
+      "button": "Subscribe",
+      "title": "Subscribe to your calendar",
+      "intro": "Add your weddings, appointments and your tasks to Apple Calendar, Google Calendar or Outlook. They update automatically.",
+      "yourLink": "Your private link",
+      "copy": "Copy",
+      "copied": "Copied",
+      "onceHint": "Keep this link to yourself: anyone with it can see your calendar. It is shown only now.",
+      "howApple": "Apple Calendar: File → New Calendar Subscription, then paste the link.",
+      "howGoogle": "Google Calendar: Other calendars → + → From URL, then paste the link.",
+      "howOutlook": "Outlook: Add calendar → Subscribe from web, then paste the link.",
+      "active": "A subscription link is active since {{date}}.",
+      "lastUsed": "Last synced {{date}}.",
+      "inactive": "You have no subscription link yet.",
+      "privacy": "For your privacy the subscription contains titles, times and places only – no notes or amounts.",
+      "create": "Create link",
+      "newLink": "Create new link",
+      "turnOff": "Turn off",
+      "close": "Close"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "intro": "Choose which emails you get from {{organization}}. Emails tell you what happened and link to it; they never contain comment text or amounts.",
+    "coupleIntro": "Choose which emails you get about your wedding.",
+    "privacy": "Important account emails, like invitations and password resets, are always sent.",
+    "kinds": {
+      "task_assigned": {
+        "title": "Tasks assigned to me",
+        "team": "When someone gives you a task.",
+        "couple": "When your planner gives you a task."
+      },
+      "comments": {
+        "title": "Comments",
+        "team": "New comments on your tasks, and messages from couples on weddings you lead.",
+        "couple": "Replies from your planner on your tasks."
+      },
+      "documents": {
+        "title": "Documents",
+        "team": "When a couple uploads a document on a wedding you lead.",
+        "couple": "When your planner shares a document with you."
+      },
+      "daily_digest": {
+        "title": "Daily overview",
+        "team": "Each morning: today's and tomorrow's appointments, your tasks due and anything overdue.",
+        "couple": "A short morning email when appointments or tasks for you are coming up."
+      }
+    }
   }
 }

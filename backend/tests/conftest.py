@@ -69,6 +69,9 @@ def database_urls(postgres: PostgresContainer) -> Iterator[dict[str, str]]:
     os.environ["ENVIRONMENT"] = "test"
     os.environ["EMAIL_BACKEND"] = "memory"
     os.environ["RATE_LIMIT_BACKEND"] = "memory"
+    os.environ["STORAGE_BACKEND"] = "memory"
+    os.environ["JOB_BACKEND"] = "inline"
+    os.environ["VIRUS_SCAN"] = "off"
     os.environ["APP_BASE_URL"] = "https://app.test"
     os.environ["DATABASE_URL"] = app_url
     os.environ["MIGRATION_DATABASE_URL"] = owner_url
@@ -97,6 +100,12 @@ async def app_engine(database_urls: dict[str, str]) -> AsyncIterator[AsyncEngine
 
 
 TABLES = (
+    "notification_log",
+    "notification_preferences",
+    "calendar_feeds",
+    "events",
+    "document_versions",
+    "documents",
     "payments",
     "budget_items",
     "budget_categories",
@@ -131,9 +140,11 @@ async def clean_state(request: pytest.FixtureRequest) -> AsyncIterator[None]:
     if "database_urls" not in request.fixturenames:
         return
     from app.core import ratelimit
+    from app.documents import storage
     from app.notifications.mailer import OUTBOX
 
     OUTBOX.clear()
+    storage.MEMORY.clear()
     ratelimit._limiter = None
     engine = create_async_engine(request.getfixturevalue("database_urls")["owner"])
     async with engine.begin() as conn:

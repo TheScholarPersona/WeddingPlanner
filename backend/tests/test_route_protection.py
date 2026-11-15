@@ -17,6 +17,8 @@ PUBLIC = {
     ("POST", "/api/v1/auth/password/reset"),
     ("GET", "/api/v1/auth/invitations/{token}"),
     ("POST", "/api/v1/auth/invitations/{token}/accept"),
+    # Calendar apps cannot sign in; the secret token in the URL is the credential.
+    ("GET", "/api/v1/calendar-feeds/{token}.ics"),
 }
 
 

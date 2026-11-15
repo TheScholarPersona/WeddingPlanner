@@ -60,7 +60,7 @@ async function toApiError(response: Response): Promise<ApiError> {
  * (double-submit cookie). Errors are thrown as ApiError with the problem details.
  */
 export async function api<T = void>(
-  method: 'GET' | 'POST' | 'PATCH' | 'DELETE',
+  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE',
   path: string,
   body?: unknown,
   extraHeaders?: Record<string, string>,
@@ -80,4 +80,24 @@ export async function api<T = void>(
   if (!response.ok) throw await toApiError(response);
   if (response.status === 204 || response.status === 202) return undefined as T;
   return (await response.json()) as T;
+}
+
+/** Sends a file upload (multipart form). The browser sets the multipart content type. */
+export async function upload<T>(path: string, form: FormData): Promise<T> {
+  const headers: Record<string, string> = { Accept: 'application/json' };
+  const token = csrfToken();
+  if (token) headers['X-CSRF-Token'] = token;
+  const response = await fetch(`${API_BASE}${path}`, {
+    method: 'POST',
+    headers,
+    credentials: 'same-origin',
+    body: form,
+  });
+  if (!response.ok) throw await toApiError(response);
+  return (await response.json()) as T;
+}
+
+/** A same-origin URL for links that download a file with the session cookie. */
+export function downloadUrl(path: string): string {
+  return `${API_BASE}${path}`;
 }

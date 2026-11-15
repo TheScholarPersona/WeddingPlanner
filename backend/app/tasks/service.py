@@ -17,6 +17,7 @@ from app.authz.deps import OrgContext, ProjectContext, not_found
 from app.authz.permissions import ADMIN_PROJECT_ROLE
 from app.core.errors import ProblemError
 from app.core.versioning import check_version
+from app.notifications import service as notify
 from app.organizations.models import Membership, MembershipStatus, OrgRole
 from app.projects.models import Project, ProjectMember
 from app.tasks.models import (
@@ -357,6 +358,8 @@ async def create_task(db: AsyncSession, ctx: ProjectContext, body: TaskIn) -> Ta
     )
     if task.visibility == Visibility.CLIENT:
         await _audit_shared(db, ctx, task)
+    if task.assignee_membership_id is not None:
+        await notify.task_assigned(db, ctx, task.id, task.title, task.assignee_membership_id)
     return await get_task(db, ctx, task.id)
 
 
@@ -394,6 +397,7 @@ async def update_task(
         )
 
     was_shared = task.visibility == Visibility.CLIENT
+    previous_assignee = task.assignee_membership_id
     nullable = {"description", "milestone_id", "due_date", "assignee_membership_id"}
     for key, value in fields.items():
         if value is not None or key in nullable:
@@ -403,6 +407,9 @@ async def update_task(
         task.completed_by = None
     task.version += 1
     await db.flush()
+
+    if task.assignee_membership_id is not None and task.assignee_membership_id != previous_assignee:
+        await notify.task_assigned(db, ctx, task.id, task.title, task.assignee_membership_id)
 
     if task.visibility == Visibility.CLIENT and not was_shared:
         await _audit_shared(db, ctx, task)
@@ -746,6 +753,17 @@ async def add_comment(db: AsyncSession, ctx: ProjectContext, body: CommentIn) ->
         summary=label,
         visibility=body.visibility,
     )
+    if body.target_type == "task":
+        task = await _get_task(db, ctx, body.target_id)
+        await notify.commented(
+            db,
+            ctx,
+            task_id=task.id,
+            title=task.title,
+            assignee_membership_id=task.assignee_membership_id,
+            assignee_type=task.assignee_type,
+            shared=comment.visibility == Visibility.CLIENT,
+        )
     return _comment_out(comment, ctx.user.full_name, ctx)
 
 

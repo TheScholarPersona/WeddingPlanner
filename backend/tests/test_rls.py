@@ -102,3 +102,21 @@ async def test_tenant_context_does_not_outlive_the_transaction(app_engine: Async
 def test_rls_builder_rejects_unsafe_identifiers() -> None:
     with pytest.raises(ValueError):
         enable_tenant_rls("tasks; DROP TABLE users")
+
+
+async def test_every_tenant_table_has_row_level_security(owner_engine: AsyncEngine) -> None:
+    """A new table with organization_id must not be created without a policy."""
+    async with owner_engine.begin() as conn:
+        rows = (
+            await conn.execute(
+                text(
+                    "SELECT c.relname, c.relrowsecurity, "
+                    "EXISTS (SELECT 1 FROM pg_policy p WHERE p.polrelid = c.oid) AS has_policy "
+                    "FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace "
+                    "JOIN pg_attribute a ON a.attrelid = c.oid AND a.attname = 'organization_id' "
+                    "WHERE n.nspname = 'public' AND c.relkind = 'r' AND c.relname <> 'rls_demo'"
+                )
+            )
+        ).all()
+    assert len(rows) >= 25
+    assert [r.relname for r in rows if not (r.relrowsecurity and r.has_policy)] == []

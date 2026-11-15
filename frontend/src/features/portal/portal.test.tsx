@@ -40,6 +40,24 @@ it('shows the countdown, progress and next steps', async () => {
   const { calls } = mockApi({
     'GET /me': [200, me],
     'GET /portal/projects': [200, projects],
+    [`GET ${K}/calendar`]: [
+      200,
+      [
+        {
+          kind: 'event',
+          id: 'e1',
+          title: 'Venue walkthrough',
+          date: '2026-12-03',
+          end_date: '2026-12-03',
+          all_day: false,
+          starts_at: '2026-12-03T14:00:00Z',
+          ends_at: null,
+          location: 'Gut Lindenhof',
+          status: null,
+          amount_cents: null,
+        },
+      ],
+    ],
     [`GET ${K}`]: [
       200,
       {
@@ -73,6 +91,7 @@ it('shows the countdown, progress and next steps', async () => {
   expect(screen.getByText('Planning 44 % complete')).toBeInTheDocument();
   expect(screen.getByText(/27\.400,00\s€ of 38\.000,00\s€/)).toBeInTheDocument();
   expect(screen.getByText('Your planners at Atelier Test: Lena Hoffmann')).toBeInTheDocument();
+  expect(await screen.findByText('Venue walkthrough')).toBeInTheDocument();
 
   await userEvent.click(screen.getByLabelText('Mark “Finalise guest list” as done'));
   await waitFor(() => expect(calls.some((c) => c.path === `${K}/tasks/t1/complete`)).toBe(true));
@@ -154,4 +173,102 @@ describe('textOn', () => {
     expect(textOn('#33443A')).toBe('#ffffff');
     expect(textOn('#F5E6C8')).toBe('#1f1d1a');
   });
+});
+
+it('shows shared files and lets the couple add one', async () => {
+  const doc = (over: Record<string, unknown>) => ({
+    id: 'd1',
+    title: 'Menu',
+    category: 'planning',
+    from_couple: false,
+    added_by: 'Lena Hoffmann',
+    created_at: '2026-11-10T09:00:00Z',
+    updated_at: '2026-11-10T09:00:00Z',
+    can_delete: false,
+    file: {
+      filename: 'Menu.pdf',
+      content_type: 'application/pdf',
+      size_bytes: 1200,
+      downloadable: true,
+      scan_status: 'clean',
+    },
+    ...over,
+  });
+  const { calls } = mockApi({
+    'GET /me': [200, me],
+    'GET /portal/projects': [200, projects],
+    [`GET ${K}/documents`]: [200, [doc({})]],
+    [`POST ${K}/documents`]: [
+      201,
+      [doc({}), doc({ id: 'd2', title: 'Guest list', from_couple: true, can_delete: true })],
+    ],
+  });
+  const user = userEvent.setup();
+  renderRoute('/portal/files');
+
+  const menu = (await screen.findByText('Menu')).closest('li')!;
+  expect(within(menu).getByRole('link', { name: 'Download' })).toHaveAttribute(
+    'href',
+    `/api/v1${K}/documents/d1/download`,
+  );
+  expect(within(menu).queryByRole('button', { name: /Delete/ })).not.toBeInTheDocument();
+
+  await user.click(screen.getByRole('button', { name: 'Add a file' }));
+  await user.upload(
+    screen.getByLabelText('File'),
+    new File(['a,b'], 'guests.csv', { type: 'text/csv' }),
+  );
+  await user.type(screen.getByLabelText('Title'), 'Guest list');
+  await user.click(screen.getByRole('button', { name: 'Upload document' }));
+
+  await waitFor(() =>
+    expect(calls.find((c) => c.method === 'POST')?.body).toEqual({
+      file: 'guests.csv',
+      title: 'Guest list',
+    }),
+  );
+});
+
+it('lists upcoming appointments in the couple calendar', async () => {
+  mockApi({
+    'GET /me': [200, me],
+    'GET /portal/projects': [200, projects],
+    [`GET ${K}/calendar`]: [
+      200,
+      [
+        {
+          kind: 'wedding',
+          id: 'w1',
+          title: 'Mia & Tom',
+          date: '2027-06-12',
+          end_date: '2027-06-12',
+          all_day: true,
+          starts_at: null,
+          ends_at: null,
+          location: null,
+          status: null,
+          amount_cents: null,
+        },
+        {
+          kind: 'payment',
+          id: 'p1',
+          title: 'Venue deposit',
+          date: '2027-01-10',
+          end_date: '2027-01-10',
+          all_day: true,
+          starts_at: null,
+          ends_at: null,
+          location: null,
+          status: null,
+          amount_cents: 400000,
+        },
+      ],
+    ],
+  });
+
+  renderRoute('/portal/calendar');
+
+  expect(await screen.findByText('Your wedding day')).toBeInTheDocument();
+  expect(screen.getByText(/Payment 4\.000,00\s€/)).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Add to my calendar' })).toBeInTheDocument();
 });

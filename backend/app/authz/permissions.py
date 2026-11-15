@@ -28,6 +28,7 @@ class Perm(StrEnum):
     TEMPLATES_READ = "templates:read"
     TEMPLATES_MANAGE = "templates:manage"
     MY_TASKS = "tasks:mine"
+    CALENDAR_READ = "calendar:read"
 
 
 _TEAM = frozenset(
@@ -43,6 +44,7 @@ _TEAM = frozenset(
         Perm.PROJECTS_CREATE,
         Perm.TEMPLATES_READ,
         Perm.MY_TASKS,
+        Perm.CALENDAR_READ,
     }
 )
 
@@ -69,6 +71,9 @@ class ProjectPerm(StrEnum):
     BUDGET_WRITE = "budget:write"
     BUDGET_SET_TOTAL = "budget:set_total"
     CLIENT_ACCESS = "client_access:manage"
+    DOCUMENTS_READ = "documents:read"
+    DOCUMENTS_WRITE = "documents:write"
+    EVENTS_WRITE = "events:write"
 
 
 # Org admins act as "admin" in every wedding: everything a lead may do, plus deleting.
@@ -81,6 +86,7 @@ _VIEWER = frozenset(
         ProjectPerm.TASKS_READ,
         ProjectPerm.COMMENT,
         ProjectPerm.BUDGET_READ,
+        ProjectPerm.DOCUMENTS_READ,
     }
 )
 _PLANNER = _VIEWER | {
@@ -88,6 +94,8 @@ _PLANNER = _VIEWER | {
     ProjectPerm.VENDORS_MANAGE,
     ProjectPerm.TASKS_WRITE,
     ProjectPerm.BUDGET_WRITE,
+    ProjectPerm.DOCUMENTS_WRITE,
+    ProjectPerm.EVENTS_WRITE,
 }
 _LEAD = _PLANNER | {
     ProjectPerm.MANAGE_TEAM,

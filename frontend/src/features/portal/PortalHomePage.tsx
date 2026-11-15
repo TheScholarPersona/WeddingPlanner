@@ -11,6 +11,9 @@ import { errorMessage } from '@/lib/api/errors';
 import { dateBadge, formatDate, formatMoney } from '@/lib/format';
 
 import { portalKeys, portalPath, textOn, usePortalProject, type PortalOverview } from './api';
+import { EventList } from '@/features/calendar/EventList';
+
+import { toAgenda, usePortalCalendar } from './calendar';
 import { PortalTaskItem } from './PortalTaskItem';
 
 const DEFAULT_ACCENT = '#33443a';
@@ -24,6 +27,7 @@ export function PortalHomePage() {
     queryFn: () => api<PortalOverview>('GET', portalPath(project!.id)),
     enabled: !!project,
   });
+  const calendar = usePortalCalendar(project?.id, 120);
 
   if (isPending || (project && overview.isPending)) return <Spinner />;
   if (error || overview.error)
@@ -36,6 +40,10 @@ export function PortalHomePage() {
   const ink = textOn(accent);
   const firstName = me?.full_name.split(' ')[0] ?? '';
   const upcoming = data.milestones.filter((m) => !m.completed).slice(0, 3);
+  const appointments = toAgenda(
+    (calendar.data ?? []).filter((i) => i.kind === 'event'),
+    t as never,
+  ).slice(0, 3);
 
   return (
     <div className="flex flex-col gap-6">
@@ -99,6 +107,20 @@ export function PortalHomePage() {
           </ul>
         )}
       </section>
+
+      {appointments.length > 0 && (
+        <section className="flex flex-col gap-2.5">
+          <div className="flex items-baseline justify-between">
+            <h2 className="font-display text-2xl font-semibold">{t('portal.home.appointments')}</h2>
+            <Link to="/portal/calendar" className="text-sm font-medium text-accent">
+              {t('portal.home.seeAll')}
+            </Link>
+          </div>
+          <div className="rounded-xl border border-line bg-surface px-4">
+            <EventList entries={appointments} />
+          </div>
+        </section>
+      )}
 
       {upcoming.length > 0 && (
         <section className="flex flex-col gap-2.5">

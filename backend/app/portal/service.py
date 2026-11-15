@@ -6,7 +6,7 @@ that is not shared with the couple; the portal schemas additionally omit interna
 
 import uuid
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from typing import Any
 
 from fastapi import Depends
@@ -18,14 +18,20 @@ from app.budget import service as budget_service
 from app.budget.models import Budget
 from app.core.errors import ProblemError
 from app.db.tenant import set_tenant_context
+from app.documents import service as document_service
+from app.documents.schemas import DocumentOut
+from app.events import service as event_service
 from app.organizations.models import Membership, MembershipStatus, Organization, OrgRole
 from app.portal.schemas import (
     PortalBudget,
     PortalBudgetCategory,
     PortalBudgetItem,
     PortalBudgetSummary,
+    PortalCalendarItem,
     PortalChecklistItem,
     PortalComment,
+    PortalDocument,
+    PortalFile,
     PortalMilestone,
     PortalOrganization,
     PortalOverview,
@@ -359,3 +365,76 @@ async def budget(db: DbSession, access: PortalAccess) -> PortalBudget:
             for p in view.upcoming_payments
         ],
     )
+
+
+# --- Documents, calendar and settings (Sprint 5) -------------------------------------------
+
+
+def _portal_document(
+    doc: DocumentOut, user_id: uuid.UUID, own_ids: set[uuid.UUID]
+) -> PortalDocument:
+    current = doc.current
+    return PortalDocument(
+        id=doc.id,
+        title=doc.title,
+        category=doc.category,
+        from_couple=doc.uploaded_by_type == "client",
+        added_by=doc.created_by_name,
+        created_at=doc.created_at,
+        updated_at=doc.updated_at,
+        can_delete=doc.id in own_ids,
+        file=PortalFile(
+            filename=current.filename,
+            content_type=current.content_type,
+            size_bytes=current.size_bytes,
+            downloadable=current.downloadable,
+            scan_status=current.scan_status,
+        )
+        if current
+        else None,
+    )
+
+
+async def documents(db: DbSession, access: PortalAccess) -> list[PortalDocument]:
+    from app.documents.models import Document
+
+    docs = await document_service.list_documents(db, access.ctx)
+    own = set(
+        (
+            await db.execute(
+                select(Document.id).where(
+                    Document.project_id == access.ctx.project.id,
+                    Document.created_by == access.ctx.user.id,
+                    Document.uploaded_by_type == "client",
+                )
+            )
+        ).scalars()
+    )
+    return [_portal_document(d, access.ctx.user.id, own) for d in docs]
+
+
+async def calendar(
+    db: DbSession, access: PortalAccess, start: date, end: date
+) -> list[PortalCalendarItem]:
+    viewer = event_service.Viewer(
+        access.ctx.organization_id, access.ctx.membership.id, is_client=True
+    )
+    items = await event_service.collect(
+        db, viewer, start, end, project_id=access.ctx.project.id, mine=True
+    )
+    return [
+        PortalCalendarItem(
+            kind=i.kind,
+            id=i.id,
+            title=i.title,
+            date=i.date,
+            end_date=i.end_date,
+            all_day=i.all_day,
+            starts_at=i.starts_at,
+            ends_at=i.ends_at,
+            location=i.location,
+            status=i.status,
+            amount_cents=i.amount_cents,
+        )
+        for i in items
+    ]

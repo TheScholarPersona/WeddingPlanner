@@ -1,10 +1,17 @@
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
+import { Bell } from 'lucide-react';
+import { Link, useNavigate } from 'react-router';
 
 import { Button } from '@/components/ui/button';
 import { useLogout, useMe } from '@/features/auth/session';
 
-export function UserMenu({ compact = false }: { compact?: boolean }) {
+export function UserMenu({
+  compact = false,
+  settingsPath,
+}: {
+  compact?: boolean;
+  settingsPath?: string;
+}) {
   const { t } = useTranslation();
   const { data: me } = useMe();
   const logout = useLogout();
@@ -28,6 +35,17 @@ export function UserMenu({ compact = false }: { compact?: boolean }) {
       </span>
       {!compact && (
         <span className="min-w-0 flex-1 truncate text-sm font-medium">{me.full_name}</span>
+      )}
+      {settingsPath && (
+        <Button asChild variant="ghost" size="icon" className="size-9">
+          <Link
+            to={settingsPath}
+            aria-label={t('notifications.title')}
+            title={t('notifications.title')}
+          >
+            <Bell aria-hidden="true" className="size-4" />
+          </Link>
+        </Button>
       )}
       <Button
         variant="ghost"

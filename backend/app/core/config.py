@@ -3,7 +3,7 @@
 from functools import lru_cache
 from typing import Literal
 
-from pydantic import Field, PostgresDsn, RedisDsn
+from pydantic import Field, PostgresDsn, RedisDsn, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -51,6 +51,33 @@ class Settings(BaseSettings):
     email_from: str = "Wedding Planning Platform <no-reply@localhost>"
     smtp_host: str = "localhost"
     smtp_port: int = 1025
+
+    # Background jobs: "queue" hands them to the ARQ worker; "inline" runs them in the API
+    # process after the response (tests).
+    job_backend: Literal["queue", "inline"] = "queue"
+
+    # Document files (S3-compatible storage; "memory" keeps tests self-contained).
+    storage_backend: Literal["s3", "memory"] = "s3"
+    s3_endpoint_url: str = "http://localhost:8333"
+    s3_access_key: str = "local-access-key"
+    s3_secret_key: str = "change-me-storage"  # noqa: S105 - local default, overridden by .env
+    s3_bucket: str = "documents"
+    s3_region: str = "us-east-1"
+    max_upload_mb: int = 25
+
+    # Virus scanning of uploads with ClamAV. "off" is only allowed outside production.
+    virus_scan: Literal["clamav", "off"] = "off"
+    clamav_host: str = "localhost"
+    clamav_port: int = 3310
+
+    # Local hour (organization time zone) at which the daily email digest goes out.
+    digest_hour: int = Field(default=7, ge=0, le=23)
+
+    @model_validator(mode="after")
+    def _production_scans_uploads(self) -> "Settings":
+        if self.environment == "production" and self.virus_scan != "clamav":
+            raise ValueError("VIRUS_SCAN must be 'clamav' in production")
+        return self
 
     @property
     def is_production(self) -> bool:
