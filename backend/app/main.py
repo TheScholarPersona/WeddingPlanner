@@ -5,10 +5,13 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import health
+from app.auth.router import router as auth_router
 from app.core.config import get_settings
+from app.core.context import RequestContextMiddleware
 from app.core.errors import register_error_handlers
 from app.core.logging import configure_logging
 from app.db.session import dispose_engine
+from app.organizations.router import router as organizations_router
 
 API_PREFIX = "/api/v1"
 
@@ -42,7 +45,11 @@ def create_app() -> FastAPI:
             allow_headers=["*"],
         )
 
+    app.add_middleware(RequestContextMiddleware)
+
     app.include_router(health.router, prefix=API_PREFIX)
+    app.include_router(auth_router, prefix=API_PREFIX)
+    app.include_router(organizations_router, prefix=API_PREFIX)
     return app
 
 

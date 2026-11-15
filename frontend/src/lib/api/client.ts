@@ -1,4 +1,6 @@
-import type { paths } from './schema';
+import type { components } from './schema';
+
+export type Schemas = components['schemas'];
 
 /** RFC 9457 Problem Details, as returned by every API error. */
 export interface ProblemDetails {
@@ -22,19 +24,23 @@ export class ApiError extends Error {
   get status(): number {
     return this.problem.status;
   }
+
+  get code(): string {
+    return this.problem.code;
+  }
 }
 
 export const API_BASE = '/api/v1';
+const CSRF_COOKIES = ['__Host-csrf', 'csrf'];
+const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
 
-type GetPath = {
-  [P in keyof paths]: paths[P] extends { get: unknown } ? P : never;
-}[keyof paths];
-
-type GetResponse<P extends GetPath> = paths[P] extends {
-  get: { responses: { 200: { content: { 'application/json': infer R } } } };
+function csrfToken(): string | undefined {
+  for (const part of document.cookie.split('; ')) {
+    const [name, ...rest] = part.split('=');
+    if (name && CSRF_COOKIES.includes(name)) return decodeURIComponent(rest.join('='));
+  }
+  return undefined;
 }
-  ? R
-  : never;
 
 async function toApiError(response: Response): Promise<ApiError> {
   try {
@@ -49,19 +55,28 @@ async function toApiError(response: Response): Promise<ApiError> {
   }
 }
 
-/** Typed GET against the generated OpenAPI schema. Cookies carry the session. */
-export async function apiGet<P extends GetPath>(
-  path: P,
-  init?: RequestInit,
-): Promise<GetResponse<P>> {
-  const response = await fetch(`${path}`, {
-    ...init,
-    method: 'GET',
-    credentials: 'same-origin',
-    headers: { Accept: 'application/json', ...init?.headers },
-  });
-  if (!response.ok) {
-    throw await toApiError(response);
+/**
+ * Calls the API with the session cookie. State-changing requests send the CSRF token
+ * (double-submit cookie). Errors are thrown as ApiError with the problem details.
+ */
+export async function api<T = void>(
+  method: 'GET' | 'POST' | 'PATCH' | 'DELETE',
+  path: string,
+  body?: unknown,
+): Promise<T> {
+  const headers: Record<string, string> = { Accept: 'application/json' };
+  if (body !== undefined) headers['Content-Type'] = 'application/json';
+  if (!SAFE_METHODS.has(method)) {
+    const token = csrfToken();
+    if (token) headers['X-CSRF-Token'] = token;
   }
-  return (await response.json()) as GetResponse<P>;
+  const response = await fetch(`${API_BASE}${path}`, {
+    method,
+    headers,
+    credentials: 'same-origin',
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+  if (!response.ok) throw await toApiError(response);
+  if (response.status === 204 || response.status === 202) return undefined as T;
+  return (await response.json()) as T;
 }

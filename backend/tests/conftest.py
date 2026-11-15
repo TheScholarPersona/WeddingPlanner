@@ -10,6 +10,7 @@ from collections.abc import AsyncIterator, Iterator
 import pytest
 from alembic import command
 from alembic.config import Config
+from fastapi import FastAPI
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
@@ -66,6 +67,9 @@ def database_urls(postgres: PostgresContainer) -> Iterator[dict[str, str]]:
     command.upgrade(_alembic_config(owner_url), "head")
 
     os.environ["ENVIRONMENT"] = "test"
+    os.environ["EMAIL_BACKEND"] = "memory"
+    os.environ["RATE_LIMIT_BACKEND"] = "memory"
+    os.environ["APP_BASE_URL"] = "https://app.test"
     os.environ["DATABASE_URL"] = app_url
     os.environ["MIGRATION_DATABASE_URL"] = owner_url
     get_settings.cache_clear()
@@ -92,11 +96,48 @@ async def app_engine(database_urls: dict[str, str]) -> AsyncIterator[AsyncEngine
     await engine.dispose()
 
 
+TABLES = (
+    "audit_log",
+    "invitations",
+    "memberships",
+    "password_reset_tokens",
+    "sessions",
+    "organizations",
+    "users",
+)
+
+
+@pytest.fixture(autouse=True)
+async def clean_state(request: pytest.FixtureRequest) -> AsyncIterator[None]:
+    """Empty all tables, the email outbox and rate limits after each database test."""
+    yield
+    if "database_urls" not in request.fixturenames:
+        return
+    from app.core import ratelimit
+    from app.notifications.mailer import OUTBOX
+
+    OUTBOX.clear()
+    ratelimit._limiter = None
+    engine = create_async_engine(request.getfixturevalue("database_urls")["owner"])
+    async with engine.begin() as conn:
+        await conn.execute(text(f"TRUNCATE {', '.join(TABLES)} CASCADE"))
+    await engine.dispose()
+    await dispose_engine()
+
+
 @pytest.fixture
-async def client(database_urls: dict[str, str]) -> AsyncIterator[AsyncClient]:
+def app(database_urls: dict[str, str]) -> FastAPI:
     from app.main import create_app
 
-    app = create_app()
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
+    return create_app()
+
+
+@pytest.fixture
+async def client(app: FastAPI) -> AsyncIterator[AsyncClient]:
+    async with new_client(app) as ac:
         yield ac
-    await dispose_engine()
+
+
+def new_client(app: FastAPI) -> AsyncClient:
+    # https so that the Secure session cookie is sent back, like in a browser.
+    return AsyncClient(transport=ASGITransport(app=app), base_url="https://test")

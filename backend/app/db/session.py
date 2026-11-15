@@ -40,6 +40,15 @@ async def dispose_engine() -> None:
 
 
 async def get_session() -> AsyncIterator[AsyncSession]:
-    """FastAPI dependency: one session and one transaction per request."""
-    async with get_sessionmaker()() as session, session.begin():
-        yield session
+    """FastAPI dependency: one session and one transaction per request.
+
+    Commits when the request succeeds and rolls back on any exception. Code that must persist
+    something before raising (e.g. an audit entry for a failed login) commits explicitly.
+    """
+    async with get_sessionmaker()() as session:
+        try:
+            yield session
+            await session.commit()
+        except BaseException:
+            await session.rollback()
+            raise

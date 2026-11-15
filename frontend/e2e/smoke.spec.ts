@@ -1,19 +1,15 @@
 import { expect, test } from '@playwright/test';
 
-test('login page renders and links into both app areas', async ({ page }) => {
+test('login page renders and protected areas redirect to it', async ({ page }) => {
   await page.goto('/');
-
   await expect(page).toHaveURL(/\/login$/);
   await expect(page.getByRole('heading', { name: 'Welcome back' })).toBeVisible();
 
-  await page.getByRole('link', { name: 'Open planner app' }).click();
-  await expect(page.getByRole('heading', { level: 1, name: 'Good morning' })).toBeVisible();
-
-  await page.goto('/portal');
-  await expect(page.getByRole('navigation', { name: 'Portal' })).toBeVisible();
+  await page.goto('/app/team');
+  await expect(page).toHaveURL(/\/login\?next=%2Fapp%2Fteam$/);
 });
 
-test('page has no horizontal scroll at its viewport width', async ({ page }) => {
+test('login page has no horizontal scroll at its viewport width', async ({ page }) => {
   await page.goto('/login');
 
   const overflow = await page.evaluate(
