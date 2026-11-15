@@ -1,4 +1,5 @@
 .env
+caddy-root.crt
 .DS_Store
 
 # Python

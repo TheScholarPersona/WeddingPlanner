@@ -38,8 +38,33 @@ make up        # builds and starts all services
 | Mailpit (captured emails) | http://localhost:8025 |
 | S3 storage | http://localhost:8333 |
 
-Run `make trust-cert` once so your browser trusts the local HTTPS certificate.
-`make help` lists all commands.
+The first start downloads and builds all images and takes a few minutes. `make help` lists all
+commands.
+
+### Trust the local HTTPS certificate (optional)
+
+Caddy issues its own certificate for `https://localhost`. Until you trust it, the browser shows a
+warning that you can click through. To trust it once:
+
+```bash
+make trust-cert
+```
+
+Then add the exported `caddy-root.crt` to your system:
+
+- macOS: `sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain caddy-root.crt`
+- Windows (PowerShell as administrator): `certutil -addstore -f ROOT caddy-root.crt`
+- Linux (Debian/Ubuntu): `sudo cp caddy-root.crt /usr/local/share/ca-certificates/ && sudo update-ca-certificates`
+
+Firefox keeps its own certificate store: Settings → Privacy & Security → Certificates → Import.
+
+### Without `make` (e.g. Windows)
+
+```bash
+cp .env.example .env
+docker compose up --build -d
+docker compose exec api python -m app.cli create-organization --name "Atelier Example" --admin-email admin@example.com
+```
 
 ### Create the first organization
 

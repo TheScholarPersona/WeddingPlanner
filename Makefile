@@ -57,8 +57,9 @@ api-types: ## Regenerate the frontend API client types from the backend
 	cd backend && PYTHONPATH=. uv run python scripts/export_openapi.py ../frontend/openapi.json
 	cd frontend && npm run api:generate
 
-trust-cert: ## Trust Caddy's local HTTPS certificate on this machine
-	$(COMPOSE) exec proxy caddy trust
+trust-cert: ## Export Caddy's local root certificate to ./caddy-root.crt (then trust it, see README)
+	$(COMPOSE) cp proxy:/data/caddy/pki/authorities/local/root.crt ./caddy-root.crt
+	@echo "Saved caddy-root.crt. Add it to your system's trusted certificates (see README)."
 
 clean: ## Stop services and delete all local data volumes
 	$(COMPOSE) down -v
