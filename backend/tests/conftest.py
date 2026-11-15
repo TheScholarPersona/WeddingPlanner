@@ -100,6 +100,9 @@ async def app_engine(database_urls: dict[str, str]) -> AsyncIterator[AsyncEngine
 
 
 TABLES = (
+    "support_access_grants",
+    "consents",
+    "recovery_codes",
     "notification_log",
     "notification_preferences",
     "calendar_feeds",

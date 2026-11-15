@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime
 from typing import Literal
 
 from pydantic import BaseModel, EmailStr, Field, field_validator
@@ -58,6 +59,39 @@ class MeOut(BaseModel):
     full_name: str
     locale: str
     memberships: list[MembershipOut]
+    two_factor_enabled: bool = False
+    is_platform_admin: bool = False
+
+
+class TwoFactorChallengeOut(BaseModel):
+    """Password accepted; the sign-in completes with POST /auth/2fa/verify."""
+
+    two_factor_required: Literal[True] = True
+
+
+class TwoFactorCodeIn(BaseModel):
+    code: str = Field(min_length=6, max_length=20)
+
+
+class TwoFactorSetupOut(BaseModel):
+    secret: str
+    otpauth_uri: str
+    qr_svg: str
+
+
+class RecoveryCodesOut(BaseModel):
+    recovery_codes: list[str]
+
+
+class TwoFactorStatusOut(BaseModel):
+    enabled: bool
+    enabled_at: datetime | None
+    recovery_codes_left: int
+
+
+class DisableTwoFactorIn(BaseModel):
+    password: str = AnyPassword
+    code: str = Field(min_length=6, max_length=20)
 
 
 class InvitationInfoOut(BaseModel):

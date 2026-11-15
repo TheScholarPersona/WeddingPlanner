@@ -15,6 +15,7 @@ class OrganizationOut(BaseModel):
     locale: str
     timezone: str
     client_access_days_after_archive: int
+    require_2fa: bool
 
 
 class OrganizationUpdateIn(BaseModel):
@@ -25,6 +26,7 @@ class OrganizationUpdateIn(BaseModel):
         None
     )
     client_access_days_after_archive: int | None = Field(default=None, ge=0, le=3650)
+    require_2fa: bool | None = None
 
 
 class MemberOut(BaseModel):
