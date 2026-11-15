@@ -1,6 +1,7 @@
 import { createBrowserRouter, Navigate, type RouteObject } from 'react-router';
 
 import { AcceptInvitationPage } from '@/features/auth/AcceptInvitationPage';
+import { BudgetPage } from '@/features/budget/BudgetPage';
 import { ForgotPasswordPage } from '@/features/auth/ForgotPasswordPage';
 import { RequireClient, RequireTeam } from '@/features/auth/guards';
 import { LoginPage } from '@/features/auth/LoginPage';
@@ -10,7 +11,9 @@ import { ClientPage } from '@/features/clients/ClientPage';
 import { ClientsPage } from '@/features/clients/ClientsPage';
 import { ComingSoonPage } from '@/features/planner/ComingSoonPage';
 import { DashboardPage } from '@/features/planner/DashboardPage';
+import { PortalBudgetPage } from '@/features/portal/PortalBudgetPage';
 import { PortalHomePage } from '@/features/portal/PortalHomePage';
+import { PortalTasksPage } from '@/features/portal/PortalTasksPage';
 import { SettingsPage } from '@/features/settings/SettingsPage';
 import { MyTasksPage } from '@/features/tasks/MyTasksPage';
 import { WeddingTasksPage } from '@/features/tasks/WeddingTasksPage';
@@ -50,6 +53,7 @@ export const routes: RouteObject[] = [
       { path: 'weddings/new', element: <NewWeddingPage /> },
       { path: 'weddings/:id', element: <WeddingPage /> },
       { path: 'weddings/:id/tasks', element: <WeddingTasksPage /> },
+      { path: 'weddings/:id/budget', element: <BudgetPage /> },
       { path: 'tasks', element: <MyTasksPage /> },
       { path: 'clients', element: <ClientsPage /> },
       { path: 'clients/:id', element: <ClientPage /> },
@@ -68,7 +72,9 @@ export const routes: RouteObject[] = [
     ),
     children: [
       { index: true, element: <PortalHomePage /> },
-      ...['tasks', 'budget', 'calendar', 'files'].map((path) => ({
+      { path: 'tasks', element: <PortalTasksPage /> },
+      { path: 'budget', element: <PortalBudgetPage /> },
+      ...['calendar', 'files'].map((path) => ({
         path,
         element: <ComingSoonPage />,
       })),

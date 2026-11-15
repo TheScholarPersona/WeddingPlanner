@@ -54,7 +54,9 @@
       "subtitleExisting": "Confirm your password to join {{organization}}.",
       "existingHint": "You already have an account with this email address.",
       "submit": "Join {{organization}}",
-      "invalidTitle": "Invitation not valid"
+      "invalidTitle": "Invitation not valid",
+      "subtitleCouple": "{{organization}} invited you to your wedding portal.",
+      "openPortal": "Open my wedding portal"
     },
     "reauth": {
       "title": "Confirm your password",
@@ -194,13 +196,60 @@
     "template.deleted": "deleted a template",
     "task.shared_with_client": "shared a task with the couple",
     "task.unshared": "made a task internal again",
-    "task.deleted": "deleted a task"
+    "task.deleted": "deleted a task",
+    "budget.updated": "changed the total budget",
+    "budget_item.created": "added a budget item",
+    "budget_item.updated": "changed a budget item",
+    "budget_item.deleted": "deleted a budget item",
+    "payment.created": "added a payment",
+    "payment.updated": "updated a payment",
+    "payment.deleted": "deleted a payment",
+    "couple.invited": "invited the couple to the portal",
+    "couple.access_revoked": "removed the couple's portal access"
   },
   "portal": {
+    "due": "Due {{date}}",
+    "checklist": "{{done}} of {{total}} done",
+    "byPlanner": "Your planner takes care of this",
     "home": {
       "greeting": "Hi {{name}}",
       "emptyTitle": "Your wedding portal",
-      "emptyBody": "Your planner will share tasks, budget and documents with you here."
+      "emptyBody": "Your planner will share tasks, budget and documents with you here.",
+      "daysToGo_one": "day to go",
+      "daysToGo_other": "days to go",
+      "progress": "Planning progress",
+      "planningComplete": "Planning {{percent}} % complete",
+      "nextSteps": "Your next steps",
+      "seeAll": "See all",
+      "allDone": "Nothing to do right now. Enjoy!",
+      "comingUp": "Coming up",
+      "budgetCommitted": "Budget committed",
+      "budgetOf": "{{committed}} of {{total}}",
+      "yourPlanners": "Your planners at {{organization}}: {{names}}"
+    },
+    "tasks": {
+      "title": "Your tasks",
+      "summary": "{{count}} tasks for you · {{done}} done",
+      "todo": "To do · {{count}}",
+      "done": "Done · {{count}}",
+      "empty": "Nothing here yet.",
+      "other": "Other"
+    },
+    "budget": {
+      "title": "Your budget",
+      "committed": "Committed so far",
+      "of": "of {{total}}",
+      "barLabel": "Paid {{paid}}, still to pay {{open}}",
+      "paid": "Paid",
+      "stillToPay": "Committed, still to pay",
+      "nextPayments": "Next payments",
+      "byCategory": "By category",
+      "empty": "Your planner has not shared budget items yet.",
+      "stage": {
+        "planned": "planned",
+        "quoted": "quote",
+        "booked": "booked"
+      }
     }
   },
   "errors": {
@@ -232,7 +281,10 @@
       "invalid_member": "Choose an active member of your team.",
       "not_found": "This item does not exist or you don't have access to it.",
       "invalid_assignee": "Assign someone from this wedding's team.",
-      "invalid_milestone": "Choose a milestone of this wedding."
+      "invalid_milestone": "Choose a milestone of this wedding.",
+      "team_member": "Team members cannot be invited as the couple.",
+      "category_not_empty": "Move or delete the items of this category first.",
+      "not_your_task": "Your planner takes care of this task."
     }
   },
   "weddings": {
@@ -495,5 +547,71 @@
       "milestone.completed": "reached the milestone",
       "comment.created": "commented on"
     }
+  },
+  "budget": {
+    "total": "Total budget",
+    "summary": {
+      "forecast": "Forecast",
+      "contracted": "Contracted",
+      "paid": "Paid"
+    },
+    "barLabel": "Paid {{paid}}, contracted {{contracted}}, forecast {{forecast}}",
+    "legend": {
+      "paid": "Paid",
+      "contracted": "Contracted, not yet paid",
+      "planned": "Planned or quoted",
+      "unplanned": "Not yet planned: {{amount}}",
+      "internalCost": "Internal cost: {{amount}}"
+    },
+    "warnings": {
+      "over_budget": "The forecast is {{amount}} above the total budget.",
+      "near_budget": "Only {{amount}} left before the total budget is reached.",
+      "quote_above_plan": "{{title}}: the quote is {{amount}} above plan.",
+      "payment_overdue": "{{title}} ({{amount}}) is overdue."
+    },
+    "categoryTotal": "Planned {{planned}} · forecast {{forecast}}",
+    "columns": {
+      "item": "Item",
+      "planned": "Planned",
+      "quoted": "Quoted",
+      "contracted": "Contracted",
+      "paid": "Paid",
+      "internalCost": "Internal cost",
+      "couple": "Couple"
+    },
+    "visible": "Visible",
+    "newItem": "New item",
+    "newItemIn": "New item in {{category}}",
+    "plannedFor": "Planned amount for {{category}}",
+    "newCategory": "New category",
+    "addCategory": "Add category",
+    "upcomingPayments": "Upcoming payments",
+    "footnote": "Internal costs, internal notes and items marked internal are never shown to the couple. Every change to an amount is recorded in the audit log.",
+    "fields": {
+      "title": "Title",
+      "category": "Category",
+      "vendor": "Vendor"
+    },
+    "noVendor": "No vendor",
+    "visibilityHint": "Visible items appear in the couple's budget, without internal cost and notes.",
+    "confirmDelete": "Delete “{{title}}” and its payments?",
+    "payments": "Payments",
+    "noPayments": "No payments yet.",
+    "dueOn": "Due {{date}}",
+    "paid": "Paid",
+    "paymentLabel": "Payment, e.g. Deposit",
+    "paymentAmount": "Amount",
+    "paymentDue": "Due date"
+  },
+  "couple": {
+    "title": "Client portal",
+    "hint": "Invite the couple to follow their planning, tick off their tasks and see shared budget items.",
+    "lastSeen": "Last signed in {{date}}",
+    "confirmRevoke": "Remove {{name}}'s access to this wedding?",
+    "revoke": "Remove access",
+    "invitedUntil": "Invited · valid until {{date}}",
+    "emailLabel": "Email of the couple",
+    "invite": "Invite",
+    "sent": "Invitation sent. The link is valid for 7 days."
   }
 }

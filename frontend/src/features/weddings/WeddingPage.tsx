@@ -32,6 +32,7 @@ import {
   type Wedding,
   type WeddingVendor,
 } from './api';
+import { CoupleAccess } from './CoupleAccess';
 import { WeddingNav } from './WeddingNav';
 
 export function WeddingPage() {
@@ -172,6 +173,7 @@ function WeddingView({ wedding, org }: { wedding: Wedding; org: string }) {
           {can('project_vendors:read') && (
             <WeddingVendors wedding={wedding} org={org} canManage={can('project_vendors:manage')} />
           )}
+          {can('client_access:manage') && <CoupleAccess org={org} projectId={wedding.id} />}
           <ActivityFeed org={org} projectId={wedding.id} />
         </div>
       </div>

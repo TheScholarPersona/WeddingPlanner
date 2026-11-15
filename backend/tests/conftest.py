@@ -97,6 +97,10 @@ async def app_engine(database_urls: dict[str, str]) -> AsyncIterator[AsyncEngine
 
 
 TABLES = (
+    "payments",
+    "budget_items",
+    "budget_categories",
+    "budgets",
     "activity_events",
     "comments",
     "task_checklist_items",

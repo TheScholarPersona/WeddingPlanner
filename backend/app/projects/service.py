@@ -12,6 +12,7 @@ from app.audit import service as audit
 from app.auth.models import User
 from app.authz.deps import OrgContext, ProjectContext, not_found
 from app.authz.permissions import ProjectPerm
+from app.budget.service import create_budget
 from app.clients.models import Client
 from app.clients.schemas import ClientIn
 from app.clients.service import create_client
@@ -176,6 +177,7 @@ async def create_project(db: AsyncSession, ctx: OrgContext, body: ProjectCreateI
         template_id = (
             await db.execute(select(ProjectTemplate.id).where(ProjectTemplate.is_default.is_(True)))
         ).scalar_one_or_none()
+    await create_budget(db, ctx.organization_id, project.id)
     task_count = 0
     if template_id is not None:
         task_count = await apply_template(

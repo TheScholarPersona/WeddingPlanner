@@ -57,6 +57,10 @@ class Invitation(IdMixin, TenantMixin, Base):
 
     email: Mapped[str] = mapped_column(String(320))
     role: Mapped[str] = mapped_column(String(20))
+    # Set for client (couple) invitations: the wedding the couple gets access to.
+    project_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("projects.id", ondelete="CASCADE")
+    )
     token_hash: Mapped[str] = mapped_column(String(64), unique=True)
     invited_by: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("users.id", ondelete="SET NULL")
