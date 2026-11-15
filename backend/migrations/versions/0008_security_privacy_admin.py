@@ -169,6 +169,18 @@ def upgrade() -> None:
         """,
     )
 
+    # Everyone may read the audit entries about their own actions (data export, Art. 15),
+    # across organizations; couples still see nothing else of the audit log.
+    op.execute(
+        "CREATE POLICY own_entries ON audit_log FOR SELECT "
+        "USING (actor_user_id = app_current_user_id())"
+    )
+    op.execute("DROP POLICY client_scope ON audit_log")
+    op.execute(
+        "CREATE POLICY client_scope ON audit_log AS RESTRICTIVE FOR SELECT "
+        f"USING ({NOT_CLIENT} OR actor_user_id = app_current_user_id())"
+    )
+
     # --- Retention -------------------------------------------------------------------------
     _definer(
         "app_purge_expired()",
@@ -206,6 +218,11 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
+    op.execute("DROP POLICY client_scope ON audit_log")
+    op.execute(
+        f"CREATE POLICY client_scope ON audit_log AS RESTRICTIVE FOR SELECT USING ({NOT_CLIENT})"
+    )
+    op.execute("DROP POLICY own_entries ON audit_log")
     op.execute("DROP FUNCTION app_purge_expired()")
     op.execute("DROP FUNCTION app_admin_set_organization_status(uuid, text)")
     op.execute("DROP FUNCTION app_admin_organizations()")

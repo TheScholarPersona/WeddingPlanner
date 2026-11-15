@@ -6,7 +6,7 @@ that is not shared with the couple; the portal schemas additionally omit interna
 
 import uuid
 from dataclasses import dataclass
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta
 from typing import Any
 
 from fastapi import Depends
@@ -87,6 +87,8 @@ async def list_projects(db: DbSession, auth: CurrentUser) -> list[PortalProjectS
             .order_by(Project.wedding_date)
         )
         for project in rows.scalars():
+            if access_ended(project, org):
+                continue
             result.append(
                 PortalProjectSummary(
                     id=project.id,
@@ -119,6 +121,8 @@ async def portal_access(project_id: uuid.UUID, auth: CurrentUser, db: DbSession)
         if project is not None:
             org = await db.get(Organization, membership.organization_id)
             assert org is not None
+            if access_ended(project, org):
+                continue
             ctx = ProjectContext(
                 user=auth.user,
                 session=auth.session,
@@ -132,6 +136,14 @@ async def portal_access(project_id: uuid.UUID, auth: CurrentUser, db: DbSession)
 
 
 Access = Depends(portal_access)
+
+
+def access_ended(project: Project, org: Organization) -> bool:
+    """Couples keep access for a while after the wedding is archived (organization setting)."""
+    if project.archived_at is None:
+        return False
+    days = org.client_access_days_after_archive
+    return datetime.now(UTC) > project.archived_at + timedelta(days=days)
 
 
 def _today() -> Any:
