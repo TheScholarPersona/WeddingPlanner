@@ -97,6 +97,9 @@ async def app_engine(database_urls: dict[str, str]) -> AsyncIterator[AsyncEngine
 
 
 TABLES = (
+    "activity_events",
+    "comments",
+    "task_checklist_items",
     "tasks",
     "milestones",
     "template_items",

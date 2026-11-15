@@ -133,6 +133,7 @@ it('lets leads edit details and sends the version it is based on', async () => {
     'GET /me': [200, meFixture('member')],
     [`GET ${O}/projects/w1`]: [200, detail(['project:read', 'project:update', 'project:archive'])],
     [`GET ${O}/projects/w1/vendors`]: [200, []],
+    [`GET ${O}/projects/w1/activity`]: [200, { items: [], next_cursor: null }],
     [`PATCH ${O}/projects/w1`]: [
       200,
       { ...detail(['project:read', 'project:update']), version: 4 },
@@ -159,6 +160,7 @@ it('shows viewers the wedding without edit controls', async () => {
     'GET /me': [200, meFixture('member')],
     [`GET ${O}/projects/w1`]: [200, detail(['project:read', 'project_vendors:read'], 'viewer')],
     [`GET ${O}/projects/w1/vendors`]: [200, []],
+    [`GET ${O}/projects/w1/activity`]: [200, { items: [], next_cursor: null }],
   });
   renderRoute('/app/weddings/w1');
 

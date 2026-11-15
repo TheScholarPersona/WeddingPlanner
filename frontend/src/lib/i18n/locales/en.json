@@ -191,7 +191,10 @@
     "project_vendor.removed": "removed a vendor from a wedding",
     "template.created": "created a template",
     "template.updated": "updated a template",
-    "template.deleted": "deleted a template"
+    "template.deleted": "deleted a template",
+    "task.shared_with_client": "shared a task with the couple",
+    "task.unshared": "made a task internal again",
+    "task.deleted": "deleted a task"
   },
   "portal": {
     "home": {
@@ -227,7 +230,9 @@
       "invalid_client": "Choose another client.",
       "invalid_vendor": "Choose another vendor.",
       "invalid_member": "Choose an active member of your team.",
-      "not_found": "This item does not exist or you don't have access to it."
+      "not_found": "This item does not exist or you don't have access to it.",
+      "invalid_assignee": "Assign someone from this wedding's team.",
+      "invalid_milestone": "Choose a milestone of this wedding."
     }
   },
   "weddings": {
@@ -308,7 +313,9 @@
       "cancelled": "Cancelled"
     },
     "addVendor": "Add a vendor",
-    "chooseVendor": "Choose a vendor…"
+    "chooseVendor": "Choose a vendor…",
+    "sections": "Wedding sections",
+    "overview": "Overview"
   },
   "clients": {
     "title": "Clients",
@@ -411,5 +418,82 @@
     "weeksBefore": "weeks before",
     "assignee": "Assigned to",
     "visibility": "Visibility"
+  },
+  "tasks": {
+    "task": "Task",
+    "markDone": "Mark “{{title}}” as done",
+    "checklistProgress": "Checklist {{done}}/{{total}}",
+    "comments_one": "{{count}} comment",
+    "comments_other": "{{count}} comments",
+    "couple": "Couple",
+    "unassigned": "Unassigned",
+    "noDueDate": "No due date",
+    "overdue": "overdue",
+    "shared": "Shared with couple",
+    "internal": "Internal",
+    "doneBy": "Done by {{name}}",
+    "fields": {
+      "title": "Title",
+      "description": "Description",
+      "milestone": "Milestone",
+      "dueDate": "Due date",
+      "assignee": "Assigned to",
+      "priority": "Priority",
+      "visibility": "Visibility"
+    },
+    "priority": {
+      "low": "Low",
+      "normal": "Normal",
+      "high": "High"
+    },
+    "noMilestone": "No milestone",
+    "visibilityHint": "New tasks are internal. Share a task to show it to the couple in their portal.",
+    "confirmDelete": "Delete the task “{{title}}”?",
+    "checklist": "Checklist",
+    "newChecklistItem": "Add a checklist item",
+    "commentsTitle": "Comments",
+    "noComments": "No comments yet.",
+    "edited": "edited",
+    "writeComment": "Write a comment",
+    "postComment": "Post comment",
+    "filter": "Show tasks",
+    "filters": {
+      "open": "Open",
+      "done": "Done",
+      "client": "For the couple",
+      "internal": "Internal only",
+      "mine": "Mine",
+      "all": "All"
+    },
+    "empty": "No tasks match this filter.",
+    "dueBy": "due {{date}}",
+    "newTask": "New task",
+    "addTask": "Add task",
+    "addMilestone": "Add a milestone",
+    "milestoneTitle": "Milestone title",
+    "milestoneDue": "Milestone due date",
+    "myTitle": "My tasks",
+    "mySubtitle": "Everything assigned to you, across all your weddings.",
+    "myEmptyTitle": "Nothing assigned to you",
+    "myEmptyBody": "Tasks assigned to you in any wedding appear here.",
+    "buckets": {
+      "overdue": "Overdue",
+      "thisWeek": "This week",
+      "later": "Later",
+      "done": "Recently done"
+    },
+    "checklistCount": "{{done}}/{{total}}"
+  },
+  "activity": {
+    "title": "Activity",
+    "empty": "Nothing has happened yet.",
+    "verbs": {
+      "task.created": "added the task",
+      "task.completed": "completed",
+      "task.reopened": "reopened",
+      "task.shared": "shared with the couple:",
+      "milestone.completed": "reached the milestone",
+      "comment.created": "commented on"
+    }
   }
 }

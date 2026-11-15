@@ -12,6 +12,8 @@ import { ComingSoonPage } from '@/features/planner/ComingSoonPage';
 import { DashboardPage } from '@/features/planner/DashboardPage';
 import { PortalHomePage } from '@/features/portal/PortalHomePage';
 import { SettingsPage } from '@/features/settings/SettingsPage';
+import { MyTasksPage } from '@/features/tasks/MyTasksPage';
+import { WeddingTasksPage } from '@/features/tasks/WeddingTasksPage';
 import { TeamPage } from '@/features/team/TeamPage';
 import { TemplatePage } from '@/features/templates/TemplatePage';
 import { TemplatesPage } from '@/features/templates/TemplatesPage';
@@ -24,7 +26,7 @@ import { NotFoundPage } from './NotFoundPage';
 import { PlannerLayout } from './PlannerLayout';
 import { PortalLayout } from './PortalLayout';
 
-const comingSoon = ['tasks', 'calendar'];
+const comingSoon = ['calendar'];
 
 export const routes: RouteObject[] = [
   { path: '/', element: <Navigate to="/login" replace /> },
@@ -47,6 +49,8 @@ export const routes: RouteObject[] = [
       { path: 'weddings', element: <WeddingsPage /> },
       { path: 'weddings/new', element: <NewWeddingPage /> },
       { path: 'weddings/:id', element: <WeddingPage /> },
+      { path: 'weddings/:id/tasks', element: <WeddingTasksPage /> },
+      { path: 'tasks', element: <MyTasksPage /> },
       { path: 'clients', element: <ClientsPage /> },
       { path: 'clients/:id', element: <ClientPage /> },
       { path: 'vendors', element: <VendorsPage /> },

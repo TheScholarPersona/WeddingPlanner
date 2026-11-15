@@ -27,6 +27,7 @@ class Perm(StrEnum):
     PROJECTS_CREATE = "projects:create"
     TEMPLATES_READ = "templates:read"
     TEMPLATES_MANAGE = "templates:manage"
+    MY_TASKS = "tasks:mine"
 
 
 _TEAM = frozenset(
@@ -41,6 +42,7 @@ _TEAM = frozenset(
         Perm.PROJECTS_LIST,
         Perm.PROJECTS_CREATE,
         Perm.TEMPLATES_READ,
+        Perm.MY_TASKS,
     }
 )
 
@@ -60,21 +62,25 @@ class ProjectPerm(StrEnum):
     DELETE = "project:delete"
     VENDORS_READ = "project_vendors:read"
     VENDORS_MANAGE = "project_vendors:manage"
+    TASKS_READ = "tasks:read"
+    TASKS_WRITE = "tasks:write"
+    COMMENT = "comments:write"
 
 
 # Org admins act as "admin" in every wedding: everything a lead may do, plus deleting.
 ADMIN_PROJECT_ROLE = "admin"
 
-_PLANNER = frozenset(
-    {ProjectPerm.READ, ProjectPerm.UPDATE, ProjectPerm.VENDORS_READ, ProjectPerm.VENDORS_MANAGE}
+_VIEWER = frozenset(
+    {ProjectPerm.READ, ProjectPerm.VENDORS_READ, ProjectPerm.TASKS_READ, ProjectPerm.COMMENT}
 )
+_PLANNER = _VIEWER | {ProjectPerm.UPDATE, ProjectPerm.VENDORS_MANAGE, ProjectPerm.TASKS_WRITE}
 _LEAD = _PLANNER | {ProjectPerm.MANAGE_TEAM, ProjectPerm.ARCHIVE}
 
 PROJECT_ROLE_PERMS: dict[str, frozenset[ProjectPerm]] = {
     ADMIN_PROJECT_ROLE: frozenset(ProjectPerm),
     ProjectRole.LEAD: _LEAD,
     ProjectRole.PLANNER: _PLANNER,
-    ProjectRole.VIEWER: frozenset({ProjectPerm.READ, ProjectPerm.VENDORS_READ}),
+    ProjectRole.VIEWER: _VIEWER,
     ProjectRole.CLIENT: frozenset(),  # couples use the portal API (Sprint 4)
 }
 
