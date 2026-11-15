@@ -31,6 +31,7 @@ from app.organizations.schemas import (
     MemberUpdateIn,
     OrganizationUpdateIn,
 )
+from app.templates.service import create_default_template
 
 
 def _now() -> datetime:
@@ -101,6 +102,7 @@ async def create_organization(
         actor_type="system",
         changes={"name": {"new": name}},
     )
+    await create_default_template(db, org.id)
     _, link = await _create_invitation(db, org, admin_email.lower(), OrgRole.ORG_ADMIN, None)
     return org, link
 

@@ -15,13 +15,20 @@ from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.models import User, UserSession
-from app.authz.permissions import Perm, has_perm
+from app.authz.permissions import (
+    ADMIN_PROJECT_ROLE,
+    Perm,
+    ProjectPerm,
+    has_perm,
+    has_project_perm,
+)
 from app.core.config import get_settings
 from app.core.errors import ProblemError
 from app.core.security import hash_token, tokens_match
 from app.db.session import get_session
 from app.db.tenant import set_tenant_context
-from app.organizations.models import Membership, MembershipStatus, Organization
+from app.organizations.models import Membership, MembershipStatus, Organization, OrgRole
+from app.projects.models import Project, ProjectMember
 
 DbSession = Annotated[AsyncSession, Depends(get_session)]
 
@@ -31,6 +38,9 @@ CSRF_HEADER = "x-csrf-token"
 NOT_AUTHENTICATED = ProblemError(
     401, "not_authenticated", "Please sign in", "Your session has ended. Please sign in again."
 )
+
+
+FORBIDDEN = ProblemError(403, "forbidden", "Not allowed", "Your role does not allow this action.")
 
 
 def not_found() -> ProblemError:
@@ -95,37 +105,97 @@ async def get_authenticated(request: Request, db: DbSession) -> Authenticated:
 CurrentUser = Annotated[Authenticated, Depends(get_authenticated)]
 
 
+async def _org_context(
+    org_id: uuid.UUID, auth: Authenticated, db: AsyncSession, perm: Perm | None
+) -> OrgContext:
+    membership = (
+        await db.execute(
+            select(Membership)
+            .join(Organization, Organization.id == Membership.organization_id)
+            .where(
+                Membership.organization_id == org_id,
+                Membership.user_id == auth.user.id,
+                Membership.status == MembershipStatus.ACTIVE,
+                Organization.status == "active",
+            )
+        )
+    ).scalar_one_or_none()
+    if membership is None:
+        raise not_found()
+    if perm is not None and not has_perm(membership.role, perm):
+        raise FORBIDDEN
+
+    await set_tenant_context(
+        db,
+        organization_id=org_id,
+        user_id=auth.user.id,
+        role=membership.role,  # type: ignore[arg-type]
+    )
+    return OrgContext(
+        user=auth.user, session=auth.session, membership=membership, organization_id=org_id
+    )
+
+
 def require(perm: Perm) -> Any:
     """Dependency factory for organization routes: `ctx: OrgContext = require(Perm.X)`."""
 
     async def dependency(org_id: uuid.UUID, auth: CurrentUser, db: DbSession) -> OrgContext:
-        membership = (
+        return await _org_context(org_id, auth, db, perm)
+
+    dependency.__authz_permission__ = perm  # type: ignore[attr-defined]
+    return Depends(dependency)
+
+
+@dataclass
+class ProjectContext(OrgContext):
+    project: Project
+    project_role: str
+
+    def can(self, perm: ProjectPerm) -> bool:
+        return has_project_perm(self.project_role, perm)
+
+
+def require_project(perm: ProjectPerm) -> Any:
+    """Dependency factory for wedding routes under /orgs/{org_id}/projects/{project_id}.
+
+    The project is loaded under row-level security, so weddings the user is not assigned to
+    are simply not found.
+    """
+
+    async def dependency(
+        org_id: uuid.UUID, project_id: uuid.UUID, auth: CurrentUser, db: DbSession
+    ) -> ProjectContext:
+        ctx = await _org_context(org_id, auth, db, None)
+        project = (
             await db.execute(
-                select(Membership)
-                .join(Organization, Organization.id == Membership.organization_id)
-                .where(
-                    Membership.organization_id == org_id,
-                    Membership.user_id == auth.user.id,
-                    Membership.status == MembershipStatus.ACTIVE,
-                    Organization.status == "active",
-                )
+                select(Project).where(Project.id == project_id, Project.deleted_at.is_(None))
             )
         ).scalar_one_or_none()
-        if membership is None:
+        if project is None:
             raise not_found()
-        if not has_perm(membership.role, perm):
-            raise ProblemError(
-                403, "forbidden", "Not allowed", "Your role does not allow this action."
-            )
 
-        await set_tenant_context(
-            db,
-            organization_id=org_id,
-            user_id=auth.user.id,
-            role=membership.role,  # type: ignore[arg-type]
-        )
-        return OrgContext(
-            user=auth.user, session=auth.session, membership=membership, organization_id=org_id
+        if ctx.role == OrgRole.ORG_ADMIN:
+            project_role: str | None = ADMIN_PROJECT_ROLE
+        else:
+            project_role = (
+                await db.execute(
+                    select(ProjectMember.project_role).where(
+                        ProjectMember.project_id == project.id,
+                        ProjectMember.membership_id == ctx.membership.id,
+                    )
+                )
+            ).scalar_one_or_none()
+        if project_role is None:
+            raise not_found()
+        if not has_project_perm(project_role, perm):
+            raise FORBIDDEN
+        return ProjectContext(
+            user=ctx.user,
+            session=ctx.session,
+            membership=ctx.membership,
+            organization_id=ctx.organization_id,
+            project=project,
+            project_role=project_role,
         )
 
     dependency.__authz_permission__ = perm  # type: ignore[attr-defined]
