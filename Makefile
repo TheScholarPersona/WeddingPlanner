@@ -1,7 +1,7 @@
 .DEFAULT_GOAL := help
 COMPOSE := docker compose
 
-.PHONY: help setup up down logs migrate migration test test-backend test-frontend e2e lint format typecheck api-types trust-cert clean
+.PHONY: help setup up down logs org migrate migration test test-backend test-frontend e2e lint format typecheck api-types trust-cert clean
 
 help: ## Show available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}'
@@ -20,6 +20,9 @@ down: ## Stop all services
 
 logs: ## Follow the logs of all services
 	$(COMPOSE) logs -f --tail=100
+
+org: ## Create an organization: make org name="Atelier Example" email=admin@example.com
+	$(COMPOSE) exec api python -m app.cli create-organization --name "$(name)" --admin-email "$(email)"
 
 migrate: ## Apply database migrations
 	$(COMPOSE) exec api alembic upgrade head

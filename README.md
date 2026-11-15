@@ -4,8 +4,9 @@ A multi-tenant SaaS for wedding planners and their clients. Planners manage wedd
 vendors, tasks, budgets, calendars and documents in one place; couples follow and take part in
 their planning through a mobile-first client portal.
 
-> Status: **Sprint 0 – foundation.** The stack runs end to end; business modules arrive from
-> Sprint 1 (authentication and organizations).
+> Status: **Sprint 1 – authentication and organizations.** Sign-in, invitations, password
+> reset, team management, organization settings and the audit log work end to end. Weddings,
+> clients and tasks follow in Sprint 2.
 
 ## Stack
 
@@ -39,6 +40,17 @@ make up        # builds and starts all services
 
 Run `make trust-cert` once so your browser trusts the local HTTPS certificate.
 `make help` lists all commands.
+
+### Create the first organization
+
+Organizations are activated manually during the pilot. This creates one and prints the
+invitation link for its first admin (the email also arrives in Mailpit):
+
+```bash
+make org name="Atelier Example" email=admin@example.com
+```
+
+Open the link, choose a name and password, and you are signed in as the organization admin.
 
 ## Development
 

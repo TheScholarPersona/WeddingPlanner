@@ -3,17 +3,62 @@
     "name": "Wedding Planning Platform",
     "skipToContent": "Skip to content"
   },
+  "common": {
+    "loading": "Loading…",
+    "cancel": "Cancel",
+    "save": "Save changes",
+    "loadMore": "Load more"
+  },
+  "roles": {
+    "org_admin": "Admin",
+    "member": "Planner",
+    "client": "Client"
+  },
   "auth": {
+    "backToLogin": "Back to sign in",
+    "fields": {
+      "email": "Email",
+      "password": "Password",
+      "newPassword": "New password",
+      "choosePassword": "Choose a password",
+      "fullName": "Full name",
+      "passwordHint": "At least {{count}} characters. A short sentence works well."
+    },
     "login": {
       "title": "Welcome back",
       "subtitle": "Sign in to plan beautiful weddings.",
-      "email": "Email",
-      "password": "Password",
       "submit": "Sign in",
-      "forgotPassword": "Forgot password?",
-      "notAvailableYet": "Sign-in arrives with the next release. You can explore the app in the meantime.",
-      "explorePlanner": "Open planner app",
-      "explorePortal": "Open client portal"
+      "submitting": "Signing in…",
+      "forgotPassword": "Forgot password?"
+    },
+    "forgot": {
+      "title": "Reset password",
+      "subtitle": "We will email you a link to choose a new password.",
+      "submit": "Send reset link",
+      "sent": "If an account exists for this address, a reset link is on its way. It is valid for 60 minutes."
+    },
+    "reset": {
+      "title": "New password",
+      "subtitle": "Choose a new password for your account.",
+      "submit": "Save new password",
+      "done": "Your password was changed. You have been signed out everywhere; please sign in again."
+    },
+    "invite": {
+      "title": "You're invited",
+      "subtitleNew": "Create your account to join {{organization}}.",
+      "subtitleExisting": "Confirm your password to join {{organization}}.",
+      "existingHint": "You already have an account with this email address.",
+      "submit": "Join {{organization}}",
+      "invalidTitle": "Invitation not valid"
+    },
+    "reauth": {
+      "title": "Confirm your password",
+      "body": "For your security, please confirm your password to continue.",
+      "submit": "Confirm"
+    },
+    "noAccess": {
+      "title": "No access yet",
+      "body": "Your account is not part of an organization or wedding at the moment. Ask your planner for a new invitation."
     }
   },
   "nav": {
@@ -31,18 +76,87 @@
     "home": "Home",
     "tasks": "Tasks",
     "budget": "Budget",
-    "files": "Files"
+    "files": "Files",
+    "signOut": "Sign out",
+    "organization": "Organization"
   },
   "planner": {
     "dashboard": {
-      "greeting": "Good morning",
+      "greeting": "Good morning, {{name}}",
       "emptyTitle": "Your dashboard is ready",
       "emptyBody": "Upcoming weddings, due tasks and budget alerts will appear here once you add your first wedding."
+    },
+    "comingSoon": {
+      "title": "Coming soon",
+      "body": "This area is part of an upcoming release."
     }
+  },
+  "team": {
+    "title": "Team",
+    "subtitle": "Who works in your organization and what they may do.",
+    "members": "Members",
+    "you": "(you)",
+    "columns": {
+      "name": "Name",
+      "role": "Role",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "status": {
+      "active": "Active",
+      "disabled": "Deactivated"
+    },
+    "changeRoleFor": "Change role for {{name}}",
+    "deactivate": "Deactivate",
+    "reactivate": "Reactivate",
+    "inviteTitle": "Invite a team member",
+    "sendInvitation": "Send invitation",
+    "invitationSent": "Invitation sent. The link is valid for 7 days.",
+    "pendingInvitations": "Pending invitations",
+    "noInvitations": "No open invitations.",
+    "invitationExpired": "Expired",
+    "invitationValidUntil": "Valid until {{date}}",
+    "resend": "Resend",
+    "revoke": "Revoke",
+    "clientLogins": "Client logins",
+    "clientLoginsHint": "Couples are invited from their wedding and only see what you share with them."
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Your organization's details and branding.",
+    "organization": "Organization",
+    "fields": {
+      "name": "Organization name",
+      "accentColor": "Accent color (client portal)",
+      "clientAccessDays": "Client access after archiving (days)",
+      "locale": "Date and number format",
+      "timezone": "Time zone"
+    },
+    "locales": {
+      "de-DE": "German (Germany) · 15.11.2026 · 1.250,00 €",
+      "de-AT": "German (Austria) · 15.11.2026 · € 1.250,00",
+      "de-CH": "German (Switzerland) · 15.11.2026 · 1’250.00",
+      "en-GB": "English (UK) · 15/11/2026 · 1,250.00",
+      "en-US": "English (US) · 11/15/2026 · 1,250.00"
+    },
+    "default": "Default",
+    "saved": "Changes saved.",
+    "adminOnly": "Only organization admins can change these settings.",
+    "auditLog": "Audit log",
+    "auditLogHint": "Important changes in your organization, newest first.",
+    "system": "System"
+  },
+  "audit": {
+    "organization.created": "created the organization",
+    "organization.updated": "updated the organization settings",
+    "invitation.created": "sent an invitation",
+    "invitation.revoked": "revoked an invitation",
+    "invitation.accepted": "joined the organization",
+    "membership.updated": "changed a team member's role or status"
   },
   "portal": {
     "home": {
-      "greeting": "Hi there",
+      "greeting": "Hi {{name}}",
       "emptyTitle": "Your wedding portal",
       "emptyBody": "Your planner will share tasks, budget and documents with you here."
     }
@@ -51,6 +165,19 @@
     "notFoundTitle": "Page not found",
     "notFoundBody": "The page you are looking for does not exist or has moved.",
     "backHome": "Back to start",
-    "generic": "Something went wrong. Please try again."
+    "generic": "Something went wrong. Please try again.",
+    "codes": {
+      "invalid_credentials": "The email or password is incorrect.",
+      "rate_limited": "Too many attempts. Please wait a minute and try again.",
+      "invalid_token": "This link is invalid or has expired. Please request a new one.",
+      "invitation_invalid": "This invitation is invalid, was already used or has expired. Ask for a new invitation.",
+      "already_member": "This person is already on your team.",
+      "cannot_change_self": "Ask another admin to change your own role or status.",
+      "last_admin": "Your organization needs at least one active admin.",
+      "csrf_failed": "Please reload the page and try again.",
+      "not_authenticated": "Your session has ended. Please sign in again.",
+      "forbidden": "Your role does not allow this action.",
+      "validation_failed": "Some fields are invalid. Please check your input."
+    }
   }
 }

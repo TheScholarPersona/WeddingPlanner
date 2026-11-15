@@ -2,7 +2,10 @@ import { CalendarDays, CircleDollarSign, FileText, House, ListChecks } from 'luc
 import { useTranslation } from 'react-i18next';
 import { NavLink, Outlet } from 'react-router';
 
+import { useMe } from '@/features/auth/session';
 import { cn } from '@/lib/utils';
+
+import { UserMenu } from './UserMenu';
 
 const items = [
   { to: '/portal', key: 'nav.home', icon: House, end: true },
@@ -14,8 +17,14 @@ const items = [
 
 export function PortalLayout() {
   const { t } = useTranslation();
+  const { data: me } = useMe();
+  const organization = me?.memberships.find((m) => m.role === 'client')?.organization_name;
   return (
     <div className="mx-auto flex min-h-screen max-w-3xl flex-col bg-ground">
+      <header className="flex items-center justify-between gap-4 px-5 pt-6">
+        <span className="font-display text-xl font-semibold">{organization}</span>
+        <UserMenu compact />
+      </header>
       <main id="main" className="flex-1 px-5 pt-6 pb-28">
         <Outlet />
       </main>
