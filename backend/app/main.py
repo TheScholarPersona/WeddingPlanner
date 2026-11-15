@@ -13,6 +13,9 @@ from app.core.context import RequestContextMiddleware
 from app.core.errors import register_error_handlers
 from app.core.logging import configure_logging
 from app.db.session import dispose_engine
+from app.documents.router import router as documents_router
+from app.events.router import router as events_router
+from app.notifications.router import router as notifications_router
 from app.organizations.router import router as organizations_router
 from app.portal.router import router as portal_router
 from app.projects.router import router as projects_router
@@ -65,6 +68,9 @@ def create_app() -> FastAPI:
         tasks_router,
         budget_router,
         portal_router,
+        documents_router,
+        events_router,
+        notifications_router,
     ):
         app.include_router(module_router, prefix=API_PREFIX)
     return app

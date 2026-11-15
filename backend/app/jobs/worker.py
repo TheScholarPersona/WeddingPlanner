@@ -1,20 +1,22 @@
-"""ARQ worker: emails, virus scans, reminders and cleanup jobs run here (ADR 007)."""
+"""ARQ worker: emails, virus scans and the daily digest run here (ADR 007)."""
 
 import logging
 from typing import Any, ClassVar, cast
 
-from arq import func
+from arq import cron, func
 from arq.connections import RedisSettings
 
 from app.core.config import get_settings
 from app.core.logging import configure_logging
+from app.documents.service import scan_document_job
+from app.notifications.digest import send_daily_digests
 from app.notifications.mailer import send_email_job
 
 logger = logging.getLogger(__name__)
 
 
 async def heartbeat(_: dict[str, Any]) -> str:
-    """Placeholder job used to verify the worker runs; real jobs arrive in later sprints."""
+    """Used to verify the worker runs."""
     logger.info("worker heartbeat")
     return "ok"
 
@@ -24,6 +26,13 @@ async def startup(_: dict[str, Any]) -> None:
 
 
 class WorkerSettings:
-    functions: ClassVar[list[Any]] = [heartbeat, func(cast(Any, send_email_job), name="send_email")]
+    functions: ClassVar[list[Any]] = [
+        heartbeat,
+        func(cast(Any, send_email_job), name="send_email"),
+        func(cast(Any, scan_document_job), name="scan_document", max_tries=3),
+    ]
+    cron_jobs: ClassVar[list[Any]] = [
+        cron(cast(Any, send_daily_digests), minute=5, run_at_startup=False),
+    ]
     on_startup = startup
     redis_settings = RedisSettings.from_dsn(str(get_settings().redis_url))

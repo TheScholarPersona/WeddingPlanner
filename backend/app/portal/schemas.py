@@ -1,6 +1,7 @@
 """Client portal schemas. They only contain what a couple may see: no internal notes, no
 internal costs, no assignee details. Separate classes make leaking such fields impossible."""
 
+import datetime as dt
 import uuid
 from datetime import date, datetime
 from typing import Literal
@@ -129,3 +130,37 @@ class PortalCommentIn(BaseModel):
 
 class PortalChecklistUpdateIn(BaseModel):
     is_done: bool
+
+
+class PortalFile(BaseModel):
+    filename: str
+    content_type: str
+    size_bytes: int
+    downloadable: bool
+    scan_status: str
+
+
+class PortalDocument(BaseModel):
+    id: uuid.UUID
+    title: str
+    category: str
+    from_couple: bool
+    added_by: str | None
+    created_at: datetime
+    updated_at: datetime
+    can_delete: bool
+    file: PortalFile | None
+
+
+class PortalCalendarItem(BaseModel):
+    kind: Literal["event", "task", "payment", "wedding"]
+    id: uuid.UUID
+    title: str
+    date: dt.date
+    end_date: dt.date
+    all_day: bool
+    starts_at: datetime | None
+    ends_at: datetime | None
+    location: str | None
+    status: str | None
+    amount_cents: int | None

@@ -1,14 +1,26 @@
 import uuid
+from datetime import date
+from typing import Annotated
 
-from fastapi import APIRouter
+from fastapi import APIRouter, File, Form, Response, UploadFile
 from pydantic import Field
 
 from app.authz.deps import CurrentUser, DbSession
+from app.documents import service as document_service
+from app.documents.files import read_upload
+from app.documents.router import file_response
+from app.events import service as event_service
+from app.events.schemas import FeedCreatedOut, FeedOut
+from app.jobs.queue import Jobs
+from app.notifications import service as notification_service
+from app.notifications.schemas import PreferencesIn, PreferencesOut
 from app.portal import service
 from app.portal.schemas import (
     PortalBudget,
+    PortalCalendarItem,
     PortalChecklistUpdateIn,
     PortalComment,
+    PortalDocument,
     PortalOverview,
     PortalProjectSummary,
     PortalTask,
@@ -81,3 +93,82 @@ async def add_comment(
 @router.get(f"{K}/budget", response_model=PortalBudget)
 async def budget(db: DbSession, access: PortalAccess = Access) -> PortalBudget:
     return await service.budget(db, access)
+
+
+# --- Documents ------------------------------------------------------------------------------
+
+
+@router.get(f"{K}/documents", response_model=list[PortalDocument])
+async def documents(db: DbSession, access: PortalAccess = Access) -> list[PortalDocument]:
+    return await service.documents(db, access)
+
+
+@router.post(f"{K}/documents", response_model=list[PortalDocument], status_code=201)
+async def upload_document(
+    db: DbSession,
+    jobs: Jobs,
+    file: Annotated[UploadFile, File()],
+    title: Annotated[str | None, Form(max_length=200)] = None,
+    access: PortalAccess = Access,
+) -> list[PortalDocument]:
+    checked = await read_upload(file)
+    await document_service.upload(
+        db, access.ctx, jobs, checked, title=title, category="other", visibility="client"
+    )
+    return await service.documents(db, access)
+
+
+@router.delete(f"{K}/documents/{{document_id}}", status_code=204)
+async def delete_document(
+    document_id: uuid.UUID, db: DbSession, access: PortalAccess = Access
+) -> None:
+    await document_service.delete(db, access.ctx, document_id)
+
+
+@router.get(f"{K}/documents/{{document_id}}/download", response_class=Response)
+async def download_document(
+    document_id: uuid.UUID, db: DbSession, access: PortalAccess = Access
+) -> Response:
+    version, data = await document_service.download(db, access.ctx, document_id, None)
+    return file_response(version, data)
+
+
+# --- Calendar -------------------------------------------------------------------------------
+
+
+@router.get(f"{K}/calendar", response_model=list[PortalCalendarItem])
+async def calendar(
+    db: DbSession, start: date, end: date, access: PortalAccess = Access
+) -> list[PortalCalendarItem]:
+    event_service.check_range(start, end, limit=400)
+    return await service.calendar(db, access, start, end)
+
+
+@router.get(f"{K}/calendar/feed", response_model=FeedOut)
+async def get_feed(db: DbSession, access: PortalAccess = Access) -> FeedOut:
+    return await event_service.get_feed(db, access.ctx)
+
+
+@router.post(f"{K}/calendar/feed", response_model=FeedCreatedOut, status_code=201)
+async def create_feed(db: DbSession, access: PortalAccess = Access) -> FeedCreatedOut:
+    return await event_service.create_feed(db, access.ctx)
+
+
+@router.delete(f"{K}/calendar/feed", status_code=204)
+async def revoke_feed(db: DbSession, access: PortalAccess = Access) -> None:
+    await event_service.revoke_feed(db, access.ctx)
+
+
+# --- Notification settings ------------------------------------------------------------------
+
+
+@router.get(f"{K}/notification-preferences", response_model=PreferencesOut)
+async def get_preferences(db: DbSession, access: PortalAccess = Access) -> PreferencesOut:
+    return await notification_service.get_preferences(db, access.ctx)
+
+
+@router.patch(f"{K}/notification-preferences", response_model=PreferencesOut)
+async def update_preferences(
+    body: PreferencesIn, db: DbSession, access: PortalAccess = Access
+) -> PreferencesOut:
+    return await notification_service.update_preferences(db, access.ctx, body)
