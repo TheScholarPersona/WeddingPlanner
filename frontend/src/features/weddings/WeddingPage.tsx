@@ -17,6 +17,7 @@ import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useActiveOrg } from '@/features/auth/useActiveOrg';
+import { ActivityFeed } from '@/features/tasks/ActivityFeed';
 import { api } from '@/lib/api/client';
 import { errorMessage } from '@/lib/api/errors';
 import { formatDate } from '@/lib/format';
@@ -31,6 +32,7 @@ import {
   type Wedding,
   type WeddingVendor,
 } from './api';
+import { WeddingNav } from './WeddingNav';
 
 export function WeddingPage() {
   const { t } = useTranslation();
@@ -131,6 +133,8 @@ function WeddingView({ wedding, org }: { wedding: Wedding; org: string }) {
         }
       />
 
+      <WeddingNav id={wedding.id} />
+
       {(archive.isError || remove.isError) && (
         <FormMessage>{errorMessage(archive.error ?? remove.error, t)}</FormMessage>
       )}
@@ -168,6 +172,7 @@ function WeddingView({ wedding, org }: { wedding: Wedding; org: string }) {
           {can('project_vendors:read') && (
             <WeddingVendors wedding={wedding} org={org} canManage={can('project_vendors:manage')} />
           )}
+          <ActivityFeed org={org} projectId={wedding.id} />
         </div>
       </div>
 

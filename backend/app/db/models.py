@@ -5,14 +5,16 @@ from app.auth.models import PasswordResetToken, User, UserSession
 from app.clients.models import Client, ClientContact
 from app.organizations.models import Invitation, Membership, Organization
 from app.projects.models import Project, ProjectMember, ProjectVendor
-from app.tasks.models import Milestone, Task
+from app.tasks.models import ActivityEvent, Comment, Milestone, Task, TaskChecklistItem
 from app.templates.models import ProjectTemplate, TemplateItem
 from app.vendors.models import Vendor
 
 __all__ = [
+    "ActivityEvent",
     "AuditLog",
     "Client",
     "ClientContact",
+    "Comment",
     "Invitation",
     "Membership",
     "Milestone",
@@ -23,6 +25,7 @@ __all__ = [
     "ProjectTemplate",
     "ProjectVendor",
     "Task",
+    "TaskChecklistItem",
     "TemplateItem",
     "User",
     "UserSession",

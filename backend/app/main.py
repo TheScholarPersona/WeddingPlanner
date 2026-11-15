@@ -14,6 +14,7 @@ from app.core.logging import configure_logging
 from app.db.session import dispose_engine
 from app.organizations.router import router as organizations_router
 from app.projects.router import router as projects_router
+from app.tasks.router import router as tasks_router
 from app.templates.router import router as templates_router
 from app.vendors.router import router as vendors_router
 
@@ -54,7 +55,13 @@ def create_app() -> FastAPI:
     app.include_router(health.router, prefix=API_PREFIX)
     app.include_router(auth_router, prefix=API_PREFIX)
     app.include_router(organizations_router, prefix=API_PREFIX)
-    for module_router in (clients_router, vendors_router, templates_router, projects_router):
+    for module_router in (
+        clients_router,
+        vendors_router,
+        templates_router,
+        projects_router,
+        tasks_router,
+    ):
         app.include_router(module_router, prefix=API_PREFIX)
     return app
 

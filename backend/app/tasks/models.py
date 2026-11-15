@@ -1,10 +1,10 @@
-"""Milestones and tasks. Created from templates in Sprint 2; their own API follows in Sprint 3."""
+"""Milestones, tasks, checklists, comments and the per-wedding activity feed."""
 
 import uuid
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 from enum import StrEnum
 
-from sqlalchemy import Date, DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy import Boolean, Date, DateTime, ForeignKey, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base, IdMixin, SoftDeleteMixin, TenantMixin, TimestampMixin
@@ -60,3 +60,57 @@ class Task(IdMixin, TimestampMixin, SoftDeleteMixin, TenantMixin, Base):
     )
     position: Mapped[int] = mapped_column(Integer, default=0)
     version: Mapped[int] = mapped_column(Integer, default=1)
+
+
+class TaskChecklistItem(IdMixin, TimestampMixin, TenantMixin, Base):
+    __tablename__ = "task_checklist_items"
+
+    task_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("tasks.id", ondelete="CASCADE"), index=True
+    )
+    title: Mapped[str] = mapped_column(String(200))
+    is_done: Mapped[bool] = mapped_column(Boolean, default=False)
+    position: Mapped[int] = mapped_column(Integer, default=0)
+
+
+class CommentTarget(StrEnum):
+    PROJECT = "project"
+    TASK = "task"
+    MILESTONE = "milestone"
+
+
+class Comment(IdMixin, TimestampMixin, TenantMixin, Base):
+    __tablename__ = "comments"
+
+    project_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("projects.id", ondelete="CASCADE"), index=True
+    )
+    target_type: Mapped[str] = mapped_column(String(20))
+    target_id: Mapped[uuid.UUID]
+    author_user_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("users.id", ondelete="SET NULL")
+    )
+    body: Mapped[str] = mapped_column(Text)
+    visibility: Mapped[str] = mapped_column(String(10), default=Visibility.INTERNAL)
+    edited_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class ActivityEvent(IdMixin, TenantMixin, Base):
+    """What happened in a wedding, for the feed. Not an audit trail (see audit_log)."""
+
+    __tablename__ = "activity_events"
+
+    project_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("projects.id", ondelete="CASCADE"), index=True
+    )
+    actor_user_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("users.id", ondelete="SET NULL")
+    )
+    verb: Mapped[str] = mapped_column(String(40))
+    target_type: Mapped[str] = mapped_column(String(20))
+    target_id: Mapped[uuid.UUID | None]
+    summary: Mapped[str] = mapped_column(String(300))
+    visibility: Mapped[str] = mapped_column(String(10), default=Visibility.INTERNAL)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(UTC), server_default=func.now()
+    )
