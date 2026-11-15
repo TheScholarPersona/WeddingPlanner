@@ -10,7 +10,7 @@ export function UserMenu({
   settingsPath,
 }: {
   compact?: boolean;
-  settingsPath: string;
+  settingsPath?: string;
 }) {
   const { t } = useTranslation();
   const { data: me } = useMe();
@@ -36,15 +36,17 @@ export function UserMenu({
       {!compact && (
         <span className="min-w-0 flex-1 truncate text-sm font-medium">{me.full_name}</span>
       )}
-      <Button asChild variant="ghost" size="icon" className="size-9">
-        <Link
-          to={settingsPath}
-          aria-label={t('notifications.title')}
-          title={t('notifications.title')}
-        >
-          <Bell aria-hidden="true" className="size-4" />
-        </Link>
-      </Button>
+      {settingsPath && (
+        <Button asChild variant="ghost" size="icon" className="size-9">
+          <Link
+            to={settingsPath}
+            aria-label={t('notifications.title')}
+            title={t('notifications.title')}
+          >
+            <Bell aria-hidden="true" className="size-4" />
+          </Link>
+        </Button>
+      )}
       <Button
         variant="ghost"
         size="sm"

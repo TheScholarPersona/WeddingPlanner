@@ -20,8 +20,8 @@ import { FeedDialog } from './FeedDialog';
 
 const KIND_STYLE: Record<CalendarItem['kind'], string> = {
   wedding: 'bg-accent text-white',
-  event: 'bg-accent-soft text-accent-strong',
-  task: 'bg-subtle text-ink-soft',
+  event: 'bg-accent-tint text-accent-strong',
+  task: 'border border-line bg-surface text-ink-soft',
   payment: 'bg-warning-soft text-warning',
 };
 
@@ -245,7 +245,10 @@ function Legend() {
     <ul className="flex flex-wrap gap-3 text-xs text-muted" aria-label={t('calendar.legend')}>
       {(Object.keys(KIND_STYLE) as CalendarItem['kind'][]).map((kind) => (
         <li key={kind} className="flex items-center gap-1.5">
-          <span aria-hidden="true" className={cn('size-3 rounded-sm', KIND_STYLE[kind])} />
+          <span
+            aria-hidden="true"
+            className={cn('size-3 rounded-sm ring-1 ring-line', KIND_STYLE[kind])}
+          />
           {t(`calendar.legendKinds.${kind}`)}
         </li>
       ))}

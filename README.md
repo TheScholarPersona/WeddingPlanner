@@ -4,9 +4,12 @@ A multi-tenant SaaS for wedding planners and their clients. Planners manage wedd
 vendors, tasks, budgets, calendars and documents in one place; couples follow and take part in
 their planning through a mobile-first client portal.
 
-> Status: **Sprint 4 – budget and client portal.** Planners run each wedding's tasks (Sprint 3)
-> and budget, and invite the couple to a mobile-first portal where they see their countdown,
-> tick off their tasks and follow the shared budget. Documents and calendar follow in Sprint 5.
+> Status: **Sprint 5 – documents, calendar and notifications.** Planners run each wedding's
+> tasks, budget, documents (virus-scanned, versioned, shareable with the couple) and
+> appointments, see everything in one calendar and subscribe to it from their calendar app.
+> Couples use a mobile-first portal for their countdown, tasks, budget, files and appointments.
+> Email notifications (assignments, comments, documents, a daily overview) are on by default and
+> can be switched off per person. Next: hardening and data protection tools (Sprint 6).
 
 ## Stack
 
@@ -38,10 +41,36 @@ make up        # builds and starts all services
 | Mailpit (captured emails) | http://localhost:8025 |
 | S3 storage | http://localhost:8333 |
 
-The first start downloads and builds all images and takes a few minutes. The ClamAV virus
-scanner is only needed once document uploads arrive and is not started by default; start it with
-`docker compose --profile scan up -d` (on Apple Silicon it runs emulated and needs more memory). `make help` lists all
+The first start downloads and builds all images and takes a few minutes. `make help` lists all
 commands.
+
+### Virus scanning of uploads
+
+Uploaded documents are scanned with ClamAV before anyone can download them. Locally the scanner
+is off by default, so the app starts quickly; uploads are then marked "not scanned". To scan:
+
+1. Set `VIRUS_SCAN=clamav` in `.env`.
+2. Start the scanner too: `docker compose --profile scan up -d`
+
+ClamAV downloads its virus signatures on the first start, which takes a few minutes; until then
+uploads stay "Checking for viruses…". On Apple Silicon it runs emulated and needs about 3 GB of
+memory for Docker. Production refuses to start without scanning.
+
+### Calendar subscriptions
+
+In **Calendar → Subscribe** (planners) or **Calendar → Add to my calendar** (couples) you get a
+private link for Apple Calendar, Google Calendar or Outlook. Calendar apps on your own computer
+can read `https://localhost` once the certificate is trusted; cloud services like Google
+Calendar cannot reach a local pilot, so they only work once the platform is hosted.
+
+### Daily overview email
+
+The worker sends the daily overview at 07:05 in the organization's time zone (`DIGEST_HOUR`).
+To see one locally right away:
+
+```bash
+docker compose exec worker python -m app.cli send-digests --now
+```
 
 ### Trust the local HTTPS certificate (optional)
 

@@ -19,6 +19,7 @@ const mainNav = [
 const footerNav = [
   { to: '/app/team', key: 'nav.team' },
   { to: '/app/settings', key: 'nav.settings' },
+  { to: '/app/notifications', key: 'nav.notifications' },
 ] as const;
 
 function navClass({ isActive }: { isActive: boolean }) {
@@ -84,7 +85,7 @@ export function PlannerLayout() {
             ))}
           </div>
           <div className="border-t border-line pt-3">
-            <UserMenu settingsPath="/app/notifications" />
+            <UserMenu />
           </div>
         </div>
       </nav>

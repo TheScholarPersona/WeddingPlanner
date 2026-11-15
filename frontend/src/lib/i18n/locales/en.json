@@ -86,7 +86,8 @@
     "files": "Files",
     "signOut": "Sign out",
     "organization": "Organization",
-    "documents": "Documents"
+    "documents": "Documents",
+    "notifications": "Notifications"
   },
   "planner": {
     "dashboard": {

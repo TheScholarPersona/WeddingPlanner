@@ -15,6 +15,8 @@ x-backend-env: &backend-env
   SMTP_PORT: 1025
   CLAMAV_HOST: clamav
   CLAMAV_PORT: 3310
+  # "clamav" scans every upload (start the scanner with `--profile scan`); "off" for quick local runs.
+  VIRUS_SCAN: ${VIRUS_SCAN:-off}
 
 services:
   proxy:
@@ -101,8 +103,9 @@ services:
     ports:
       - "127.0.0.1:8025:8025"
 
-  # Virus scanning for uploads (needed from Sprint 5). Opt-in: `docker compose --profile scan up`.
-  # ClamAV publishes amd64 images only; Apple Silicon runs it through emulation.
+  # Virus scanning for uploads. Opt-in: set VIRUS_SCAN=clamav in .env and run
+  # `docker compose --profile scan up -d`. ClamAV publishes amd64 images only; Apple Silicon
+  # runs it through emulation (it needs about 3 GB of memory and a few minutes to start).
   clamav:
     image: clamav/clamav:stable
     platform: linux/amd64

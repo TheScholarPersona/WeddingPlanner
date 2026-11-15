@@ -16,6 +16,10 @@ localhost {
 	}
 
 	handle /api/* {
+		# Uploads are limited to 25 MB by the API; reject anything clearly larger here.
+		request_body {
+			max_size 30MB
+		}
 		reverse_proxy api:8000
 	}
 
