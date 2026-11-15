@@ -45,6 +45,22 @@ async def _send_digests() -> None:
     print(f"Queued {total} daily overview email(s).")
 
 
+async def _grant_platform_admin(email: str) -> None:
+    from sqlalchemy import update
+
+    from app.auth.models import User
+
+    async with get_sessionmaker()() as db:
+        result = await db.execute(
+            update(User).where(User.email == email.lower()).values(is_platform_admin=True)
+        )
+        await db.commit()
+    await dispose_engine()
+    if not result.rowcount:  # type: ignore[attr-defined]
+        raise SystemExit(f"No account with the email {email}.")
+    print(f"{email} is now a platform admin. They must turn on two-factor authentication.")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(prog="python -m app.cli")
     commands = parser.add_subparsers(dest="command", required=True)
@@ -53,11 +69,15 @@ def main() -> None:
     create.add_argument("--admin-email", required=True)
     digests = commands.add_parser("send-digests", help="Send today's daily overview emails")
     digests.add_argument("--now", action="store_true", required=True)
+    grant = commands.add_parser("grant-platform-admin", help="Make an account a platform admin")
+    grant.add_argument("--email", required=True)
     args = parser.parse_args()
 
     get_settings()
     if args.command == "create-organization":
         asyncio.run(_create_organization(args.name, args.admin_email))
+    elif args.command == "grant-platform-admin":
+        asyncio.run(_grant_platform_admin(args.email))
     elif args.command == "send-digests":
         asyncio.run(_send_digests())
 

@@ -11,7 +11,7 @@ from typing import Literal
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-TenantRole = Literal["org_admin", "member", "client"]
+TenantRole = Literal["org_admin", "member", "client", "support"]
 
 
 async def set_tenant_context(

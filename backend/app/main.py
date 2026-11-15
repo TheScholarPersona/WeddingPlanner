@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.admin.router import router as admin_router
 from app.api import health
 from app.auth.router import router as auth_router
 from app.budget.router import router as budget_router
@@ -73,6 +74,7 @@ def create_app() -> FastAPI:
         events_router,
         notifications_router,
         privacy_router,
+        admin_router,
     ):
         app.include_router(module_router, prefix=API_PREFIX)
     return app
