@@ -101,8 +101,12 @@ services:
     ports:
       - "127.0.0.1:8025:8025"
 
+  # Virus scanning for uploads (needed from Sprint 5). Opt-in: `docker compose --profile scan up`.
+  # ClamAV publishes amd64 images only; Apple Silicon runs it through emulation.
   clamav:
     image: clamav/clamav:stable
+    platform: linux/amd64
+    profiles: ["scan"]
     volumes:
       - clamavdata:/var/lib/clamav
 

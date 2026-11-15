@@ -38,7 +38,9 @@ make up        # builds and starts all services
 | Mailpit (captured emails) | http://localhost:8025 |
 | S3 storage | http://localhost:8333 |
 
-The first start downloads and builds all images and takes a few minutes. `make help` lists all
+The first start downloads and builds all images and takes a few minutes. The ClamAV virus
+scanner is only needed once document uploads arrive and is not started by default; start it with
+`docker compose --profile scan up -d` (on Apple Silicon it runs emulated and needs more memory). `make help` lists all
 commands.
 
 ### Trust the local HTTPS certificate (optional)
