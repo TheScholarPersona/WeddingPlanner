@@ -1,26 +1,12 @@
-import { execSync } from 'node:child_process';
-import path from 'node:path';
-
 import { expect, test } from '@playwright/test';
+
+import { createOrganization, fullStack, password } from './support';
 
 /**
  * Full stack: needs `make up` and runs against https://localhost.
- *   E2E_FULL_STACK=1 E2E_BASE_URL=https://localhost npx playwright test auth-flow
+ *   E2E_FULL_STACK=1 E2E_BASE_URL=https://localhost npx playwright test
  */
-test.skip(!process.env.E2E_FULL_STACK, 'needs the Docker stack (E2E_FULL_STACK=1)');
-
-const repoRoot = path.resolve(import.meta.dirname, '..', '..');
-const password = 'correct horse battery staple';
-
-function createOrganization(name: string, adminEmail: string): string {
-  const output = execSync(
-    `docker compose exec -T api python -m app.cli create-organization --name "${name}" --admin-email ${adminEmail}`,
-    { cwd: repoRoot, encoding: 'utf-8' },
-  );
-  const match = output.match(/\/invite\/([A-Za-z0-9_-]+)/);
-  if (!match?.[1]) throw new Error(`No invitation link in: ${output}`);
-  return match[1];
-}
+test.skip(!fullStack, 'needs the Docker stack (E2E_FULL_STACK=1)');
 
 test('an invited admin sets up the account, manages the team and signs in again', async ({
   page,

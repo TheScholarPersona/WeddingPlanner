@@ -4,9 +4,9 @@ A multi-tenant SaaS for wedding planners and their clients. Planners manage wedd
 vendors, tasks, budgets, calendars and documents in one place; couples follow and take part in
 their planning through a mobile-first client portal.
 
-> Status: **Sprint 1 – authentication and organizations.** Sign-in, invitations, password
-> reset, team management, organization settings and the audit log work end to end. Weddings,
-> clients and tasks follow in Sprint 2.
+> Status: **Sprint 2 – clients, vendors, weddings and templates.** On top of sign-in, team
+> management and the audit log (Sprint 1), planners manage clients and a vendor directory, create
+> weddings from templates and see them on the dashboard. Tasks follow in Sprint 3.
 
 ## Stack
 

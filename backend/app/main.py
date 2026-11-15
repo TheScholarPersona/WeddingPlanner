@@ -6,12 +6,16 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import health
 from app.auth.router import router as auth_router
+from app.clients.router import router as clients_router
 from app.core.config import get_settings
 from app.core.context import RequestContextMiddleware
 from app.core.errors import register_error_handlers
 from app.core.logging import configure_logging
 from app.db.session import dispose_engine
 from app.organizations.router import router as organizations_router
+from app.projects.router import router as projects_router
+from app.templates.router import router as templates_router
+from app.vendors.router import router as vendors_router
 
 API_PREFIX = "/api/v1"
 
@@ -50,6 +54,8 @@ def create_app() -> FastAPI:
     app.include_router(health.router, prefix=API_PREFIX)
     app.include_router(auth_router, prefix=API_PREFIX)
     app.include_router(organizations_router, prefix=API_PREFIX)
+    for module_router in (clients_router, vendors_router, templates_router, projects_router):
+        app.include_router(module_router, prefix=API_PREFIX)
     return app
 
 
