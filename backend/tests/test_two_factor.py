@@ -3,10 +3,10 @@
 import time
 from typing import Any
 
-import pyotp
 import pytest
 from fastapi import FastAPI
 from httpx import AsyncClient
+from pyotp.totp import TOTP
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncEngine
 
@@ -24,20 +24,20 @@ async def reauth(client: AsyncClient) -> None:
     assert response.status_code == 204
 
 
-async def turn_on(client: AsyncClient) -> tuple[pyotp.TOTP, list[str]]:
+async def turn_on(client: AsyncClient) -> tuple[TOTP, list[str]]:
     await reauth(client)
     setup = (await send(client, "POST", "/api/v1/me/2fa/setup")).json()
     assert setup["otpauth_uri"].startswith("otpauth://totp/")
     assert setup["qr_svg"].startswith("data:image/svg+xml")
-    totp = pyotp.TOTP(setup["secret"])
+    totp = TOTP(setup["secret"])
     enabled = await send(client, "POST", "/api/v1/me/2fa/enable", json={"code": totp.now()})
     assert enabled.status_code == 200, enabled.text
     return totp, enabled.json()["recovery_codes"]
 
 
-def next_code(totp: pyotp.TOTP) -> str:
+def next_code(totp: TOTP) -> str:
     """The next time step's code: the current one was used up when 2FA was switched on."""
-    return totp.at(time.time() + 30)
+    return str(totp.at(time.time() + 30))
 
 
 async def login(app: FastAPI, email: str) -> tuple[AsyncClient, Any]:
