@@ -4,11 +4,10 @@ A multi-tenant SaaS for wedding planners and their clients. Planners manage wedd
 vendors, tasks, budgets, calendars and documents in one place; couples follow and take part in
 their planning through a mobile-first client portal.
 
-> Status: **Sprint 6 – ready for the pilot.** Planners run weddings end to end: clients, tasks,
-> budget, documents, appointments and a shared calendar; couples use a mobile-first portal.
-> Sprint 6 added two-factor authentication, GDPR tools (exports, erasure, consents, retention),
-> support access and a platform admin area, a demo organization, a security review
-> ([`docs/security-review.md`](docs/security-review.md)), a load test and an accessibility audit.
+> Status: **Sprint 7 – moodboards.** Planners run weddings end to end: clients, tasks, budget,
+> documents, appointments, a shared calendar and moodboards that planner and couple fill together;
+> couples use a mobile-first portal. Sprint 6 added two-factor authentication, GDPR tools, support
+> access, a platform admin area and a security review ([`docs/security-review.md`](docs/security-review.md)).
 
 ## Stack
 
@@ -54,6 +53,15 @@ is off by default, so the app starts quickly; uploads are then marked "not scann
 ClamAV downloads its virus signatures on the first start, which takes a few minutes; until then
 uploads stay "Checking for viruses…". On Apple Silicon it runs emulated and needs about 3 GB of
 memory for Docker. Production refuses to start without scanning.
+
+### Moodboards
+
+Each wedding has a **Moodboards** tab. Planner and couple collect images in boards with sections
+(Overall look, Venue, Flowers, …), heart and comment them; the planner marks images as selected or
+discarded, adds a color palette and exports the board as a PDF for vendors (only the selected
+images, without the couple's name unless chosen). Couples find their shared boards under
+**Inspiration** in the portal and can start their own. Images are virus-scanned; previews are
+re-encoded without metadata, so GPS data from phone photos never reaches other viewers.
 
 ### Calendar subscriptions
 

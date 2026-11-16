@@ -16,6 +16,13 @@ import { ResetPasswordPage } from '@/features/auth/ResetPasswordPage';
 import { ClientPage } from '@/features/clients/ClientPage';
 import { ClientsPage } from '@/features/clients/ClientsPage';
 import { DocumentsPage } from '@/features/documents/DocumentsPage';
+import {
+  MoodboardPage,
+  MoodboardsPage,
+  PortalBoardPage,
+  PortalInspirationPage,
+  PortalMorePage,
+} from '@/features/moodboards/pages';
 import { NotificationsPage } from '@/features/notifications/NotificationsPage';
 import { DashboardPage } from '@/features/planner/DashboardPage';
 import { PortalBudgetPage } from '@/features/portal/PortalBudgetPage';
@@ -65,6 +72,8 @@ export const routes: RouteObject[] = [
       { path: 'weddings/:id/budget', element: <BudgetPage /> },
       { path: 'weddings/:id/documents', element: <DocumentsPage /> },
       { path: 'weddings/:id/calendar', element: <WeddingCalendarPage /> },
+      { path: 'weddings/:id/moodboards', element: <MoodboardsPage /> },
+      { path: 'weddings/:id/moodboards/:boardId', element: <MoodboardPage /> },
       { path: 'calendar', element: <CalendarPage /> },
       { path: 'notifications', element: <NotificationsPage /> },
       { path: 'account', element: <AccountPage area="app" /> },
@@ -91,6 +100,9 @@ export const routes: RouteObject[] = [
       { path: 'files', element: <PortalFilesPage /> },
       { path: 'notifications', element: <PortalNotificationsPage /> },
       { path: 'privacy', element: <PortalPrivacyPage /> },
+      { path: 'inspiration', element: <PortalInspirationPage /> },
+      { path: 'inspiration/:boardId', element: <PortalBoardPage /> },
+      { path: 'more', element: <PortalMorePage /> },
       { path: 'account', element: <AccountPage area="portal" /> },
     ],
   },

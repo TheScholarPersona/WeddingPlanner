@@ -379,3 +379,9 @@ async def test_couple_notified_when_a_document_is_shared(
     assert len(emails) == 1
     assert emails[0].subject == "New document: Seating plan"
     assert "/portal/files" in emails[0].text
+
+
+def test_unreachable_scanner_is_retried_in_the_worker() -> None:
+    assert scanner.retry_later({"job_try": 1, "max_tries": 3}) is True
+    assert scanner.retry_later({"job_try": 3, "max_tries": 3}) is False
+    assert scanner.retry_later({}) is False  # inline runs (tests) fail at once

@@ -100,6 +100,10 @@ async def app_engine(database_urls: dict[str, str]) -> AsyncIterator[AsyncEngine
 
 
 TABLES = (
+    "moodboard_reactions",
+    "moodboard_items",
+    "moodboard_sections",
+    "moodboards",
     "support_access_grants",
     "consents",
     "recovery_codes",

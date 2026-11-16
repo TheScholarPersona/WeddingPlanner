@@ -115,9 +115,11 @@ test('documents and appointments are shared with the couple', async ({
 
   // The couple sees both
   const nav = portal.getByRole('navigation', { name: 'Portal' });
-  await nav.getByRole('link', { name: 'Files' }).click();
+  await nav.getByRole('link', { name: 'More' }).click();
+  await portal.getByRole('main').getByRole('link', { name: 'Files' }).click();
   await expect(portal.getByText('Menu')).toBeVisible();
-  await nav.getByRole('link', { name: 'Calendar' }).click();
+  await nav.getByRole('link', { name: 'More' }).click();
+  await portal.getByRole('main').getByRole('link', { name: 'Calendar' }).click();
   await expect(portal.getByText('Cake tasting')).toBeVisible();
   await expect(portal.getByText('Your wedding day')).toBeVisible();
   await couple.close();

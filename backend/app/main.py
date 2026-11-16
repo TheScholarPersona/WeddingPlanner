@@ -16,6 +16,7 @@ from app.core.logging import configure_logging
 from app.db.session import dispose_engine
 from app.documents.router import router as documents_router
 from app.events.router import router as events_router
+from app.moodboards.router import router as moodboards_router
 from app.notifications.router import router as notifications_router
 from app.organizations.router import router as organizations_router
 from app.portal.router import router as portal_router
@@ -75,6 +76,7 @@ def create_app() -> FastAPI:
         notifications_router,
         privacy_router,
         admin_router,
+        moodboards_router,
     ):
         app.include_router(module_router, prefix=API_PREFIX)
     return app

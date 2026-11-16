@@ -38,7 +38,13 @@ test('planner pages meet WCAG 2.2 AA', async ({ page }) => {
     .click();
   const wedding = new URL(page.url()).pathname;
 
+  await page.goto(`${wedding}/moodboards`);
+  await page.getByRole('link', { name: /Overall look/ }).click();
+  await expect(page.getByRole('heading', { name: 'Flowers' })).toBeVisible();
+  const board = new URL(page.url()).pathname;
+
   for (const path of [
+    board,
     '/app',
     '/app/weddings',
     wedding,
@@ -46,6 +52,7 @@ test('planner pages meet WCAG 2.2 AA', async ({ page }) => {
     `${wedding}/budget`,
     `${wedding}/documents`,
     `${wedding}/calendar`,
+    `${wedding}/moodboards`,
     '/app/tasks',
     '/app/calendar',
     '/app/clients',
@@ -69,6 +76,8 @@ test('portal pages meet WCAG 2.2 AA', async ({ page }) => {
     '/portal/budget',
     '/portal/calendar',
     '/portal/files',
+    '/portal/inspiration',
+    '/portal/more',
     '/portal/privacy',
     '/portal/notifications',
     '/portal/account',

@@ -9,6 +9,7 @@ import uuid
 from datetime import UTC, datetime
 from typing import Any
 
+from arq import Retry
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -378,7 +379,7 @@ async def download(
 
 
 async def scan_document_job(
-    _: dict[str, Any], organization_id: str, version_id: str, user_id: str
+    ctx: dict[str, Any], organization_id: str, version_id: str, user_id: str
 ) -> str:
     """Worker job: scan one uploaded version and record the verdict."""
     async with get_sessionmaker()() as db:
@@ -394,7 +395,9 @@ async def scan_document_job(
         storage = get_storage()
         try:
             verdict = await scanner.scan_bytes(await storage.get(version.storage_key))
-        except scanner.ScanError:
+        except scanner.ScanError as exc:
+            if scanner.retry_later(ctx):
+                raise Retry(defer=scanner.RETRY_DELAY_SECONDS) from exc
             version.scan_status = ScanStatus.FAILED
             verdict = None
         if verdict == "clean":

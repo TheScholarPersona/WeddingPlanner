@@ -92,7 +92,12 @@ def settings_link(is_client: bool) -> str:
 
 def wedding_link(project_id: uuid.UUID, section: str, is_client: bool, query: str = "") -> str:
     base = get_settings().app_base_url
-    portal_section = {"tasks": "tasks", "documents": "files", "calendar": ""}.get(section, "")
+    portal_section = {
+        "tasks": "tasks",
+        "documents": "files",
+        "calendar": "",
+        "moodboards": "inspiration",
+    }.get(section, "")
     if is_client:
         return f"{base}/portal/{portal_section}".rstrip("/")
     return f"{base}/app/weddings/{project_id}/{section}{query}"
@@ -215,6 +220,66 @@ async def document_shared(db: AsyncSession, ctx: ProjectContext, title: str) -> 
             title,
             ctx.project.title,
             wedding_link(ctx.project.id, "documents", r.is_client),
+            settings_link(r.is_client),
+        ),
+    )
+
+
+async def couple_added_images(
+    db: AsyncSession, ctx: ProjectContext, board: str, count: int
+) -> None:
+    """The couple added inspiration: the wedding's leads hear about it (setting "documents")."""
+    ids = await _project_members(db, ctx.project.id, {ProjectRole.LEAD})
+    await _send(
+        db,
+        ctx,
+        await _recipients(db, ids),
+        "documents",
+        lambda r: mailer.moodboard_email(
+            r.email,
+            _actor(ctx),
+            f"{count} image{'s' if count != 1 else ''} on “{board}”",
+            ctx.project.title,
+            wedding_link(ctx.project.id, "moodboards", r.is_client),
+            settings_link(r.is_client),
+        ),
+    )
+
+
+async def moodboard_commented(
+    db: AsyncSession, ctx: ProjectContext, item_id: uuid.UUID, label: str
+) -> None:
+    """A comment on an image reaches whoever uploaded it; couple comments reach the leads."""
+    from app.moodboards.models import MoodboardItem
+
+    item = await db.get(MoodboardItem, item_id)
+    if item is None:
+        return
+    ids: list[uuid.UUID] = []
+    if ctx.project_role == ProjectRole.CLIENT:
+        ids += await _project_members(db, ctx.project.id, {ProjectRole.LEAD})
+    if item.uploaded_by:
+        ids += list(
+            (
+                await db.execute(
+                    select(Membership.id).where(
+                        Membership.user_id == item.uploaded_by,
+                        Membership.organization_id == ctx.organization_id,
+                    )
+                )
+            ).scalars()
+        )
+    await _send(
+        db,
+        ctx,
+        await _recipients(db, ids),
+        "comments",
+        lambda r: mailer.comment_email(
+            r.email,
+            _actor(ctx),
+            label,
+            ctx.project.title,
+            wedding_link(ctx.project.id, "moodboards", r.is_client),
             settings_link(r.is_client),
         ),
     )

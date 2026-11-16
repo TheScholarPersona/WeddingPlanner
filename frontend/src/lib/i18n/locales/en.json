@@ -97,7 +97,10 @@
     "documents": "Documents",
     "notifications": "Notifications",
     "account": "Account",
-    "admin": "Platform admin"
+    "admin": "Platform admin",
+    "moodboards": "Moodboards",
+    "inspiration": "Inspiration",
+    "more": "More"
   },
   "planner": {
     "dashboard": {
@@ -253,7 +256,12 @@
     "admin.organization_created": "(platform admin) created the organization",
     "admin.organization_suspended": "(platform admin) suspended the organization",
     "admin.organization_reactivated": "(platform admin) reactivated the organization",
-    "admin.two_factor_reset": "(platform admin) reset a member's two-factor authentication"
+    "admin.two_factor_reset": "(platform admin) reset a member's two-factor authentication",
+    "moodboard.shared_with_client": "shared a moodboard with the couple",
+    "moodboard.unshared": "made a moodboard internal again",
+    "moodboard.deleted": "deleted a moodboard",
+    "moodboard.exported": "exported a moodboard as PDF",
+    "moodboard.virus_found": "blocked an image that contained a virus"
   },
   "portal": {
     "due": "Due {{date}}",
@@ -368,7 +376,13 @@
       "invalid_current_password": "The password is incorrect.",
       "confirmation_mismatch": "The name does not match.",
       "no_support_access": "An admin of this organization has to grant support access first.",
-      "reauth_required": "Please confirm your password."
+      "reauth_required": "Please confirm your password.",
+      "unsupported_image": "This file is not accepted. Upload JPG, PNG, WebP or HEIC images.",
+      "too_many_images": "This wedding has reached its limit of 300 moodboard images.",
+      "too_many_boards": "A wedding can have up to 30 boards.",
+      "too_many_sections": "A board can have up to 20 sections.",
+      "couple_board": "Boards the couple created stay shared with them.",
+      "image_processing": "The image is still being prepared. Try again in a moment."
     }
   },
   "weddings": {
@@ -965,5 +979,74 @@
       "weddings": "Weddings",
       "no2fa": "No 2FA"
     }
+  },
+  "moodboards": {
+    "portalTitle": "Inspiration",
+    "introTeam": "Collect the look of the wedding with the couple, then narrow it down and send it to vendors as a PDF.",
+    "introCouple": "Collect ideas with your planner: add photos, heart your favorites and comment.",
+    "newBoard": "New board",
+    "create": "Create board",
+    "boardTitle": "Title",
+    "titlePlaceholder": "e.g. Overall look",
+    "useTemplate": "Start with sections",
+    "templateHint": "Overall look, Venue, Flowers, Table decor, Cake, Outfits, Stationery",
+    "shareWithCouple": "Share with the couple",
+    "shareHint": "The couple can see the board, add images, heart and comment.",
+    "shared": "Shared with couple",
+    "fromCouple": "From the couple",
+    "emptyTitle": "No boards yet",
+    "emptyTeam": "Create a board to collect the style of this wedding with the couple.",
+    "emptyCouple": "Create a board and add photos that inspire you. Your planner sees them right away.",
+    "counts_one": "{{count}} image · {{selected}} selected",
+    "counts_other": "{{count}} images · {{selected}} selected",
+    "unsorted": "More ideas",
+    "showDiscarded_one": "Show {{count}} discarded image",
+    "showDiscarded_other": "Show {{count}} discarded images",
+    "emptySection": "No images yet.",
+    "emptySectionUpload": "No images yet. Add some with the button above.",
+    "addImages": "Add images",
+    "addImagesTo": "Add images to {{section}}",
+    "tooMany": "Choose up to {{max}} images at a time.",
+    "tooLarge": "Images can be up to {{max}} MB.",
+    "processing": "Preparing…",
+    "imageIn": "Image in {{section}}",
+    "newSection": "New section",
+    "sectionPlaceholder": "e.g. Lighting",
+    "rename": "Rename",
+    "pdfSelected": "PDF: selected",
+    "pdfAll": "PDF: all ideas",
+    "confirmDelete": "Delete the board “{{title}}” with all its images?",
+    "palette": "Color palette",
+    "pickColor": "Pick a color",
+    "hexValue": "Hex value",
+    "addColor": "Add color",
+    "removeColor": "Remove {{color}}",
+    "notes": "Internal note",
+    "notesHint": "Only your team sees this note.",
+    "previous": "Previous image",
+    "next": "Next image",
+    "close": "Close",
+    "heart": "Heart",
+    "hearted": "Hearted",
+    "heartedBy": "Hearted by {{names}}",
+    "decision": "Decision",
+    "status": {
+      "selected": "Selected",
+      "proposed": "Idea",
+      "discarded": "Discarded"
+    },
+    "selectedHint": "Your planner selected this one.",
+    "caption": "Description",
+    "captionPlaceholder": "e.g. Peonies in blush",
+    "section": "Section",
+    "comments": "Comments",
+    "noComments": "No comments yet.",
+    "writeComment": "Write a comment",
+    "teamOnly": "team only",
+    "teamOnlyComment": "Only for the team",
+    "send": "Send",
+    "someone": "Someone",
+    "deleteImage": "Delete image",
+    "confirmDeleteImage": "Delete this image?"
   }
 }

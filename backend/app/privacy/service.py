@@ -31,6 +31,8 @@ from app.db.tenant import set_tenant_context
 from app.documents.models import Document, DocumentVersion
 from app.documents.storage import get_storage
 from app.events.models import CalendarFeed, Event
+from app.moodboards.models import Moodboard, MoodboardItem, MoodboardSection
+from app.moodboards.service import project_storage_keys as moodboard_storage_keys
 from app.notifications.models import NotificationPreference
 from app.organizations.models import Membership, MembershipStatus, Organization, OrgRole
 from app.privacy.models import CONSENT_TEXT_VERSION, Consent, ConsentKind
@@ -129,6 +131,16 @@ async def export_client(
                 "document_versions": await _rows(
                     db, DocumentVersion, DocumentVersion.project_id == project.id
                 ),
+                "moodboards": await _rows(db, Moodboard, Moodboard.project_id == project.id),
+                "moodboard_sections": await _rows(
+                    db, MoodboardSection, MoodboardSection.project_id == project.id
+                ),
+                "moodboard_images": [
+                    {k: v for k, v in row.items() if k not in ("thumb_key", "display_key")}
+                    for row in await _rows(
+                        db, MoodboardItem, MoodboardItem.project_id == project.id
+                    )
+                ],
             }
         )
     couples = await _couple_users(db, ids)
@@ -174,6 +186,20 @@ async def export_client(
                 except Exception:  # noqa: S112 - a missing object must not stop the export
                     continue
                 archive.writestr(f"files/{v.document_id}/v{v.number}-{v.filename}", content)
+            items = (
+                await db.execute(
+                    select(MoodboardItem).where(
+                        MoodboardItem.project_id.in_(ids),
+                        MoodboardItem.scan_status.in_(["clean", "not_scanned"]),
+                    )
+                )
+            ).scalars()
+            for item in items:
+                try:
+                    content = await storage.get(item.storage_key)
+                except Exception:  # noqa: S112 - a missing object must not stop the export
+                    continue
+                archive.writestr(f"moodboards/{item.board_id}/{item.id}-{item.filename}", content)
     await audit.record(
         db,
         action="privacy.client_exported",
@@ -213,6 +239,7 @@ async def erase_client(
                 )
             ).scalars()
         )
+        keys += await moodboard_storage_keys(db, ids)
     couples = await _couple_users(db, ids)
 
     # Documents point at their current version; clear that before the cascade.

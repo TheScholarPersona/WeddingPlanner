@@ -7,6 +7,12 @@ from app.budget.models import Budget, BudgetCategory, BudgetItem, Payment
 from app.clients.models import Client, ClientContact
 from app.documents.models import Document, DocumentVersion
 from app.events.models import CalendarFeed, Event
+from app.moodboards.models import (
+    Moodboard,
+    MoodboardItem,
+    MoodboardReaction,
+    MoodboardSection,
+)
 from app.notifications.models import NotificationLog, NotificationPreference
 from app.organizations.models import Invitation, Membership, Organization
 from app.privacy.models import Consent
@@ -32,6 +38,10 @@ __all__ = [
     "Invitation",
     "Membership",
     "Milestone",
+    "Moodboard",
+    "MoodboardItem",
+    "MoodboardReaction",
+    "MoodboardSection",
     "NotificationLog",
     "NotificationPreference",
     "Organization",

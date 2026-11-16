@@ -164,3 +164,16 @@ def digest_email(to: str, organization_name: str, lines: list[str], settings_lin
             f"Good morning,\n\nhere is what is coming up:\n\n{body}\n", settings_link
         ),
     )
+
+
+def moodboard_email(
+    to: str, actor: str, what: str, wedding_title: str, link: str, settings_link: str
+) -> Email:
+    return Email(
+        to=to,
+        subject=f"New inspiration for “{wedding_title}”",
+        text=_with_footer(
+            f"Hello,\n\n{actor} added {what} in “{wedding_title}”.\n\nHave a look:\n{link}\n",
+            settings_link,
+        ),
+    )

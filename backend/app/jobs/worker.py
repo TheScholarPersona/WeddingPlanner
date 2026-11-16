@@ -10,6 +10,7 @@ from app.core.config import get_settings
 from app.core.logging import configure_logging
 from app.documents.service import scan_document_job
 from app.jobs.retention import purge
+from app.moodboards.service import process_image_job
 from app.notifications.digest import send_daily_digests
 from app.notifications.mailer import send_email_job
 
@@ -31,6 +32,7 @@ class WorkerSettings:
         heartbeat,
         func(cast(Any, send_email_job), name="send_email"),
         func(cast(Any, scan_document_job), name="scan_document", max_tries=3),
+        func(cast(Any, process_image_job), name="process_moodboard_image", max_tries=3),
     ]
     cron_jobs: ClassVar[list[Any]] = [
         cron(cast(Any, send_daily_digests), minute=5, run_at_startup=False),
