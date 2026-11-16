@@ -76,6 +76,9 @@ class ProjectPerm(StrEnum):
     DOCUMENTS_READ = "documents:read"
     DOCUMENTS_WRITE = "documents:write"
     EVENTS_WRITE = "events:write"
+    MOODBOARDS_READ = "moodboards:read"
+    MOODBOARDS_WRITE = "moodboards:write"
+    MOODBOARDS_DELETE = "moodboards:delete"
 
 
 # Org admins act as "admin" in every wedding: everything a lead may do, plus deleting.
@@ -89,6 +92,7 @@ _VIEWER = frozenset(
         ProjectPerm.COMMENT,
         ProjectPerm.BUDGET_READ,
         ProjectPerm.DOCUMENTS_READ,
+        ProjectPerm.MOODBOARDS_READ,
     }
 )
 _PLANNER = _VIEWER | {
@@ -98,12 +102,14 @@ _PLANNER = _VIEWER | {
     ProjectPerm.BUDGET_WRITE,
     ProjectPerm.DOCUMENTS_WRITE,
     ProjectPerm.EVENTS_WRITE,
+    ProjectPerm.MOODBOARDS_WRITE,
 }
 _LEAD = _PLANNER | {
     ProjectPerm.MANAGE_TEAM,
     ProjectPerm.ARCHIVE,
     ProjectPerm.BUDGET_SET_TOTAL,
     ProjectPerm.CLIENT_ACCESS,
+    ProjectPerm.MOODBOARDS_DELETE,
 }
 
 PROJECT_ROLE_PERMS: dict[str, frozenset[ProjectPerm]] = {

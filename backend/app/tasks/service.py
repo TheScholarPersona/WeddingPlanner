@@ -691,6 +691,20 @@ async def _check_target(
         if target_id != ctx.project.id:
             raise not_found()
         return ctx.project.title
+    if target_type == "moodboard_item":
+        from app.moodboards.models import Moodboard, MoodboardItem
+
+        row = (
+            await db.execute(
+                select(MoodboardItem, Moodboard.title)
+                .join(Moodboard, Moodboard.id == MoodboardItem.board_id)
+                .where(MoodboardItem.id == target_id, MoodboardItem.project_id == ctx.project.id)
+            )
+        ).one_or_none()
+        if row is None:
+            raise not_found()
+        item, board_title = row
+        return item.caption or f"Image on {board_title}"
     target: Task | Milestone | None = (
         await db.get(Task, target_id)
         if target_type == "task"
@@ -753,6 +767,8 @@ async def add_comment(db: AsyncSession, ctx: ProjectContext, body: CommentIn) ->
         summary=label,
         visibility=body.visibility,
     )
+    if body.target_type == "moodboard_item":
+        await notify.moodboard_commented(db, ctx, body.target_id, label)
     if body.target_type == "task":
         task = await _get_task(db, ctx, body.target_id)
         await notify.commented(

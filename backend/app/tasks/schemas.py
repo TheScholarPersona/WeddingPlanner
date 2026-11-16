@@ -117,7 +117,7 @@ class MilestoneDetailOut(BaseModel):
 
 
 class CommentIn(BaseModel):
-    target_type: Literal["project", "task", "milestone"]
+    target_type: Literal["project", "task", "milestone", "moodboard_item"]
     target_id: uuid.UUID
     body: str = Field(min_length=1, max_length=5000)
     visibility: VisibilityT = "internal"
