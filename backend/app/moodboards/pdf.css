@@ -1,0 +1,23 @@
+/* Moodboard PDF layout (WeasyPrint). {FONTS} is replaced with the bundled font folder. */
+@font-face { font-family: Inter; font-weight: 400; src: url('{FONTS}/inter-latin-400-normal.woff2'); }
+@font-face { font-family: Inter; font-weight: 600; src: url('{FONTS}/inter-latin-600-normal.woff2'); }
+@font-face { font-family: Cormorant; font-weight: 500; src: url('{FONTS}/cormorant-garamond-latin-500-normal.woff2'); }
+@font-face { font-family: Cormorant; font-weight: 600; src: url('{FONTS}/cormorant-garamond-latin-600-normal.woff2'); }
+@page { size: A4 landscape; margin: 14mm 16mm; @bottom-right { content: counter(page); font: 8pt Inter; color: #8a8378; } }
+body { font-family: Inter; color: #2b2925; font-size: 9pt; }
+h1, h2 { font-family: Cormorant; font-weight: 600; margin: 0; }
+.cover { height: 170mm; display: flex; flex-direction: column; justify-content: center; }
+.eyebrow { text-transform: uppercase; letter-spacing: .12em; font-size: 8pt; color: #6b6458; }
+.cover h1 { font-size: 44pt; margin: 6mm 0 3mm; }
+.meta { font-size: 11pt; color: #4a463f; }
+.palette { display: flex; gap: 6mm; margin-top: 12mm; }
+.swatch { width: 22mm; }
+.chip { height: 16mm; border-radius: 3mm; border: .3mm solid #e4ded3; }
+.hex { font-size: 8pt; margin-top: 1.5mm; color: #4a463f; }
+section { page-break-before: always; }
+section h2 { font-size: 24pt; margin-bottom: 5mm; border-bottom: .3mm solid #e4ded3; padding-bottom: 2mm; }
+.grid { display: flex; flex-wrap: wrap; gap: 5mm; }
+figure { width: 76mm; margin: 0; page-break-inside: avoid; }
+figure img { width: 76mm; height: 57mm; object-fit: cover; border-radius: 2mm; }
+figcaption { margin-top: 1.5mm; color: #4a463f; }
+.footer { margin-top: 8mm; font-size: 7.5pt; color: #8a8378; }

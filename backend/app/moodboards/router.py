@@ -1,5 +1,6 @@
 import uuid
 from typing import Annotated, Literal
+from urllib.parse import quote
 
 from fastapi import APIRouter, File, Form, Header, Response, UploadFile, status
 from pydantic import BaseModel, Field
@@ -7,7 +8,7 @@ from pydantic import BaseModel, Field
 from app.authz.deps import DbSession, ProjectContext, require_project
 from app.authz.permissions import ProjectPerm
 from app.jobs.queue import Jobs
-from app.moodboards import images, service
+from app.moodboards import images, pdf, service
 from app.moodboards.models import MoodboardItem
 from app.moodboards.schemas import (
     BoardIn,
@@ -174,6 +175,35 @@ async def item_image(
 ) -> Response:
     item, data, content_type = await service.image(db, ctx, board_id, item_id, size)
     return image_response(item, data, content_type, size)
+
+
+@router.get(P + B + "/export.pdf", response_class=Response)
+async def export_pdf(
+    board_id: uuid.UUID,
+    db: DbSession,
+    selected_only: bool = True,
+    section: uuid.UUID | None = None,
+    include_couple: bool = False,
+    ctx: ProjectContext = Read,
+) -> Response:
+    """PDF for vendors; the planner sends it on (vendors get no access to the platform)."""
+    filename, data = await pdf.render(
+        db,
+        ctx,
+        board_id,
+        selected_only=selected_only,
+        section_id=section,
+        include_couple=include_couple,
+    )
+    return Response(
+        content=data,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f"attachment; filename*=UTF-8''{quote(filename)}",
+            "Cache-Control": "private, no-store",
+            "X-Content-Type-Options": "nosniff",
+        },
+    )
 
 
 # --- Portal (the couple) ------------------------------------------------------------------

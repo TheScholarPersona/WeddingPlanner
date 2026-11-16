@@ -324,3 +324,40 @@ async def test_client_export_contains_moodboard_images(
 
     archive = zipfile.ZipFile(io.BytesIO(response.content))
     assert any(n.startswith("moodboards/") and n.endswith("idea-0.jpg") for n in archive.namelist())
+
+
+async def test_pdf_export_for_vendors(
+    world: World, wedding: dict[str, Any], owner_engine: AsyncEngine
+) -> None:
+    lead = world["member"].client
+    board = await new_board(lead, MB(world, wedding), title="Flowers for Blütenwerk")
+    flowers = next(s["id"] for s in board["sections"] if s["title"] == "Flowers")
+    board = await add_images(lead, MB(world, wedding, f"/{board['id']}"), 3, flowers)
+    first, second = board["items"][0]["id"], board["items"][1]["id"]
+    base = MB(world, wedding, f"/{board['id']}")
+    await send(
+        lead,
+        "PATCH",
+        f"{base}/items/{first}",
+        json={"status": "selected", "caption": "Peonies, blush"},
+    )
+    await send(lead, "PATCH", f"{base}/items/{second}", json={"status": "discarded"})
+
+    selected = await world["member2"].client.get(f"{base}/export.pdf")  # viewers may export
+    everything = await lead.get(f"{base}/export.pdf", params={"selected_only": False})
+
+    assert selected.status_code == 200
+    assert selected.headers["content-type"] == "application/pdf"
+    assert selected.content.startswith(b"%PDF")
+    assert "attachment" in selected.headers["content-disposition"]
+    # One selected image vs. two not-discarded ones: the second PDF is larger.
+    assert len(everything.content) > len(selected.content)
+    async with owner_engine.begin() as conn:
+        exports = (
+            await conn.execute(
+                text("SELECT count(*) FROM audit_log WHERE action = 'moodboard.exported'")
+            )
+        ).scalar_one()
+    assert exports == 2
+    # The couple cannot export.
+    assert (await world["client"].client.get(f"{base}/export.pdf")).status_code == 404
