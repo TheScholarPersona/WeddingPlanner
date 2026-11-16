@@ -1,6 +1,6 @@
-import { CalendarDays, CircleDollarSign, FileText, House, ListChecks } from 'lucide-react';
+import { CircleDollarSign, Ellipsis, House, ListChecks, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { NavLink, Outlet } from 'react-router';
+import { NavLink, Outlet, useLocation } from 'react-router';
 
 import { useMe } from '@/features/auth/session';
 import { cn } from '@/lib/utils';
@@ -11,13 +11,22 @@ const items = [
   { to: '/portal', key: 'nav.home', icon: House, end: true },
   { to: '/portal/tasks', key: 'nav.tasks', icon: ListChecks },
   { to: '/portal/budget', key: 'nav.budget', icon: CircleDollarSign },
-  { to: '/portal/calendar', key: 'nav.calendar', icon: CalendarDays },
-  { to: '/portal/files', key: 'nav.files', icon: FileText },
+  { to: '/portal/inspiration', key: 'nav.inspiration', icon: Sparkles },
+  { to: '/portal/more', key: 'nav.more', icon: Ellipsis },
 ] as const;
 
 export function PortalLayout() {
   const { t } = useTranslation();
   const { data: me } = useMe();
+  const { pathname } = useLocation();
+  // Pages reached through "More" keep it highlighted.
+  const underMore = [
+    '/portal/calendar',
+    '/portal/files',
+    '/portal/notifications',
+    '/portal/privacy',
+    '/portal/account',
+  ].some((p) => pathname.startsWith(p));
   const organization = me?.memberships.find((m) => m.role === 'client')?.organization_name;
   return (
     <div className="mx-auto flex min-h-screen max-w-3xl flex-col bg-ground">
@@ -40,7 +49,8 @@ export function PortalLayout() {
             className={({ isActive }) =>
               cn(
                 'flex min-h-11 flex-col items-center justify-center gap-1 text-[11px] text-muted',
-                isActive && 'font-semibold text-accent-strong',
+                (isActive || (to === '/portal/more' && underMore)) &&
+                  'font-semibold text-accent-strong',
               )
             }
           >

@@ -1827,6 +1827,344 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/orgs/{org_id}/projects/{project_id}/moodboards": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Boards */
+        get: operations["list_boards_api_v1_orgs__org_id__projects__project_id__moodboards_get"];
+        put?: never;
+        /** Create Board */
+        post: operations["create_board_api_v1_orgs__org_id__projects__project_id__moodboards_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orgs/{org_id}/projects/{project_id}/moodboards/{board_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Board */
+        get: operations["get_board_api_v1_orgs__org_id__projects__project_id__moodboards__board_id__get"];
+        put?: never;
+        post?: never;
+        /** Delete Board */
+        delete: operations["delete_board_api_v1_orgs__org_id__projects__project_id__moodboards__board_id__delete"];
+        options?: never;
+        head?: never;
+        /** Update Board */
+        patch: operations["update_board_api_v1_orgs__org_id__projects__project_id__moodboards__board_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/orgs/{org_id}/projects/{project_id}/moodboards/{board_id}/sections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add Section */
+        post: operations["add_section_api_v1_orgs__org_id__projects__project_id__moodboards__board_id__sections_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orgs/{org_id}/projects/{project_id}/moodboards/{board_id}/sections/{section_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Section */
+        delete: operations["delete_section_api_v1_orgs__org_id__projects__project_id__moodboards__board_id__sections__section_id__delete"];
+        options?: never;
+        head?: never;
+        /** Rename Section */
+        patch: operations["rename_section_api_v1_orgs__org_id__projects__project_id__moodboards__board_id__sections__section_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/orgs/{org_id}/projects/{project_id}/moodboards/{board_id}/reorder": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reorder */
+        post: operations["reorder_api_v1_orgs__org_id__projects__project_id__moodboards__board_id__reorder_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orgs/{org_id}/projects/{project_id}/moodboards/{board_id}/items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Upload */
+        post: operations["upload_api_v1_orgs__org_id__projects__project_id__moodboards__board_id__items_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orgs/{org_id}/projects/{project_id}/moodboards/{board_id}/items/{item_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Item */
+        delete: operations["delete_item_api_v1_orgs__org_id__projects__project_id__moodboards__board_id__items__item_id__delete"];
+        options?: never;
+        head?: never;
+        /** Update Item */
+        patch: operations["update_item_api_v1_orgs__org_id__projects__project_id__moodboards__board_id__items__item_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/orgs/{org_id}/projects/{project_id}/moodboards/{board_id}/items/{item_id}/heart": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Heart */
+        put: operations["heart_api_v1_orgs__org_id__projects__project_id__moodboards__board_id__items__item_id__heart_put"];
+        post?: never;
+        /** Unheart */
+        delete: operations["unheart_api_v1_orgs__org_id__projects__project_id__moodboards__board_id__items__item_id__heart_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orgs/{org_id}/projects/{project_id}/moodboards/{board_id}/items/{item_id}/image": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Item Image */
+        get: operations["item_image_api_v1_orgs__org_id__projects__project_id__moodboards__board_id__items__item_id__image_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orgs/{org_id}/projects/{project_id}/moodboards/{board_id}/export.pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Export Pdf
+         * @description PDF for vendors; the planner sends it on (vendors get no access to the platform).
+         */
+        get: operations["export_pdf_api_v1_orgs__org_id__projects__project_id__moodboards__board_id__export_pdf_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/portal/projects/{project_id}/moodboards": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Portal Boards */
+        get: operations["portal_boards_api_v1_portal_projects__project_id__moodboards_get"];
+        put?: never;
+        /** Portal Create */
+        post: operations["portal_create_api_v1_portal_projects__project_id__moodboards_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/portal/projects/{project_id}/moodboards/{board_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Portal Board */
+        get: operations["portal_board_api_v1_portal_projects__project_id__moodboards__board_id__get"];
+        put?: never;
+        post?: never;
+        /** Portal Delete */
+        delete: operations["portal_delete_api_v1_portal_projects__project_id__moodboards__board_id__delete"];
+        options?: never;
+        head?: never;
+        /** Portal Rename */
+        patch: operations["portal_rename_api_v1_portal_projects__project_id__moodboards__board_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/portal/projects/{project_id}/moodboards/{board_id}/sections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Portal Add Section */
+        post: operations["portal_add_section_api_v1_portal_projects__project_id__moodboards__board_id__sections_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/portal/projects/{project_id}/moodboards/{board_id}/reorder": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Portal Reorder */
+        post: operations["portal_reorder_api_v1_portal_projects__project_id__moodboards__board_id__reorder_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/portal/projects/{project_id}/moodboards/{board_id}/items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Portal Upload */
+        post: operations["portal_upload_api_v1_portal_projects__project_id__moodboards__board_id__items_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/portal/projects/{project_id}/moodboards/{board_id}/items/{item_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Portal Delete Item */
+        delete: operations["portal_delete_item_api_v1_portal_projects__project_id__moodboards__board_id__items__item_id__delete"];
+        options?: never;
+        head?: never;
+        /** Portal Update Item */
+        patch: operations["portal_update_item_api_v1_portal_projects__project_id__moodboards__board_id__items__item_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/portal/projects/{project_id}/moodboards/{board_id}/items/{item_id}/heart": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Portal Heart */
+        put: operations["portal_heart_api_v1_portal_projects__project_id__moodboards__board_id__items__item_id__heart_put"];
+        post?: never;
+        /** Portal Unheart */
+        delete: operations["portal_unheart_api_v1_portal_projects__project_id__moodboards__board_id__items__item_id__heart_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/portal/projects/{project_id}/moodboards/{board_id}/items/{item_id}/image": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Portal Image */
+        get: operations["portal_image_api_v1_portal_projects__project_id__moodboards__board_id__items__item_id__image_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/portal/projects/{project_id}/moodboards/{board_id}/items/{item_id}/comments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Portal Comments */
+        get: operations["portal_comments_api_v1_portal_projects__project_id__moodboards__board_id__items__item_id__comments_get"];
+        put?: never;
+        /** Portal Comment */
+        post: operations["portal_comment_api_v1_portal_projects__project_id__moodboards__board_id__items__item_id__comments_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1958,10 +2296,124 @@ export interface components {
             /** Next Cursor */
             next_cursor: string | null;
         };
+        /** BoardIn */
+        BoardIn: {
+            /** Title */
+            title: string;
+            /**
+             * Visibility
+             * @default internal
+             * @enum {string}
+             */
+            visibility: "internal" | "client";
+            /**
+             * From Template
+             * @default true
+             */
+            from_template: boolean;
+        };
+        /** BoardOut */
+        BoardOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Title */
+            title: string;
+            /**
+             * Visibility
+             * @enum {string}
+             */
+            visibility: "internal" | "client";
+            /**
+             * Created By Type
+             * @enum {string}
+             */
+            created_by_type: "team" | "client";
+            /** Palette */
+            palette: string[];
+            /** Item Count */
+            item_count: number;
+            /** Selected Count */
+            selected_count: number;
+            /** Preview */
+            preview: string[];
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Version */
+            version: number;
+            /** Notes Internal */
+            notes_internal: string | null;
+            /** Sections */
+            sections: components["schemas"]["SectionOut"][];
+            /** Items */
+            items: components["schemas"]["app__moodboards__schemas__ItemOut"][];
+            /** Can Manage */
+            can_manage: boolean;
+            /** Can Delete */
+            can_delete: boolean;
+        };
+        /** BoardSummaryOut */
+        BoardSummaryOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Title */
+            title: string;
+            /**
+             * Visibility
+             * @enum {string}
+             */
+            visibility: "internal" | "client";
+            /**
+             * Created By Type
+             * @enum {string}
+             */
+            created_by_type: "team" | "client";
+            /** Palette */
+            palette: string[];
+            /** Item Count */
+            item_count: number;
+            /** Selected Count */
+            selected_count: number;
+            /** Preview */
+            preview: string[];
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** BoardUpdateIn */
+        BoardUpdateIn: {
+            /** Title */
+            title?: string | null;
+            /** Visibility */
+            visibility?: ("internal" | "client") | null;
+            /** Palette */
+            palette?: string[] | null;
+            /** Notes Internal */
+            notes_internal?: string | null;
+        };
         /** Body_add_version_api_v1_orgs__org_id__projects__project_id__documents__document_id__versions_post */
         Body_add_version_api_v1_orgs__org_id__projects__project_id__documents__document_id__versions_post: {
             /** File */
             file: string;
+        };
+        /** Body_portal_upload_api_v1_portal_projects__project_id__moodboards__board_id__items_post */
+        Body_portal_upload_api_v1_portal_projects__project_id__moodboards__board_id__items_post: {
+            /** Files */
+            files: string[];
+            /** Section Id */
+            section_id?: string | null;
+            /** Caption */
+            caption?: string | null;
         };
         /** Body_upload_api_v1_orgs__org_id__projects__project_id__documents_post */
         Body_upload_api_v1_orgs__org_id__projects__project_id__documents_post: {
@@ -1981,6 +2433,15 @@ export interface components {
              * @enum {string}
              */
             visibility: "internal" | "client";
+        };
+        /** Body_upload_api_v1_orgs__org_id__projects__project_id__moodboards__board_id__items_post */
+        Body_upload_api_v1_orgs__org_id__projects__project_id__moodboards__board_id__items_post: {
+            /** Files */
+            files: string[];
+            /** Section Id */
+            section_id?: string | null;
+            /** Caption */
+            caption?: string | null;
         };
         /** Body_upload_document_api_v1_portal_projects__project_id__documents_post */
         Body_upload_document_api_v1_portal_projects__project_id__documents_post: {
@@ -2095,7 +2556,7 @@ export interface components {
             /** Forecast Cents */
             forecast_cents: number;
             /** Items */
-            items: components["schemas"]["ItemOut"][];
+            items: components["schemas"]["app__budget__schemas__ItemOut"][];
         };
         /** CategoryUpdateIn */
         CategoryUpdateIn: {
@@ -2786,71 +3247,6 @@ export interface components {
              */
             visibility: "internal" | "client";
         };
-        /** ItemOut */
-        ItemOut: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /**
-             * Category Id
-             * Format: uuid
-             */
-            category_id: string;
-            /** Title */
-            title: string;
-            /** Vendor Id */
-            vendor_id: string | null;
-            /** Vendor Name */
-            vendor_name: string | null;
-            /** Planned Cents */
-            planned_cents: number;
-            /** Quoted Cents */
-            quoted_cents: number | null;
-            /** Contracted Cents */
-            contracted_cents: number | null;
-            /** Internal Cost Cents */
-            internal_cost_cents: number | null;
-            /** Paid By */
-            paid_by: string;
-            /** Notes Internal */
-            notes_internal: string | null;
-            /**
-             * Visibility
-             * @enum {string}
-             */
-            visibility: "internal" | "client";
-            /** Version */
-            version: number;
-            /** Paid Cents */
-            paid_cents: number;
-            /** Payments */
-            payments: components["schemas"]["PaymentOut"][];
-        };
-        /** ItemUpdateIn */
-        ItemUpdateIn: {
-            /** Category Id */
-            category_id?: string | null;
-            /** Title */
-            title?: string | null;
-            /** Vendor Id */
-            vendor_id?: string | null;
-            /** Planned Cents */
-            planned_cents?: number | null;
-            /** Quoted Cents */
-            quoted_cents?: number | null;
-            /** Contracted Cents */
-            contracted_cents?: number | null;
-            /** Internal Cost Cents */
-            internal_cost_cents?: number | null;
-            /** Paid By */
-            paid_by?: ("client" | "planner") | null;
-            /** Notes Internal */
-            notes_internal?: string | null;
-            /** Visibility */
-            visibility?: ("internal" | "client") | null;
-        };
         /** LoginIn */
         LoginIn: {
             /**
@@ -3159,6 +3555,69 @@ export interface components {
             /** Paid */
             paid?: boolean | null;
         };
+        /** PortalBoard */
+        PortalBoard: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Title */
+            title: string;
+            /** From Couple */
+            from_couple: boolean;
+            /** Palette */
+            palette: string[];
+            /** Item Count */
+            item_count: number;
+            /** Selected Count */
+            selected_count: number;
+            /** Preview */
+            preview: string[];
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Version */
+            version: number;
+            /** Sections */
+            sections: components["schemas"]["SectionOut"][];
+            /** Items */
+            items: components["schemas"]["app__moodboards__schemas__ItemOut"][];
+            /** Can Manage */
+            can_manage: boolean;
+            /** Can Delete */
+            can_delete: boolean;
+        };
+        /**
+         * PortalBoardSummary
+         * @description What a couple sees: no internal notes, no visibility switch.
+         */
+        PortalBoardSummary: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Title */
+            title: string;
+            /** From Couple */
+            from_couple: boolean;
+            /** Palette */
+            palette: string[];
+            /** Item Count */
+            item_count: number;
+            /** Selected Count */
+            selected_count: number;
+            /** Preview */
+            preview: string[];
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
         /** PortalBudget */
         PortalBudget: {
             /** Total Cents */
@@ -3336,6 +3795,11 @@ export interface components {
             downloadable: boolean;
             /** Scan Status */
             scan_status: string;
+        };
+        /** PortalItemCommentIn */
+        PortalItemCommentIn: {
+            /** Body */
+            body: string;
         };
         /** PortalMilestone */
         PortalMilestone: {
@@ -3731,11 +4195,6 @@ export interface components {
             /** Recovery Codes */
             recovery_codes: string[];
         };
-        /** ReorderIn */
-        ReorderIn: {
-            /** Items */
-            items: components["schemas"]["ReorderItem"][];
-        };
         /** ReorderItem */
         ReorderItem: {
             /**
@@ -3762,6 +4221,21 @@ export interface components {
             email: string;
             /** Reason */
             reason: string;
+        };
+        /** SectionIn */
+        SectionIn: {
+            /** Title */
+            title: string;
+        };
+        /** SectionOut */
+        SectionOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Title */
+            title: string;
         };
         /** SupportAuditOut */
         SupportAuditOut: {
@@ -4396,6 +4870,144 @@ export interface components {
             /** Title */
             title?: string | null;
         };
+        /** ItemOut */
+        app__budget__schemas__ItemOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Category Id
+             * Format: uuid
+             */
+            category_id: string;
+            /** Title */
+            title: string;
+            /** Vendor Id */
+            vendor_id: string | null;
+            /** Vendor Name */
+            vendor_name: string | null;
+            /** Planned Cents */
+            planned_cents: number;
+            /** Quoted Cents */
+            quoted_cents: number | null;
+            /** Contracted Cents */
+            contracted_cents: number | null;
+            /** Internal Cost Cents */
+            internal_cost_cents: number | null;
+            /** Paid By */
+            paid_by: string;
+            /** Notes Internal */
+            notes_internal: string | null;
+            /**
+             * Visibility
+             * @enum {string}
+             */
+            visibility: "internal" | "client";
+            /** Version */
+            version: number;
+            /** Paid Cents */
+            paid_cents: number;
+            /** Payments */
+            payments: components["schemas"]["PaymentOut"][];
+        };
+        /** ItemUpdateIn */
+        app__budget__schemas__ItemUpdateIn: {
+            /** Category Id */
+            category_id?: string | null;
+            /** Title */
+            title?: string | null;
+            /** Vendor Id */
+            vendor_id?: string | null;
+            /** Planned Cents */
+            planned_cents?: number | null;
+            /** Quoted Cents */
+            quoted_cents?: number | null;
+            /** Contracted Cents */
+            contracted_cents?: number | null;
+            /** Internal Cost Cents */
+            internal_cost_cents?: number | null;
+            /** Paid By */
+            paid_by?: ("client" | "planner") | null;
+            /** Notes Internal */
+            notes_internal?: string | null;
+            /** Visibility */
+            visibility?: ("internal" | "client") | null;
+        };
+        /** ItemOut */
+        app__moodboards__schemas__ItemOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Section Id */
+            section_id: string | null;
+            /** Caption */
+            caption: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "proposed" | "selected" | "discarded";
+            /** Width */
+            width: number | null;
+            /** Height */
+            height: number | null;
+            /** Ready */
+            ready: boolean;
+            /** Scan Status */
+            scan_status: string;
+            /** Uploaded By Name */
+            uploaded_by_name: string | null;
+            /**
+             * Uploaded By Type
+             * @enum {string}
+             */
+            uploaded_by_type: "team" | "client";
+            /** Can Edit */
+            can_edit: boolean;
+            /** Hearts */
+            hearts: number;
+            /** Hearted By Me */
+            hearted_by_me: boolean;
+            /** Heart Names */
+            heart_names: string[];
+            /** Comment Count */
+            comment_count: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** ItemUpdateIn */
+        app__moodboards__schemas__ItemUpdateIn: {
+            /** Caption */
+            caption?: string | null;
+            /** Section Id */
+            section_id?: string | null;
+            /** Status */
+            status?: ("proposed" | "selected" | "discarded") | null;
+            /**
+             * Move To Unsorted
+             * @default false
+             */
+            move_to_unsorted: boolean;
+        };
+        /**
+         * ReorderIn
+         * @description Full order of the board: section ids, and for each section (or "" = unsorted) its items.
+         */
+        app__moodboards__schemas__ReorderIn: {
+            /** Sections */
+            sections?: string[];
+            /** Items */
+            items?: {
+                [key: string]: string[];
+            };
+        };
         /** CommentIn */
         app__portal__router__CommentIn: {
             /** Body */
@@ -4407,7 +5019,7 @@ export interface components {
              * Target Type
              * @enum {string}
              */
-            target_type: "project" | "task" | "milestone";
+            target_type: "project" | "task" | "milestone" | "moodboard_item";
             /**
              * Target Id
              * Format: uuid
@@ -4421,6 +5033,11 @@ export interface components {
              * @enum {string}
              */
             visibility: "internal" | "client";
+        };
+        /** ReorderIn */
+        app__tasks__schemas__ReorderIn: {
+            /** Items */
+            items: components["schemas"]["ReorderItem"][];
         };
     };
     responses: never;
@@ -6708,7 +7325,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["ReorderIn"];
+                "application/json": components["schemas"]["app__tasks__schemas__ReorderIn"];
             };
         };
         responses: {
@@ -7147,7 +7764,7 @@ export interface operations {
     list_comments_api_v1_orgs__org_id__projects__project_id__comments_get: {
         parameters: {
             query: {
-                target_type: "project" | "task" | "milestone";
+                target_type: "project" | "task" | "milestone" | "moodboard_item";
                 target_id: string;
             };
             header?: never;
@@ -7574,7 +8191,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["ItemUpdateIn"];
+                "application/json": components["schemas"]["app__budget__schemas__ItemUpdateIn"];
             };
         };
         responses: {
@@ -9383,6 +10000,1082 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_boards_api_v1_orgs__org_id__projects__project_id__moodboards_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                org_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BoardSummaryOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_board_api_v1_orgs__org_id__projects__project_id__moodboards_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                org_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BoardIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BoardOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_board_api_v1_orgs__org_id__projects__project_id__moodboards__board_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                board_id: string;
+                org_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BoardOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_board_api_v1_orgs__org_id__projects__project_id__moodboards__board_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                board_id: string;
+                org_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_board_api_v1_orgs__org_id__projects__project_id__moodboards__board_id__patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                "if-match"?: string | null;
+            };
+            path: {
+                board_id: string;
+                org_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BoardUpdateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BoardOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_section_api_v1_orgs__org_id__projects__project_id__moodboards__board_id__sections_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                board_id: string;
+                org_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SectionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BoardOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_section_api_v1_orgs__org_id__projects__project_id__moodboards__board_id__sections__section_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                board_id: string;
+                section_id: string;
+                org_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BoardOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    rename_section_api_v1_orgs__org_id__projects__project_id__moodboards__board_id__sections__section_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                board_id: string;
+                section_id: string;
+                org_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SectionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BoardOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reorder_api_v1_orgs__org_id__projects__project_id__moodboards__board_id__reorder_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                board_id: string;
+                org_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["app__moodboards__schemas__ReorderIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BoardOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    upload_api_v1_orgs__org_id__projects__project_id__moodboards__board_id__items_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                board_id: string;
+                org_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_upload_api_v1_orgs__org_id__projects__project_id__moodboards__board_id__items_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BoardOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_item_api_v1_orgs__org_id__projects__project_id__moodboards__board_id__items__item_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                board_id: string;
+                item_id: string;
+                org_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BoardOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_item_api_v1_orgs__org_id__projects__project_id__moodboards__board_id__items__item_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                board_id: string;
+                item_id: string;
+                org_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["app__moodboards__schemas__ItemUpdateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BoardOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    heart_api_v1_orgs__org_id__projects__project_id__moodboards__board_id__items__item_id__heart_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                board_id: string;
+                item_id: string;
+                org_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BoardOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    unheart_api_v1_orgs__org_id__projects__project_id__moodboards__board_id__items__item_id__heart_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                board_id: string;
+                item_id: string;
+                org_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BoardOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    item_image_api_v1_orgs__org_id__projects__project_id__moodboards__board_id__items__item_id__image_get: {
+        parameters: {
+            query?: {
+                size?: "thumb" | "display" | "original";
+            };
+            header?: never;
+            path: {
+                board_id: string;
+                item_id: string;
+                org_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    export_pdf_api_v1_orgs__org_id__projects__project_id__moodboards__board_id__export_pdf_get: {
+        parameters: {
+            query?: {
+                selected_only?: boolean;
+                section?: string | null;
+                include_couple?: boolean;
+            };
+            header?: never;
+            path: {
+                board_id: string;
+                org_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    portal_boards_api_v1_portal_projects__project_id__moodboards_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PortalBoardSummary"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    portal_create_api_v1_portal_projects__project_id__moodboards_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BoardIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PortalBoard"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    portal_board_api_v1_portal_projects__project_id__moodboards__board_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                board_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PortalBoard"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    portal_delete_api_v1_portal_projects__project_id__moodboards__board_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                board_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    portal_rename_api_v1_portal_projects__project_id__moodboards__board_id__patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                "if-match"?: string | null;
+            };
+            path: {
+                board_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BoardUpdateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PortalBoard"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    portal_add_section_api_v1_portal_projects__project_id__moodboards__board_id__sections_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                board_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SectionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PortalBoard"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    portal_reorder_api_v1_portal_projects__project_id__moodboards__board_id__reorder_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                board_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["app__moodboards__schemas__ReorderIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PortalBoard"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    portal_upload_api_v1_portal_projects__project_id__moodboards__board_id__items_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                board_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_portal_upload_api_v1_portal_projects__project_id__moodboards__board_id__items_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PortalBoard"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    portal_delete_item_api_v1_portal_projects__project_id__moodboards__board_id__items__item_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                board_id: string;
+                item_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PortalBoard"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    portal_update_item_api_v1_portal_projects__project_id__moodboards__board_id__items__item_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                board_id: string;
+                item_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["app__moodboards__schemas__ItemUpdateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PortalBoard"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    portal_heart_api_v1_portal_projects__project_id__moodboards__board_id__items__item_id__heart_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                board_id: string;
+                item_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PortalBoard"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    portal_unheart_api_v1_portal_projects__project_id__moodboards__board_id__items__item_id__heart_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                board_id: string;
+                item_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PortalBoard"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    portal_image_api_v1_portal_projects__project_id__moodboards__board_id__items__item_id__image_get: {
+        parameters: {
+            query?: {
+                size?: "thumb" | "display";
+            };
+            header?: never;
+            path: {
+                board_id: string;
+                item_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    portal_comments_api_v1_portal_projects__project_id__moodboards__board_id__items__item_id__comments_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                board_id: string;
+                item_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CommentOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    portal_comment_api_v1_portal_projects__project_id__moodboards__board_id__items__item_id__comments_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                board_id: string;
+                item_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PortalItemCommentIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CommentOut"];
+                };
             };
             /** @description Validation Error */
             422: {

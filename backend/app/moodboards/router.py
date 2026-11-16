@@ -225,6 +225,7 @@ def _portal_summary(board: BoardSummaryOut) -> PortalBoardSummary:
 def _portal(board: BoardOut) -> PortalBoard:
     return PortalBoard(
         **_portal_summary(board).model_dump(),
+        version=board.version,
         sections=board.sections,
         items=board.items,
         can_manage=board.can_manage,

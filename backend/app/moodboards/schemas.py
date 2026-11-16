@@ -99,6 +99,7 @@ class PortalBoardSummary(BaseModel):
 
 
 class PortalBoard(PortalBoardSummary):
+    version: int
     sections: list[SectionOut]
     items: list[ItemOut]
     can_manage: bool

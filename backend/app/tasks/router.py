@@ -191,7 +191,7 @@ async def delete_milestone(
 
 @router.get(f"{P}/comments", response_model=list[CommentOut])
 async def list_comments(
-    target_type: Literal["project", "task", "milestone"],
+    target_type: Literal["project", "task", "milestone", "moodboard_item"],
     target_id: uuid.UUID,
     db: DbSession,
     ctx: ProjectContext = require_project(ProjectPerm.TASKS_READ),

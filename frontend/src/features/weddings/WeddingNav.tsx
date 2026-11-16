@@ -27,6 +27,9 @@ export function WeddingNav({ id }: { id: string }) {
       <NavLink to={`/app/weddings/${id}/documents`} className={link}>
         {t('nav.documents')}
       </NavLink>
+      <NavLink to={`/app/weddings/${id}/moodboards`} className={link}>
+        {t('nav.moodboards')}
+      </NavLink>
       <NavLink to={`/app/weddings/${id}/calendar`} className={link}>
         {t('nav.calendar')}
       </NavLink>
