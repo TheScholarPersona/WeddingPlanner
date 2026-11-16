@@ -272,3 +272,37 @@ it('lists upcoming appointments in the couple calendar', async () => {
   expect(screen.getByText(/Payment 4\.000,00\s€/)).toBeInTheDocument();
   expect(screen.getByRole('button', { name: 'Add to my calendar' })).toBeInTheDocument();
 });
+
+it('lets the couple decide on optional permissions', async () => {
+  const { calls } = mockApi({
+    'GET /me': [200, me],
+    'GET /portal/projects': [200, projects],
+    [`GET ${K}/consents`]: [
+      200,
+      [
+        { kind: 'portfolio', granted: null, decided_at: null, outdated: false },
+        { kind: 'reviews', granted: null, decided_at: null, outdated: false },
+      ],
+    ],
+    [`PUT ${K}/consents`]: [
+      200,
+      [
+        { kind: 'portfolio', granted: false, decided_at: '2026-11-16T08:00:00Z', outdated: false },
+        { kind: 'reviews', granted: null, decided_at: null, outdated: false },
+      ],
+    ],
+  });
+  const user = userEvent.setup();
+  renderRoute('/portal/privacy');
+
+  const portfolio = await screen.findByRole('group', { name: 'Show our wedding as a reference' });
+  await user.click(within(portfolio).getByLabelText('No'));
+
+  await waitFor(() =>
+    expect(calls.find((c) => c.method === 'PUT')?.body).toEqual({
+      kind: 'portfolio',
+      granted: false,
+    }),
+  );
+  expect(await screen.findByText('Your answer from 16.11.2026.')).toBeInTheDocument();
+});
