@@ -13,6 +13,8 @@ x-backend-env: &backend-env
   S3_BUCKET: ${S3_BUCKET:-documents}
   SMTP_HOST: mailpit
   SMTP_PORT: 1025
+  # Links in emails and calendar feeds; `make lan` sets the Mac's network name here.
+  APP_BASE_URL: ${APP_BASE_URL:-https://localhost}
   CLAMAV_HOST: clamav
   CLAMAV_PORT: 3310
   # "clamav" scans every upload (start the scanner with `--profile scan`); "off" for quick local runs.
@@ -21,11 +23,16 @@ x-backend-env: &backend-env
 services:
   proxy:
     image: caddy:2-alpine
+    # The whole folder is mounted and watched: `git pull` replaces the Caddyfile, which a
+    # single-file mount would not show to the running container.
+    command: caddy run --config /etc/caddy/Caddyfile --adapter caddyfile --watch
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-localhost}
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./docker/caddy:/etc/caddy:ro
       - caddy_data:/data
     depends_on:
       - api
@@ -36,11 +43,13 @@ services:
     # node_modules lives in a container volume that survives rebuilds; install what a newer
     # package-lock.json adds before starting (quick no-op when nothing changed).
     command: sh -c "npm install --no-audit --no-fund && npm run dev"
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+      # Host names the dev server accepts behind the proxy (besides localhost).
+      VITE_ALLOWED_HOSTS: ${LAN_HOST:-}
     volumes:
       - ./frontend:/app
       - /app/node_modules
-    environment:
-      CHOKIDAR_USEPOLLING: "true"
 
   api:
     build: ./backend

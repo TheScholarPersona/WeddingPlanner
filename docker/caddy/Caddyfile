@@ -3,7 +3,9 @@
 	local_certs
 }
 
-localhost {
+# SITE_ADDRESS (from .env) lists the names the app answers to: "localhost" by default, plus the
+# Mac's network name (e.g. "localhost, my-mac.local") for phones in the same Wi-Fi (`make lan`).
+{$SITE_ADDRESS:localhost} {
 	encode zstd gzip
 
 	header {
@@ -16,7 +18,7 @@ localhost {
 		# Everything comes from this origin (fonts are bundled). 'unsafe-inline' for scripts and
 		# the websocket are only needed by the Vite dev server used in the local pilot; a
 		# production build drops both (see docs/security-review.md).
-		Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' wss://localhost; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+		Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' wss://{http.request.host}; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
 		-Server
 	}
 

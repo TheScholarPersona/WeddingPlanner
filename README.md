@@ -114,6 +114,31 @@ Then add the exported `caddy-root.crt` to your system:
 
 Firefox keeps its own certificate store: Settings → Privacy & Security → Certificates → Import.
 
+### Open it on a phone in the same Wi-Fi
+
+```bash
+make lan
+```
+
+This makes the app answer to your Mac's network name (e.g. `https://my-mac.local`, also printed
+with its IP address) and points links in emails and calendar feeds there. The phone has to trust
+the local certificate once: AirDrop the exported `caddy-root.crt` to the iPhone, install the
+profile under **Settings → Profile Downloaded**, then turn it on under **Settings → General →
+About → Certificate Trust Settings**. The command prints these steps too. `make lan-off` switches
+back to `https://localhost` only.
+
+Only use this in a Wi-Fi you trust: everyone in it can reach the sign-in page.
+
+### If the app does not open
+
+- **Safari "can't connect to the server"** although everything runs: Safari remembers a failed
+  connection. Open https://localhost in a private window (Cmd + Shift + N) or quit Safari once.
+- **Check that everything is up:** `docker compose ps` lists every service as "Up";
+  `curl -sk https://localhost/api/v1/health` answers `{"status":"ok","database":"ok"}`.
+- **Blank page right after an update:** the frontend is still installing or bundling new
+  packages; wait a moment and reload with Cmd + Shift + R.
+- **Still stuck:** `docker compose logs --tail=40 proxy api frontend` shows what went wrong.
+
 ### Without `make` (e.g. Windows)
 
 ```bash
