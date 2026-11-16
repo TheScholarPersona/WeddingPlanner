@@ -93,7 +93,7 @@ test('the planner selects an image in the large view', async () => {
     'src',
     `/api/v1${MB}/b1/items/i2/image?size=thumb`,
   );
-  await user.click(screen.getByRole('button', { name: 'Open Peonies in blush' }));
+  await user.click(screen.getByRole('button', { name: /^Peonies in blush/ }));
   const dialog = within(screen.getByRole('dialog'));
   expect(dialog.getByText('Hearted by Mia Becker')).toBeInTheDocument();
   await user.click(dialog.getByRole('button', { name: 'Selected' }));
@@ -161,7 +161,7 @@ test('couples heart and comment but do not decide', async () => {
   const user = userEvent.setup();
   renderRoute('/portal/inspiration/b1');
 
-  await user.click(await screen.findByRole('button', { name: 'Open Peonies in blush' }));
+  await user.click(await screen.findByRole('button', { name: /^Peonies in blush/ }));
   const dialog = within(screen.getByRole('dialog'));
   expect(dialog.queryByRole('button', { name: 'Selected' })).not.toBeInTheDocument();
   expect(dialog.queryByRole('button', { name: 'Delete image' })).not.toBeInTheDocument();

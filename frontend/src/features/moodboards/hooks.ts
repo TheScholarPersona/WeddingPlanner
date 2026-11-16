@@ -7,6 +7,7 @@ import {
   fromTeamSummary,
   type Board,
   type BoardSummary,
+  type Item,
   type MoodboardScope,
 } from './api';
 
@@ -14,6 +15,10 @@ import {
 function toBoard(scope: MoodboardScope, data: any): Board {
   return scope.kind === 'team' ? fromTeam(data) : (data as Board);
 }
+
+/** Still being scanned or resized; failed or infected images are final. */
+export const isProcessing = (item: Item) =>
+  !item.ready && !['failed', 'infected'].includes(item.scan_status);
 
 export function useBoards(scope: MoodboardScope) {
   return useQuery({
@@ -31,7 +36,7 @@ export function useBoard(scope: MoodboardScope, id: string) {
     queryFn: async () => toBoard(scope, await api<any>('GET', `${scope.base}/${id}`)),
     // Images are processed after upload (virus scan, previews): check again until ready.
     refetchInterval: (query) =>
-      query.state.data?.items.some((i) => !i.ready && i.scan_status !== 'infected') ? 2500 : false,
+      query.state.data?.items.some((i) => isProcessing(i)) ? 2500 : false,
   });
 }
 

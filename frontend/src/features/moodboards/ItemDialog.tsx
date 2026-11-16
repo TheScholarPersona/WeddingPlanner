@@ -66,18 +66,27 @@ export function ItemDialog({ scope, board, item, canSelect, onClose, onNavigate 
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="flex w-full max-w-6xl flex-col overflow-hidden bg-surface sm:rounded-[var(--radius-card)] lg:flex-row"
+        className="flex w-full max-w-6xl flex-col overflow-y-auto bg-surface sm:rounded-[var(--radius-card)] lg:flex-row lg:overflow-hidden"
       >
-        <div className="relative flex min-h-[45vh] flex-1 items-center justify-center bg-ink">
+        <div className="relative flex min-h-[40vh] shrink-0 items-center justify-center bg-ink lg:min-h-0 lg:flex-1">
           {item.ready ? (
             <img
               src={imageUrl(scope, board.id, item.id, 'display')}
               alt={alt}
-              className="max-h-[80vh] max-w-full object-contain"
+              className="max-h-[60vh] max-w-full object-contain lg:max-h-[85vh]"
             />
           ) : (
             <span className="text-sm text-white/80">{t('moodboards.processing')}</span>
           )}
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label={t('moodboards.close')}
+            className="absolute top-2 right-2 bg-white/80 hover:bg-white"
+            onClick={onClose}
+          >
+            <X aria-hidden="true" />
+          </Button>
           <Button
             variant="ghost"
             size="icon"
@@ -97,19 +106,11 @@ export function ItemDialog({ scope, board, item, canSelect, onClose, onNavigate 
             <ChevronRight aria-hidden="true" />
           </Button>
         </div>
-        <aside className="flex w-full flex-col gap-4 overflow-y-auto p-5 lg:w-[360px]">
+        <aside className="flex w-full flex-col gap-4 p-5 lg:w-[360px] lg:overflow-y-auto">
           <div className="flex items-start justify-between gap-2">
             <h2 id={titleId} className="font-display text-2xl font-semibold">
               {item.caption || section?.title || t('moodboards.unsorted')}
             </h2>
-            <Button
-              variant="ghost"
-              size="icon"
-              aria-label={t('moodboards.close')}
-              onClick={onClose}
-            >
-              <X aria-hidden="true" />
-            </Button>
           </div>
           <p className="text-xs text-muted">
             {[

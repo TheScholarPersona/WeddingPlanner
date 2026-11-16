@@ -72,6 +72,43 @@ WEDDINGS: list[dict[str, Any]] = [
 ]
 
 
+def _pattern(color: tuple[int, int, int], kind: int) -> bytes:
+    """An invented image: soft color fields and shapes, so the demo needs no third-party photos."""
+    import io
+
+    from PIL import Image, ImageDraw
+
+    image = Image.new("RGB", (1200, 1500), color)
+    draw = ImageDraw.Draw(image)
+    darker = tuple(max(0, c - 28) for c in color)
+    lighter = tuple(min(255, c + 22) for c in color)
+    if kind % 3 == 0:
+        for r in range(80, 900, 70):
+            draw.ellipse((600 - r, 750 - r, 600 + r, 750 + r), outline=darker, width=10)
+    elif kind % 3 == 1:
+        for x in range(-1500, 1200, 90):
+            draw.line((x, 0, x + 1500, 1500), fill=lighter, width=28)
+    else:
+        for y in range(120, 1500, 260):
+            for x in range(120, 1200, 260):
+                draw.ellipse(
+                    (x - 70, y - 70, x + 70, y + 70), fill=lighter, outline=darker, width=6
+                )
+    out = io.BytesIO()
+    image.save(out, format="JPEG", quality=85)
+    return out.getvalue()
+
+
+MOODBOARD_IDEAS = [
+    ("Flowers", (201, 169, 166), "Peonies in blush", True),
+    ("Flowers", (234, 219, 200), "Garden roses and ranunculus", False),
+    ("Flowers", (122, 140, 118), "Eucalyptus garland", True),
+    ("Table decor", (226, 211, 190), "Linen napkins, natural", True),
+    ("Table decor", (190, 160, 110), "Brass candle holders", False),
+    ("Cake", (240, 232, 222), "Three tiers, buttercream", False),
+]
+
+
 def _password() -> str:
     return "-".join(secrets.token_urlsafe(4) for _ in range(4))
 
@@ -235,6 +272,39 @@ async def seed_demo(
             },
         )
 
+    # Moodboards: one shared look and the team's vendor shortlist.
+    look = await _call(
+        admin, "POST", f"{path}/moodboards", json={"title": "Overall look", "visibility": "client"}
+    )
+    sections = {s["title"]: s["id"] for s in look["sections"]}
+    board_path = f"{path}/moodboards/{look['id']}"
+    await _call(
+        admin,
+        "PATCH",
+        board_path,
+        json={"palette": ["#c9a9a6", "#eadbc8", "#7a8c76", "#4f6354", "#2b2925"]},
+        headers={"If-Match": f'"{look["version"]}"'},
+    )
+    for index, (section, color, caption, selected) in enumerate(MOODBOARD_IDEAS):
+        view = await _call(
+            planner,
+            "POST",
+            f"{board_path}/items",
+            files=[("files", (f"idea-{index}.jpg", _pattern(color, index), "image/jpeg"))],
+            data={"section_id": sections[section], "caption": caption},
+        )
+        if selected:
+            newest = max(view["items"], key=lambda i: i["created_at"])
+            await _call(
+                admin, "PATCH", f"{board_path}/items/{newest['id']}", json={"status": "selected"}
+            )
+    await _call(
+        admin,
+        "POST",
+        f"{path}/moodboards",
+        json={"title": "Vendor shortlist", "from_template": False},
+    )
+
     # The couple's portal login for the first wedding.
     token = new_token()
     async with get_sessionmaker()() as db:
@@ -263,6 +333,29 @@ async def seed_demo(
         "/comments",
         json={"body": "Could we add a vegan option to the menu?"},
     )
+    shared = (await _call(couple, "GET", f"/portal/projects/{portal[0]['id']}/moodboards"))[0]
+    ideas = await _call(
+        couple,
+        "POST",
+        f"/portal/projects/{portal[0]['id']}/moodboards",
+        json={"title": "Our ideas", "from_template": False},
+    )
+    await _call(
+        couple,
+        "POST",
+        f"/portal/projects/{portal[0]['id']}/moodboards/{ideas['id']}/items",
+        files=[("files", ("our-favorite.jpg", _pattern((214, 190, 205), 2), "image/jpeg"))],
+        data={"caption": "Lilac accents?"},
+    )
+    shared_board = await _call(
+        couple, "GET", f"/portal/projects/{portal[0]['id']}/moodboards/{shared['id']}"
+    )
+    await _call(
+        couple,
+        "PUT",
+        f"/portal/projects/{portal[0]['id']}/moodboards/{shared['id']}/items/{shared_board['items'][0]['id']}/heart",
+    )
+
     for client in (admin, planner, couple):
         await client.aclose()
 

@@ -84,7 +84,10 @@ function BoardBody({ scope, board }: { scope: MoodboardScope; board: Board }) {
   const discarded = board.items.filter((i) => i.status === 'discarded').length;
 
   useEffect(() => {
-    if (!dragging.current) setOrder(orderOf(board, showDiscarded));
+    if (dragging.current) return;
+    const next = orderOf(board, showDiscarded);
+    // Keep the same object when nothing moved, so refreshes do not re-layout the grid.
+    setOrder((prev) => (JSON.stringify(prev) === JSON.stringify(next) ? prev : next));
   }, [board, showDiscarded]);
 
   const reorder = useBoardMutation(scope, board.id, (next: Order) =>
@@ -276,7 +279,7 @@ function SectionBlock({
         )}
       </div>
       {ids.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-line px-4 py-6 text-center text-sm text-muted">
+        <p className="rounded-lg border border-dashed border-line px-4 py-3 text-center text-sm text-muted">
           {canUpload ? t('moodboards.emptySectionUpload') : t('moodboards.emptySection')}
         </p>
       ) : (
@@ -287,6 +290,7 @@ function SectionBlock({
               return item ? (
                 <Tile
                   key={id}
+                  sortable={sortable}
                   scope={scope}
                   board={board}
                   item={item}
@@ -307,8 +311,10 @@ function Tile({
   board,
   item,
   sectionTitle,
+  sortable,
   onOpen,
 }: {
+  sortable: boolean;
   scope: MoodboardScope;
   board: Board;
   item: Item;
@@ -318,7 +324,10 @@ function Tile({
   const { t } = useTranslation();
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.id,
+    disabled: !sortable,
   });
+  // Without sorting, the tile is a plain button: dnd-kit's attributes would mark it disabled.
+  const dragProps = sortable ? { ...attributes, ...listeners } : {};
   const alt = item.caption || t('moodboards.imageIn', { section: sectionTitle });
   return (
     <li
@@ -328,10 +337,8 @@ function Tile({
     >
       <button
         type="button"
-        {...attributes}
-        {...listeners}
+        {...dragProps}
         onClick={() => onOpen(item.id)}
-        aria-label={t('moodboards.openImage', { caption: alt })}
         className={cn(
           'group relative block aspect-[4/5] w-full overflow-hidden rounded-lg bg-subtle',
           item.status === 'selected' && 'ring-2 ring-accent ring-offset-2 ring-offset-ground',
@@ -362,7 +369,10 @@ function Tile({
           </span>
         )}
         {(item.hearts > 0 || item.comment_count > 0) && (
-          <span className="absolute right-2 bottom-2 flex gap-1.5 rounded-full bg-ink/60 px-2 py-0.5 text-[11px] text-white">
+          <span
+            aria-hidden="true"
+            className="absolute right-2 bottom-2 flex gap-1.5 rounded-full bg-ink/60 px-2 py-0.5 text-[11px] text-white"
+          >
             {item.hearts > 0 && (
               <span className="flex items-center gap-0.5">
                 <Heart

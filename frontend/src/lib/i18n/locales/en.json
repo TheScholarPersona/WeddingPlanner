@@ -1010,7 +1010,6 @@
     "tooLarge": "Images can be up to {{max}} MB.",
     "processing": "Preparing…",
     "imageIn": "Image in {{section}}",
-    "openImage": "Open {{caption}}",
     "newSection": "New section",
     "sectionPlaceholder": "e.g. Lighting",
     "rename": "Rename",

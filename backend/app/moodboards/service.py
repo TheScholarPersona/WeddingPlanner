@@ -10,6 +10,7 @@ from collections import defaultdict
 from datetime import UTC, datetime
 from typing import Any
 
+from arq import Retry
 from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -724,7 +725,7 @@ async def _delete_files(keys: list[str]) -> None:
 
 
 async def process_image_job(
-    _: dict[str, Any], organization_id: str, item_id: str, user_id: str
+    ctx: dict[str, Any], organization_id: str, item_id: str, user_id: str
 ) -> str:
     """Worker job: virus scan, then thumbnail and display version without metadata."""
     async with get_sessionmaker()() as db:
@@ -742,7 +743,9 @@ async def process_image_job(
         if item.scan_status == "pending":
             try:
                 verdict = await scanner.scan_bytes(data)
-            except scanner.ScanError:
+            except scanner.ScanError as exc:
+                if scanner.retry_later(ctx):
+                    raise Retry(defer=scanner.RETRY_DELAY_SECONDS) from exc
                 item.scan_status = "failed"
                 await db.commit()
                 return "failed"

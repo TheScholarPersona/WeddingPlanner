@@ -40,3 +40,16 @@ async def scan_bytes(data: bytes) -> ScanResult:
     if reply.endswith(b"FOUND"):
         return "infected"
     raise ScanError(f"Unexpected ClamAV reply: {reply[:200]!r}")
+
+
+RETRY_DELAY_SECONDS = 30
+
+
+def retry_later(ctx: dict[str, object]) -> bool:
+    """In the worker: ClamAV not reachable (e.g. still starting) is retried before giving up.
+
+    Tests and inline runs pass an empty ctx: there the scan fails at once.
+    """
+    job_try = ctx.get("job_try")
+    max_tries = ctx.get("max_tries", 3)
+    return isinstance(job_try, int) and isinstance(max_tries, int) and job_try < max_tries
