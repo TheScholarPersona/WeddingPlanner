@@ -22,25 +22,25 @@ class BoardUpdateIn(BaseModel):
     notes_internal: str | None = Field(default=None, max_length=5000)
 
 
-class SectionIn(BaseModel):
+class MoodboardSectionIn(BaseModel):
     title: str = Field(min_length=1, max_length=80)
 
 
-class ReorderIn(BaseModel):
+class MoodboardReorderIn(BaseModel):
     """Full order of the board: section ids, and for each section (or "" = unsorted) its items."""
 
     sections: list[uuid.UUID] = Field(default_factory=list, max_length=50)
     items: dict[str, list[uuid.UUID]] = Field(default_factory=dict)
 
 
-class ItemUpdateIn(BaseModel):
+class MoodboardItemUpdateIn(BaseModel):
     caption: str | None = Field(default=None, max_length=300)
     section_id: uuid.UUID | None = None
     status: StatusT | None = None
     move_to_unsorted: bool = False
 
 
-class ItemOut(BaseModel):
+class MoodboardItemOut(BaseModel):
     id: uuid.UUID
     section_id: uuid.UUID | None
     caption: str | None
@@ -59,7 +59,7 @@ class ItemOut(BaseModel):
     created_at: datetime
 
 
-class SectionOut(BaseModel):
+class MoodboardSectionOut(BaseModel):
     id: uuid.UUID
     title: str
 
@@ -79,8 +79,8 @@ class BoardSummaryOut(BaseModel):
 class BoardOut(BoardSummaryOut):
     version: int
     notes_internal: str | None
-    sections: list[SectionOut]
-    items: list[ItemOut]
+    sections: list[MoodboardSectionOut]
+    items: list[MoodboardItemOut]
     can_manage: bool
     can_delete: bool
 
@@ -100,7 +100,7 @@ class PortalBoardSummary(BaseModel):
 
 class PortalBoard(PortalBoardSummary):
     version: int
-    sections: list[SectionOut]
-    items: list[ItemOut]
+    sections: list[MoodboardSectionOut]
+    items: list[MoodboardItemOut]
     can_manage: bool
     can_delete: bool

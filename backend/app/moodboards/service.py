@@ -41,11 +41,11 @@ from app.moodboards.schemas import (
     BoardOut,
     BoardSummaryOut,
     BoardUpdateIn,
-    ItemOut,
-    ItemUpdateIn,
-    ReorderIn,
-    SectionIn,
-    SectionOut,
+    MoodboardItemOut,
+    MoodboardItemUpdateIn,
+    MoodboardReorderIn,
+    MoodboardSectionIn,
+    MoodboardSectionOut,
 )
 from app.notifications import service as notify
 from app.projects.models import ProjectRole
@@ -163,7 +163,7 @@ async def list_boards(db: AsyncSession, ctx: ProjectContext) -> list[BoardSummar
     ]
 
 
-async def _items(db: AsyncSession, ctx: ProjectContext, board: Moodboard) -> list[ItemOut]:
+async def _items(db: AsyncSession, ctx: ProjectContext, board: Moodboard) -> list[MoodboardItemOut]:
     rows = (
         await db.execute(
             select(MoodboardItem, User.full_name)
@@ -194,7 +194,7 @@ async def _items(db: AsyncSession, ctx: ProjectContext, board: Moodboard) -> lis
         ).all():
             comments[target_id] = n
     return [
-        ItemOut(
+        MoodboardItemOut(
             id=item.id,
             section_id=item.section_id,
             caption=item.caption,
@@ -251,7 +251,7 @@ async def get_board(db: AsyncSession, ctx: ProjectContext, board_id: uuid.UUID) 
         created_by_type=board.created_by_type,
         version=board.version,
         notes_internal=None if is_client(ctx) else board.notes_internal,
-        sections=[SectionOut(id=s.id, title=s.title) for s in sections],
+        sections=[MoodboardSectionOut(id=s.id, title=s.title) for s in sections],
         items=await _items(db, ctx, board),
         can_manage=_manages(ctx, board),
         can_delete=await _can_delete_board(db, ctx, board),
@@ -386,7 +386,7 @@ async def delete_board(db: AsyncSession, ctx: ProjectContext, board_id: uuid.UUI
 
 
 async def add_section(
-    db: AsyncSession, ctx: ProjectContext, board_id: uuid.UUID, body: SectionIn
+    db: AsyncSession, ctx: ProjectContext, board_id: uuid.UUID, body: MoodboardSectionIn
 ) -> BoardOut:
     board = await _board(db, ctx, board_id)
     if not _manages(ctx, board):
@@ -428,7 +428,7 @@ async def rename_section(
     ctx: ProjectContext,
     board_id: uuid.UUID,
     section_id: uuid.UUID,
-    body: SectionIn,
+    body: MoodboardSectionIn,
 ) -> BoardOut:
     board = await _board(db, ctx, board_id)
     if not _manages(ctx, board):
@@ -453,7 +453,7 @@ async def delete_section(
 
 
 async def reorder(
-    db: AsyncSession, ctx: ProjectContext, board_id: uuid.UUID, body: ReorderIn
+    db: AsyncSession, ctx: ProjectContext, board_id: uuid.UUID, body: MoodboardReorderIn
 ) -> BoardOut:
     """Saves a drag-and-drop result. Couples may only move images within their own boards."""
     board = await _board(db, ctx, board_id)
@@ -605,7 +605,7 @@ async def update_item(
     ctx: ProjectContext,
     board_id: uuid.UUID,
     item_id: uuid.UUID,
-    body: ItemUpdateIn,
+    body: MoodboardItemUpdateIn,
 ) -> BoardOut:
     board = await _board(db, ctx, board_id)
     item = await _item(db, ctx, board, item_id)

@@ -1,7 +1,7 @@
 import type { Schemas } from '@/lib/api/client';
 
-export type Item = Schemas['ItemOut'];
-export type Section = Schemas['SectionOut'];
+export type Item = Schemas['MoodboardItemOut'];
+export type Section = Schemas['MoodboardSectionOut'];
 export type Comment = Schemas['CommentOut'];
 
 /** The fields planner and portal boards share; the planner's has a few more. */

@@ -2349,9 +2349,9 @@ export interface components {
             /** Notes Internal */
             notes_internal: string | null;
             /** Sections */
-            sections: components["schemas"]["SectionOut"][];
+            sections: components["schemas"]["MoodboardSectionOut"][];
             /** Items */
-            items: components["schemas"]["app__moodboards__schemas__ItemOut"][];
+            items: components["schemas"]["MoodboardItemOut"][];
             /** Can Manage */
             can_manage: boolean;
             /** Can Delete */
@@ -2556,7 +2556,7 @@ export interface components {
             /** Forecast Cents */
             forecast_cents: number;
             /** Items */
-            items: components["schemas"]["app__budget__schemas__ItemOut"][];
+            items: components["schemas"]["ItemOut"][];
         };
         /** CategoryUpdateIn */
         CategoryUpdateIn: {
@@ -3247,6 +3247,71 @@ export interface components {
              */
             visibility: "internal" | "client";
         };
+        /** ItemOut */
+        ItemOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Category Id
+             * Format: uuid
+             */
+            category_id: string;
+            /** Title */
+            title: string;
+            /** Vendor Id */
+            vendor_id: string | null;
+            /** Vendor Name */
+            vendor_name: string | null;
+            /** Planned Cents */
+            planned_cents: number;
+            /** Quoted Cents */
+            quoted_cents: number | null;
+            /** Contracted Cents */
+            contracted_cents: number | null;
+            /** Internal Cost Cents */
+            internal_cost_cents: number | null;
+            /** Paid By */
+            paid_by: string;
+            /** Notes Internal */
+            notes_internal: string | null;
+            /**
+             * Visibility
+             * @enum {string}
+             */
+            visibility: "internal" | "client";
+            /** Version */
+            version: number;
+            /** Paid Cents */
+            paid_cents: number;
+            /** Payments */
+            payments: components["schemas"]["PaymentOut"][];
+        };
+        /** ItemUpdateIn */
+        ItemUpdateIn: {
+            /** Category Id */
+            category_id?: string | null;
+            /** Title */
+            title?: string | null;
+            /** Vendor Id */
+            vendor_id?: string | null;
+            /** Planned Cents */
+            planned_cents?: number | null;
+            /** Quoted Cents */
+            quoted_cents?: number | null;
+            /** Contracted Cents */
+            contracted_cents?: number | null;
+            /** Internal Cost Cents */
+            internal_cost_cents?: number | null;
+            /** Paid By */
+            paid_by?: ("client" | "planner") | null;
+            /** Notes Internal */
+            notes_internal?: string | null;
+            /** Visibility */
+            visibility?: ("internal" | "client") | null;
+        };
         /** LoginIn */
         LoginIn: {
             /**
@@ -3409,6 +3474,94 @@ export interface components {
             visibility?: ("internal" | "client") | null;
             /** Completed */
             completed?: boolean | null;
+        };
+        /** MoodboardItemOut */
+        MoodboardItemOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Section Id */
+            section_id: string | null;
+            /** Caption */
+            caption: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "proposed" | "selected" | "discarded";
+            /** Width */
+            width: number | null;
+            /** Height */
+            height: number | null;
+            /** Ready */
+            ready: boolean;
+            /** Scan Status */
+            scan_status: string;
+            /** Uploaded By Name */
+            uploaded_by_name: string | null;
+            /**
+             * Uploaded By Type
+             * @enum {string}
+             */
+            uploaded_by_type: "team" | "client";
+            /** Can Edit */
+            can_edit: boolean;
+            /** Hearts */
+            hearts: number;
+            /** Hearted By Me */
+            hearted_by_me: boolean;
+            /** Heart Names */
+            heart_names: string[];
+            /** Comment Count */
+            comment_count: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** MoodboardItemUpdateIn */
+        MoodboardItemUpdateIn: {
+            /** Caption */
+            caption?: string | null;
+            /** Section Id */
+            section_id?: string | null;
+            /** Status */
+            status?: ("proposed" | "selected" | "discarded") | null;
+            /**
+             * Move To Unsorted
+             * @default false
+             */
+            move_to_unsorted: boolean;
+        };
+        /**
+         * MoodboardReorderIn
+         * @description Full order of the board: section ids, and for each section (or "" = unsorted) its items.
+         */
+        MoodboardReorderIn: {
+            /** Sections */
+            sections?: string[];
+            /** Items */
+            items?: {
+                [key: string]: string[];
+            };
+        };
+        /** MoodboardSectionIn */
+        MoodboardSectionIn: {
+            /** Title */
+            title: string;
+        };
+        /** MoodboardSectionOut */
+        MoodboardSectionOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Title */
+            title: string;
         };
         /** MyTaskOut */
         MyTaskOut: {
@@ -3582,9 +3735,9 @@ export interface components {
             /** Version */
             version: number;
             /** Sections */
-            sections: components["schemas"]["SectionOut"][];
+            sections: components["schemas"]["MoodboardSectionOut"][];
             /** Items */
-            items: components["schemas"]["app__moodboards__schemas__ItemOut"][];
+            items: components["schemas"]["MoodboardItemOut"][];
             /** Can Manage */
             can_manage: boolean;
             /** Can Delete */
@@ -4195,6 +4348,11 @@ export interface components {
             /** Recovery Codes */
             recovery_codes: string[];
         };
+        /** ReorderIn */
+        ReorderIn: {
+            /** Items */
+            items: components["schemas"]["ReorderItem"][];
+        };
         /** ReorderItem */
         ReorderItem: {
             /**
@@ -4221,21 +4379,6 @@ export interface components {
             email: string;
             /** Reason */
             reason: string;
-        };
-        /** SectionIn */
-        SectionIn: {
-            /** Title */
-            title: string;
-        };
-        /** SectionOut */
-        SectionOut: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /** Title */
-            title: string;
         };
         /** SupportAuditOut */
         SupportAuditOut: {
@@ -4870,144 +5013,6 @@ export interface components {
             /** Title */
             title?: string | null;
         };
-        /** ItemOut */
-        app__budget__schemas__ItemOut: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /**
-             * Category Id
-             * Format: uuid
-             */
-            category_id: string;
-            /** Title */
-            title: string;
-            /** Vendor Id */
-            vendor_id: string | null;
-            /** Vendor Name */
-            vendor_name: string | null;
-            /** Planned Cents */
-            planned_cents: number;
-            /** Quoted Cents */
-            quoted_cents: number | null;
-            /** Contracted Cents */
-            contracted_cents: number | null;
-            /** Internal Cost Cents */
-            internal_cost_cents: number | null;
-            /** Paid By */
-            paid_by: string;
-            /** Notes Internal */
-            notes_internal: string | null;
-            /**
-             * Visibility
-             * @enum {string}
-             */
-            visibility: "internal" | "client";
-            /** Version */
-            version: number;
-            /** Paid Cents */
-            paid_cents: number;
-            /** Payments */
-            payments: components["schemas"]["PaymentOut"][];
-        };
-        /** ItemUpdateIn */
-        app__budget__schemas__ItemUpdateIn: {
-            /** Category Id */
-            category_id?: string | null;
-            /** Title */
-            title?: string | null;
-            /** Vendor Id */
-            vendor_id?: string | null;
-            /** Planned Cents */
-            planned_cents?: number | null;
-            /** Quoted Cents */
-            quoted_cents?: number | null;
-            /** Contracted Cents */
-            contracted_cents?: number | null;
-            /** Internal Cost Cents */
-            internal_cost_cents?: number | null;
-            /** Paid By */
-            paid_by?: ("client" | "planner") | null;
-            /** Notes Internal */
-            notes_internal?: string | null;
-            /** Visibility */
-            visibility?: ("internal" | "client") | null;
-        };
-        /** ItemOut */
-        app__moodboards__schemas__ItemOut: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /** Section Id */
-            section_id: string | null;
-            /** Caption */
-            caption: string | null;
-            /**
-             * Status
-             * @enum {string}
-             */
-            status: "proposed" | "selected" | "discarded";
-            /** Width */
-            width: number | null;
-            /** Height */
-            height: number | null;
-            /** Ready */
-            ready: boolean;
-            /** Scan Status */
-            scan_status: string;
-            /** Uploaded By Name */
-            uploaded_by_name: string | null;
-            /**
-             * Uploaded By Type
-             * @enum {string}
-             */
-            uploaded_by_type: "team" | "client";
-            /** Can Edit */
-            can_edit: boolean;
-            /** Hearts */
-            hearts: number;
-            /** Hearted By Me */
-            hearted_by_me: boolean;
-            /** Heart Names */
-            heart_names: string[];
-            /** Comment Count */
-            comment_count: number;
-            /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
-        };
-        /** ItemUpdateIn */
-        app__moodboards__schemas__ItemUpdateIn: {
-            /** Caption */
-            caption?: string | null;
-            /** Section Id */
-            section_id?: string | null;
-            /** Status */
-            status?: ("proposed" | "selected" | "discarded") | null;
-            /**
-             * Move To Unsorted
-             * @default false
-             */
-            move_to_unsorted: boolean;
-        };
-        /**
-         * ReorderIn
-         * @description Full order of the board: section ids, and for each section (or "" = unsorted) its items.
-         */
-        app__moodboards__schemas__ReorderIn: {
-            /** Sections */
-            sections?: string[];
-            /** Items */
-            items?: {
-                [key: string]: string[];
-            };
-        };
         /** CommentIn */
         app__portal__router__CommentIn: {
             /** Body */
@@ -5033,11 +5038,6 @@ export interface components {
              * @enum {string}
              */
             visibility: "internal" | "client";
-        };
-        /** ReorderIn */
-        app__tasks__schemas__ReorderIn: {
-            /** Items */
-            items: components["schemas"]["ReorderItem"][];
         };
     };
     responses: never;
@@ -7325,7 +7325,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["app__tasks__schemas__ReorderIn"];
+                "application/json": components["schemas"]["ReorderIn"];
             };
         };
         responses: {
@@ -8191,7 +8191,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["app__budget__schemas__ItemUpdateIn"];
+                "application/json": components["schemas"]["ItemUpdateIn"];
             };
         };
         responses: {
@@ -10196,7 +10196,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["SectionIn"];
+                "application/json": components["schemas"]["MoodboardSectionIn"];
             };
         };
         responses: {
@@ -10268,7 +10268,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["SectionIn"];
+                "application/json": components["schemas"]["MoodboardSectionIn"];
             };
         };
         responses: {
@@ -10305,7 +10305,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["app__moodboards__schemas__ReorderIn"];
+                "application/json": components["schemas"]["MoodboardReorderIn"];
             };
         };
         responses: {
@@ -10414,7 +10414,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["app__moodboards__schemas__ItemUpdateIn"];
+                "application/json": components["schemas"]["MoodboardItemUpdateIn"];
             };
         };
         responses: {
@@ -10753,7 +10753,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["SectionIn"];
+                "application/json": components["schemas"]["MoodboardSectionIn"];
             };
         };
         responses: {
@@ -10789,7 +10789,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["app__moodboards__schemas__ReorderIn"];
+                "application/json": components["schemas"]["MoodboardReorderIn"];
             };
         };
         responses: {
@@ -10895,7 +10895,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["app__moodboards__schemas__ItemUpdateIn"];
+                "application/json": components["schemas"]["MoodboardItemUpdateIn"];
             };
         };
         responses: {

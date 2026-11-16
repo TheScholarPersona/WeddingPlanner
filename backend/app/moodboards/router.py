@@ -15,11 +15,11 @@ from app.moodboards.schemas import (
     BoardOut,
     BoardSummaryOut,
     BoardUpdateIn,
-    ItemUpdateIn,
+    MoodboardItemUpdateIn,
+    MoodboardReorderIn,
+    MoodboardSectionIn,
     PortalBoard,
     PortalBoardSummary,
-    ReorderIn,
-    SectionIn,
 )
 from app.portal.service import Access, PortalAccess
 from app.tasks import service as tasks
@@ -89,7 +89,7 @@ async def delete_board(
 
 @router.post(P + B + "/sections", response_model=BoardOut, status_code=201)
 async def add_section(
-    board_id: uuid.UUID, body: SectionIn, db: DbSession, ctx: ProjectContext = Write
+    board_id: uuid.UUID, body: MoodboardSectionIn, db: DbSession, ctx: ProjectContext = Write
 ) -> BoardOut:
     return await service.add_section(db, ctx, board_id, body)
 
@@ -98,7 +98,7 @@ async def add_section(
 async def rename_section(
     board_id: uuid.UUID,
     section_id: uuid.UUID,
-    body: SectionIn,
+    body: MoodboardSectionIn,
     db: DbSession,
     ctx: ProjectContext = Write,
 ) -> BoardOut:
@@ -114,7 +114,7 @@ async def delete_section(
 
 @router.post(P + B + "/reorder", response_model=BoardOut)
 async def reorder(
-    board_id: uuid.UUID, body: ReorderIn, db: DbSession, ctx: ProjectContext = Write
+    board_id: uuid.UUID, body: MoodboardReorderIn, db: DbSession, ctx: ProjectContext = Write
 ) -> BoardOut:
     return await service.reorder(db, ctx, board_id, body)
 
@@ -137,7 +137,7 @@ async def upload(
 async def update_item(
     board_id: uuid.UUID,
     item_id: uuid.UUID,
-    body: ItemUpdateIn,
+    body: MoodboardItemUpdateIn,
     db: DbSession,
     ctx: ProjectContext = Write,
 ) -> BoardOut:
@@ -268,14 +268,14 @@ async def portal_delete(board_id: uuid.UUID, db: DbSession, access: PortalAccess
 
 @router.post(K + B + "/sections", response_model=PortalBoard, status_code=201)
 async def portal_add_section(
-    board_id: uuid.UUID, body: SectionIn, db: DbSession, access: PortalAccess = Access
+    board_id: uuid.UUID, body: MoodboardSectionIn, db: DbSession, access: PortalAccess = Access
 ) -> PortalBoard:
     return _portal(await service.add_section(db, access.ctx, board_id, body))
 
 
 @router.post(K + B + "/reorder", response_model=PortalBoard)
 async def portal_reorder(
-    board_id: uuid.UUID, body: ReorderIn, db: DbSession, access: PortalAccess = Access
+    board_id: uuid.UUID, body: MoodboardReorderIn, db: DbSession, access: PortalAccess = Access
 ) -> PortalBoard:
     return _portal(await service.reorder(db, access.ctx, board_id, body))
 
@@ -300,7 +300,7 @@ async def portal_upload(
 async def portal_update_item(
     board_id: uuid.UUID,
     item_id: uuid.UUID,
-    body: ItemUpdateIn,
+    body: MoodboardItemUpdateIn,
     db: DbSession,
     access: PortalAccess = Access,
 ) -> PortalBoard:
