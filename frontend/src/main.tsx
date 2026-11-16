@@ -1,4 +1,10 @@
 import '@/lib/i18n';
+// Fonts are served by the app itself: no request (and no IP address) goes to a font CDN.
+import '@fontsource/cormorant-garamond/500.css';
+import '@fontsource/cormorant-garamond/600.css';
+import '@fontsource/inter/400.css';
+import '@fontsource/inter/500.css';
+import '@fontsource/inter/600.css';
 import '@/styles/index.css';
 
 import { StrictMode } from 'react';

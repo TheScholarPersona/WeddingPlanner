@@ -33,6 +33,9 @@ services:
 
   frontend:
     build: ./frontend
+    # node_modules lives in a container volume that survives rebuilds; install what a newer
+    # package-lock.json adds before starting (quick no-op when nothing changed).
+    command: sh -c "npm install --no-audit --no-fund && npm run dev"
     volumes:
       - ./frontend:/app
       - /app/node_modules

@@ -29,6 +29,8 @@ class Perm(StrEnum):
     TEMPLATES_MANAGE = "templates:manage"
     MY_TASKS = "tasks:mine"
     CALENDAR_READ = "calendar:read"
+    PRIVACY_MANAGE = "privacy:manage"  # export and erase client data (org admins)
+    SUPPORT_ACCESS = "support_access:manage"
 
 
 _TEAM = frozenset(

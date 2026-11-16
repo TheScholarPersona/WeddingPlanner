@@ -66,6 +66,14 @@
     "noAccess": {
       "title": "No access yet",
       "body": "Your account is not part of an organization or wedding at the moment. Ask your planner for a new invitation."
+    },
+    "twoFactor": {
+      "title": "Two-step sign-in",
+      "subtitle": "Enter the 6-digit code from your authenticator app.",
+      "code": "Authentication code",
+      "recoveryHint": "Lost your phone? Enter one of your recovery codes instead.",
+      "submit": "Verify",
+      "cancel": "Use a different account"
     }
   },
   "nav": {
@@ -87,7 +95,9 @@
     "signOut": "Sign out",
     "organization": "Organization",
     "documents": "Documents",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "account": "Account",
+    "admin": "Platform admin"
   },
   "planner": {
     "dashboard": {
@@ -160,7 +170,26 @@
     "adminOnly": "Only organization admins can change these settings.",
     "auditLog": "Audit log",
     "auditLogHint": "Important changes in your organization, newest first.",
-    "system": "System"
+    "system": "System",
+    "security": {
+      "title": "Security",
+      "require2fa": "Require two-factor authentication for the team",
+      "require2faHint": "Team members without it are asked to set it up before they can continue. Couples are not affected.",
+      "openAccount": "Set it up in your account"
+    },
+    "support": {
+      "title": "Support access",
+      "intro": "If you need help, let platform support look into your organization for a few days: team, weddings and the audit log, read-only. Every look is recorded in your audit log.",
+      "activeBadge": "Support can look in",
+      "activeUntil": "Support access is active until {{date}}",
+      "endNow": "End now",
+      "duration": "Duration",
+      "days_one": "{{count}} day",
+      "days_other": "{{count}} days",
+      "reason": "Reason (optional)",
+      "reasonPlaceholder": "e.g. a team member cannot sign in",
+      "grant": "Grant access"
+    }
   },
   "audit": {
     "organization.created": "created the organization",
@@ -203,7 +232,28 @@
     "payment.updated": "updated a payment",
     "payment.deleted": "deleted a payment",
     "couple.invited": "invited the couple to the portal",
-    "couple.access_revoked": "removed the couple's portal access"
+    "couple.access_revoked": "removed the couple's portal access",
+    "document.uploaded": "uploaded a document",
+    "document.deleted": "deleted a document",
+    "document.shared_with_client": "shared a document with the couple",
+    "document.unshared": "made a document internal again",
+    "document.virus_found": "blocked a file that contained a virus",
+    "event.shared_with_client": "shared an appointment with the couple",
+    "event.unshared": "made an appointment internal again",
+    "calendar_feed.created": "created a calendar subscription link",
+    "calendar_feed.revoked": "turned off a calendar subscription link",
+    "consent.granted": "gave a permission",
+    "consent.withdrawn": "withdrew a permission",
+    "privacy.client_exported": "exported a client's data",
+    "privacy.client_erased": "erased a client and their weddings",
+    "user.account_deleted": "deleted their account",
+    "support_access.granted": "allowed platform support to look in",
+    "support_access.revoked": "ended platform support access",
+    "support.viewed": "(platform support) looked into the organization",
+    "admin.organization_created": "(platform admin) created the organization",
+    "admin.organization_suspended": "(platform admin) suspended the organization",
+    "admin.organization_reactivated": "(platform admin) reactivated the organization",
+    "admin.two_factor_reset": "(platform admin) reset a member's two-factor authentication"
   },
   "portal": {
     "due": "Due {{date}}",
@@ -308,7 +358,17 @@
       "file_infected": "The file contained a virus and was removed.",
       "file_failed": "The virus check failed. Please upload the file again.",
       "too_many_versions": "This document has too many versions. Upload it as a new document.",
-      "invalid_range": "Choose a shorter date range."
+      "invalid_range": "Choose a shorter date range.",
+      "invalid_code": "The code is not valid. Check the time on your phone and try again.",
+      "two_factor_required": "Your organization requires two-factor authentication.",
+      "two_factor_pending": "Enter the code from your authenticator app.",
+      "two_factor_mandatory": "Platform admins cannot turn off two-factor authentication.",
+      "setup_not_started": "Start the setup again.",
+      "enable_own_2fa_first": "Turn on your own two-factor authentication first, otherwise you would lock yourself out.",
+      "invalid_current_password": "The password is incorrect.",
+      "confirmation_mismatch": "The name does not match.",
+      "no_support_access": "An admin of this organization has to grant support access first.",
+      "reauth_required": "Please confirm your password."
     }
   },
   "weddings": {
@@ -772,6 +832,138 @@
         "team": "Each morning: today's and tomorrow's appointments, your tasks due and anything overdue.",
         "couple": "A short morning email when appointments or tasks for you are coming up."
       }
+    }
+  },
+  "account": {
+    "title": "Account",
+    "profile": "Profile",
+    "password": "Password",
+    "currentPassword": "Current password",
+    "changePassword": "Change password",
+    "passwordChanged": "Password changed. Other devices were signed out.",
+    "twoFactor": {
+      "title": "Two-factor authentication",
+      "on": "On",
+      "off": "Off",
+      "intro": "Protect your account with a code from an authenticator app (for example Google Authenticator, 1Password or Microsoft Authenticator) in addition to your password.",
+      "requiredByOrganization": "Your organization requires two-factor authentication. Turn it on to continue.",
+      "turnOn": "Turn on",
+      "turnOff": "Turn off",
+      "turnOffTitle": "Turn off two-factor authentication",
+      "turnOffBody": "Your account will only be protected by your password. Confirm with your password and a current code.",
+      "since": "On since {{date}}.",
+      "codesLeft_one": "{{count}} recovery code left.",
+      "codesLeft_other": "{{count}} recovery codes left.",
+      "newCodes": "New recovery codes",
+      "step1": "Open your authenticator app and add a new account.",
+      "step2": "Scan the QR code, or enter the key by hand.",
+      "step3": "Enter the 6-digit code the app shows.",
+      "qrAlt": "QR code for your authenticator app",
+      "manual": "Key for manual entry",
+      "codeLabel": "Code from the app",
+      "confirm": "Turn on",
+      "enabled": "Two-factor authentication is on.",
+      "codesIntro": "Save these recovery codes somewhere safe. Each one works once if you lose your phone. They are shown only now.",
+      "codesLabel": "Recovery codes",
+      "codesFileHeader": "Recovery codes for the Wedding Planning Platform. Each code works once.",
+      "downloadCodes": "Download codes",
+      "savedCodes": "I saved them"
+    },
+    "data": {
+      "title": "Your data",
+      "exportBody": "Download a copy of the personal data stored about you: your profile, memberships, sign-ins, settings, comments and activity.",
+      "export": "Download my data",
+      "deleteBody": "Deleting your account removes you from all organizations. Weddings and documents belong to your organization and stay there.",
+      "deleteBodyCouple": "Deleting your account ends your portal access. Your planner keeps the wedding details they need; ask them if you want those erased too.",
+      "delete": "Delete my account",
+      "deleteTitle": "Delete your account",
+      "deleteWarning": "This cannot be undone. Your login is removed and your name is replaced with “Deleted user” wherever it appears.",
+      "typeDelete": "Type DELETE to confirm",
+      "deleteForGood": "Delete for good"
+    }
+  },
+  "privacy": {
+    "title": "Privacy",
+    "portalIntro": "Some things {{organization}} may only do with your permission. You can change your answer at any time.",
+    "portalFootnote": "To download your data or delete your account, open your",
+    "client": {
+      "title": "Data protection",
+      "intro": "Export everything stored about this client (for a data access request), or erase it for good.",
+      "export": "Export client data",
+      "erase": "Erase client",
+      "eraseTitle": "Erase {{name}}",
+      "eraseWarning": "This deletes the client, all their weddings with tasks, budget, appointments and documents, and the couple's portal access. It cannot be undone. Export the data first if you need a copy.",
+      "typeName": "Type “{{name}}” to confirm",
+      "eraseForGood": "Erase for good"
+    },
+    "consents": {
+      "title": "Couple's permissions",
+      "plannerHint": "Decided by the couple in their portal.",
+      "notDecided": "Not decided",
+      "yesSince": "Yes · {{date}}",
+      "no": "No",
+      "allow": "Yes, I agree",
+      "deny": "No",
+      "decidedOn": "Your answer from {{date}}.",
+      "kinds": {
+        "portfolio": {
+          "title": "Show our wedding as a reference",
+          "short": "Portfolio and references",
+          "body": "{{organization}} may show photos and details of our wedding on their website and social media."
+        },
+        "reviews": {
+          "title": "Ask us for a review",
+          "short": "Review request",
+          "body": "{{organization}} may email us after the wedding to ask for a review."
+        }
+      }
+    }
+  },
+  "admin": {
+    "title": "Platform admin",
+    "organizations": "Organizations",
+    "intro": "Names and numbers only. To look into an organization, one of its admins grants support access.",
+    "backToApp": "Back to the app",
+    "needs2fa": "Platform admins must use two-factor authentication.",
+    "columns": {
+      "name": "Name",
+      "since": "Since",
+      "team": "Team",
+      "couples": "Couples",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "status": {
+      "active": "Active",
+      "suspended": "Suspended"
+    },
+    "supportUntil": "Support until {{date}}",
+    "openSupport": "Open",
+    "suspend": "Suspend",
+    "reactivate": "Reactivate",
+    "confirmSuspend": "Suspend {{name}}? Nobody in it can sign in to it until it is reactivated.",
+    "create": {
+      "title": "New organization",
+      "name": "Organization name",
+      "adminEmail": "Email of its first admin",
+      "hint": "They receive an invitation by email.",
+      "submit": "Create and invite",
+      "done": "{{name}} was created and the invitation sent."
+    },
+    "reset2fa": {
+      "title": "Reset two-factor authentication",
+      "intro": "For someone who lost their phone and recovery codes. Needs support access from their organization and is recorded there.",
+      "reason": "Reason",
+      "submit": "Reset",
+      "confirm": "Reset two-factor authentication for {{email}}?",
+      "done": "Done. They can sign in with their password and set it up again."
+    },
+    "support": {
+      "readOnlyUntil": "Read-only support access until {{date}}",
+      "logged": "This view is recorded in the organization's audit log.",
+      "members": "Team and couples",
+      "weddings": "Weddings",
+      "no2fa": "No 2FA"
     }
   }
 }

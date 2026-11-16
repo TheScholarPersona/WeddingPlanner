@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from fastapi.dependencies.models import Dependant
 from fastapi.routing import APIRoute
 
-from app.authz.deps import get_authenticated
+from app.authz.deps import get_authenticated, get_pending_two_factor
 from app.main import create_app
 
 PUBLIC = {
@@ -50,6 +50,7 @@ def test_every_non_public_route_requires_a_session() -> None:
     unauthenticated = [
         f"{method} {path}"
         for method, path, route in _routes(create_app())
-        if (method, path) not in PUBLIC and get_authenticated not in set(_calls(route.dependant))
+        if (method, path) not in PUBLIC
+        and not {get_authenticated, get_pending_two_factor} & set(_calls(route.dependant))
     ]
     assert unauthenticated == []

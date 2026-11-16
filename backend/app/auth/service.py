@@ -58,7 +58,9 @@ async def get_user_by_email(db: AsyncSession, email: str) -> User | None:
 # --- Sessions ---------------------------------------------------------------------------
 
 
-async def start_session(db: AsyncSession, user: User, response: Response) -> UserSession:
+async def start_session(
+    db: AsyncSession, user: User, response: Response, *, mfa_pending: bool = False
+) -> UserSession:
     settings = get_settings()
     token = new_token()
     info = current_request()
@@ -68,7 +70,9 @@ async def start_session(db: AsyncSession, user: User, response: Response) -> Use
         ip=info.ip if info else None,
         user_agent=info.user_agent if info else None,
         expires_at=_now() + timedelta(hours=settings.session_lifetime_hours),
-        reauth_at=_now(),  # signing in counts as a fresh password confirmation
+        # Signing in counts as a fresh password confirmation, once it is complete.
+        reauth_at=None if mfa_pending else _now(),
+        mfa_pending=mfa_pending,
     )
     db.add(session)
     await db.flush()
@@ -108,6 +112,8 @@ async def authenticate(db: AsyncSession, email: str, password: str) -> User:
     user = await get_user_by_email(db, email)
     now = _now()
 
+    if user is not None and user.deleted_at is not None:
+        user = None
     locked = user is not None and user.locked_until is not None and user.locked_until > now
     valid = verify_password(user.password_hash if user else None, password)
 
@@ -167,6 +173,8 @@ async def build_me(db: AsyncSession, user: User) -> MeOut:
         email=user.email,
         full_name=user.full_name,
         locale=user.locale,
+        two_factor_enabled=user.two_factor_enabled,
+        is_platform_admin=user.is_platform_admin,
         memberships=[
             MembershipOut(
                 organization_id=org.id,

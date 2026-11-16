@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.admin.router import router as admin_router
 from app.api import health
 from app.auth.router import router as auth_router
 from app.budget.router import router as budget_router
@@ -18,6 +19,7 @@ from app.events.router import router as events_router
 from app.notifications.router import router as notifications_router
 from app.organizations.router import router as organizations_router
 from app.portal.router import router as portal_router
+from app.privacy.router import router as privacy_router
 from app.projects.router import router as projects_router
 from app.tasks.router import router as tasks_router
 from app.templates.router import router as templates_router
@@ -71,6 +73,8 @@ def create_app() -> FastAPI:
         documents_router,
         events_router,
         notifications_router,
+        privacy_router,
+        admin_router,
     ):
         app.include_router(module_router, prefix=API_PREFIX)
     return app

@@ -11,12 +11,21 @@ import { ReauthDialog } from './ReauthDialog';
 export function useReauth() {
   const [pending, setPending] = useState<(() => Promise<unknown>) | null>(null);
 
-  async function run<T>(action: () => Promise<T>): Promise<T | undefined> {
+  /** `onResult` also receives the result of the retry after the password was confirmed. */
+  async function run<T>(
+    action: () => Promise<T>,
+    onResult?: (result: T) => void,
+  ): Promise<T | undefined> {
     try {
-      return await action();
+      const result = await action();
+      onResult?.(result);
+      return result;
     } catch (error) {
       if (error instanceof ApiError && error.code === 'reauth_required') {
-        setPending(() => action);
+        setPending(() => async () => {
+          const result = await action();
+          onResult?.(result);
+        });
         return undefined;
       }
       throw error;

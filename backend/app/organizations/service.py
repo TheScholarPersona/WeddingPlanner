@@ -59,6 +59,13 @@ async def update_organization(
 ) -> Organization:
     org = await get_organization(db, ctx)
     fields = body.model_dump(exclude_unset=True)
+    if fields.get("require_2fa") and not ctx.user.two_factor_enabled:
+        raise ProblemError(
+            409,
+            "enable_own_2fa_first",
+            "Turn on your own two-factor authentication first",
+            "Otherwise you would lock yourself out.",
+        )
     before = {k: getattr(org, k) for k in fields}
     for key, value in fields.items():
         if value is not None:

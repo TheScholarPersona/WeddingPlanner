@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Bell } from 'lucide-react';
+import { UserRound } from 'lucide-react';
 import { Link, useNavigate } from 'react-router';
 
 import { Button } from '@/components/ui/button';
@@ -43,7 +43,7 @@ export function UserMenu({
             aria-label={t('notifications.title')}
             title={t('notifications.title')}
           >
-            <Bell aria-hidden="true" className="size-4" />
+            <UserRound aria-hidden="true" className="size-4" />
           </Link>
         </Button>
       )}

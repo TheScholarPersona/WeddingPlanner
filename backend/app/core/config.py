@@ -31,6 +31,10 @@ class Settings(BaseSettings):
     # Public base URL of the web app, used for links in emails.
     app_base_url: str = "https://localhost"
 
+    # Encrypts secrets stored in the database (two-factor keys). Keep it secret and stable:
+    # changing it makes enabled authenticator apps stop working.
+    secret_key: str = "local-development-secret-key-change-me"  # noqa: S105
+
     # Sessions and cookies (ADR 003).
     cookie_secure: bool = True
     session_lifetime_hours: int = 24 * 14
@@ -77,6 +81,10 @@ class Settings(BaseSettings):
     def _production_scans_uploads(self) -> "Settings":
         if self.environment == "production" and self.virus_scan != "clamav":
             raise ValueError("VIRUS_SCAN must be 'clamav' in production")
+        if self.environment == "production" and (
+            len(self.secret_key) < 32 or "change-me" in self.secret_key
+        ):
+            raise ValueError("SECRET_KEY must be a random value of at least 32 characters")
         return self
 
     @property

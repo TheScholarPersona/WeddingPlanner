@@ -7,6 +7,11 @@ export type Membership = Schemas['MembershipOut'];
 
 export const meQueryKey = ['me'] as const;
 
+/** Sign-in either completes, or asks for the code from the authenticator app. */
+export type SignInResult = Me | Schemas['TwoFactorChallengeOut'];
+export const needsSecondFactor = (r: SignInResult): r is Schemas['TwoFactorChallengeOut'] =>
+  'two_factor_required' in r;
+
 /** The signed-in user, or null when there is no valid session. */
 export function useMe() {
   return useQuery({
@@ -41,6 +46,7 @@ export const isTeamRole = (m: Membership) => m.role === 'org_admin' || m.role ==
 export function homePathFor(me: Me): string {
   if (me.memberships.some(isTeamRole)) return '/app';
   if (me.memberships.length > 0) return '/portal';
+  if (me.is_platform_admin) return '/admin';
   return '/no-access';
 }
 

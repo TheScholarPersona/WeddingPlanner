@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from enum import StrEnum
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String, UniqueConstraint, func
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base, IdMixin, TenantMixin, TimestampMixin
@@ -36,6 +36,7 @@ class Organization(IdMixin, TimestampMixin, Base):
     locale: Mapped[str] = mapped_column(String(10), default="de-DE")
     timezone: Mapped[str] = mapped_column(String(64), default="Europe/Berlin")
     client_access_days_after_archive: Mapped[int] = mapped_column(Integer, default=90)
+    require_2fa: Mapped[bool] = mapped_column(Boolean, default=False)
 
 
 class Membership(IdMixin, TimestampMixin, TenantMixin, Base):

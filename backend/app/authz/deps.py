@@ -40,6 +40,16 @@ NOT_AUTHENTICATED = ProblemError(
 )
 
 
+TWO_FACTOR_PENDING = ProblemError(
+    401, "two_factor_pending", "Enter your code", "Enter the code from your authenticator app."
+)
+TWO_FACTOR_REQUIRED = ProblemError(
+    403,
+    "two_factor_required",
+    "Two-factor authentication required",
+    "Your organization requires two-factor authentication. Turn it on in your account.",
+)
+
 FORBIDDEN = ProblemError(403, "forbidden", "Not allowed", "Your role does not allow this action.")
 
 
@@ -66,7 +76,7 @@ class OrgContext:
         return self.membership.role
 
 
-async def get_authenticated(request: Request, db: DbSession) -> Authenticated:
+async def _load_session(request: Request, db: AsyncSession, *, pending: bool) -> Authenticated:
     settings = get_settings()
     token = request.cookies.get(settings.session_cookie_name)
     if not token:
@@ -92,8 +102,15 @@ async def get_authenticated(request: Request, db: DbSession) -> Authenticated:
     if row is None:
         raise NOT_AUTHENTICATED
     user_session, user = row
-    if user_session.revoked_at is not None or user_session.expires_at <= now:
+    if (
+        user_session.revoked_at is not None
+        or user_session.expires_at <= now
+        or user.deleted_at is not None
+    ):
         raise NOT_AUTHENTICATED
+    if user_session.mfa_pending != pending:
+        # A password-only session can do nothing but complete the second step (and vice versa).
+        raise TWO_FACTOR_PENDING if user_session.mfa_pending else NOT_AUTHENTICATED
 
     if now - user_session.last_seen_at > timedelta(minutes=5):
         user_session.last_seen_at = now
@@ -102,15 +119,25 @@ async def get_authenticated(request: Request, db: DbSession) -> Authenticated:
     return Authenticated(user=user, session=user_session)
 
 
+async def get_authenticated(request: Request, db: DbSession) -> Authenticated:
+    return await _load_session(request, db, pending=False)
+
+
+async def get_pending_two_factor(request: Request, db: DbSession) -> Authenticated:
+    """The session after a correct password, before the second factor was entered."""
+    return await _load_session(request, db, pending=True)
+
+
 CurrentUser = Annotated[Authenticated, Depends(get_authenticated)]
+PendingTwoFactor = Annotated[Authenticated, Depends(get_pending_two_factor)]
 
 
 async def _org_context(
     org_id: uuid.UUID, auth: Authenticated, db: AsyncSession, perm: Perm | None
 ) -> OrgContext:
-    membership = (
+    row = (
         await db.execute(
-            select(Membership)
+            select(Membership, Organization.require_2fa)
             .join(Organization, Organization.id == Membership.organization_id)
             .where(
                 Membership.organization_id == org_id,
@@ -119,9 +146,12 @@ async def _org_context(
                 Organization.status == "active",
             )
         )
-    ).scalar_one_or_none()
-    if membership is None:
+    ).one_or_none()
+    if row is None:
         raise not_found()
+    membership, require_2fa = row
+    if require_2fa and membership.role != OrgRole.CLIENT and not auth.user.two_factor_enabled:
+        raise TWO_FACTOR_REQUIRED
     if perm is not None and not has_perm(membership.role, perm):
         raise FORBIDDEN
 

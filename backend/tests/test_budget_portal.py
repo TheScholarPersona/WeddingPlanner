@@ -346,7 +346,13 @@ async def test_client_rls_in_sql(
         assert await count("SELECT count(*) FROM tasks WHERE visibility = 'internal'") == 0
         assert await count("SELECT count(*) FROM tasks") > 0
         assert await count("SELECT count(*) FROM budget_items") == 1
-        assert await count("SELECT count(*) FROM audit_log") == 0
+        # Only their own audit entries (for their data export), nothing else of the log.
+        assert (
+            await count(
+                f"SELECT count(*) FROM audit_log WHERE actor_user_id IS DISTINCT FROM '{couple_id}'"
+            )
+            == 0
+        )
         assert await count("SELECT count(*) FROM invitations") == 0
         assert await count("SELECT count(*) FROM project_vendors") == 0
         # Own membership plus the wedding team (lead + viewer), not the rest of the org.

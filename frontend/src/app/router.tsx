@@ -1,5 +1,9 @@
 import { createBrowserRouter, Navigate, type RouteObject } from 'react-router';
 
+import { AccountPage } from '@/features/account/AccountPage';
+import { AdminLayout, RequireAdmin } from '@/features/admin/AdminLayout';
+import { AdminOrganizationsPage } from '@/features/admin/AdminOrganizationsPage';
+import { AdminSupportPage } from '@/features/admin/AdminSupportPage';
 import { AcceptInvitationPage } from '@/features/auth/AcceptInvitationPage';
 import { BudgetPage } from '@/features/budget/BudgetPage';
 import { CalendarPage } from '@/features/calendar/CalendarPage';
@@ -19,6 +23,7 @@ import { PortalCalendarPage } from '@/features/portal/PortalCalendarPage';
 import { PortalFilesPage } from '@/features/portal/PortalFilesPage';
 import { PortalHomePage } from '@/features/portal/PortalHomePage';
 import { PortalNotificationsPage } from '@/features/portal/PortalNotificationsPage';
+import { PortalPrivacyPage } from '@/features/portal/PortalPrivacyPage';
 import { PortalTasksPage } from '@/features/portal/PortalTasksPage';
 import { SettingsPage } from '@/features/settings/SettingsPage';
 import { MyTasksPage } from '@/features/tasks/MyTasksPage';
@@ -62,6 +67,7 @@ export const routes: RouteObject[] = [
       { path: 'weddings/:id/calendar', element: <WeddingCalendarPage /> },
       { path: 'calendar', element: <CalendarPage /> },
       { path: 'notifications', element: <NotificationsPage /> },
+      { path: 'account', element: <AccountPage area="app" /> },
       { path: 'tasks', element: <MyTasksPage /> },
       { path: 'clients', element: <ClientsPage /> },
       { path: 'clients/:id', element: <ClientPage /> },
@@ -84,6 +90,21 @@ export const routes: RouteObject[] = [
       { path: 'calendar', element: <PortalCalendarPage /> },
       { path: 'files', element: <PortalFilesPage /> },
       { path: 'notifications', element: <PortalNotificationsPage /> },
+      { path: 'privacy', element: <PortalPrivacyPage /> },
+      { path: 'account', element: <AccountPage area="portal" /> },
+    ],
+  },
+  {
+    path: '/admin',
+    element: (
+      <RequireAdmin>
+        <AdminLayout />
+      </RequireAdmin>
+    ),
+    children: [
+      { index: true, element: <AdminOrganizationsPage /> },
+      { path: 'organizations/:id', element: <AdminSupportPage /> },
+      { path: 'account', element: <AccountPage area="app" /> },
     ],
   },
   { path: '*', element: <NotFoundPage /> },
