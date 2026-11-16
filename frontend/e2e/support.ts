@@ -1,4 +1,5 @@
 import { execSync } from 'node:child_process';
+import { createHmac } from 'node:crypto';
 import path from 'node:path';
 
 import { expect, type Page } from '@playwright/test';
@@ -41,4 +42,47 @@ export async function invitationTokenFromMail(to: string): Promise<string> {
     await new Promise((resolve) => setTimeout(resolve, 500));
   }
   throw new Error(`No invitation email to ${to}`);
+}
+
+export interface DemoLogins {
+  admin: { email: string; password: string };
+  planner: { email: string; password: string };
+  couple: { email: string; password: string };
+}
+
+/** Creates a demo organization with invented data and returns its logins. */
+export function seedDemo(name: string): DemoLogins {
+  const output = execSync(
+    `docker compose exec -T api python -m app.cli seed-demo --name "${name}"`,
+    { cwd: repoRoot, encoding: 'utf-8' },
+  );
+  const login = (role: string) => {
+    const match = output.match(new RegExp(`${role}\\s+(\\S+@example\\.com)\\s+/\\s+(\\S+)`));
+    if (!match) throw new Error(`No ${role} login in: ${output}`);
+    return { email: match[1]!, password: match[2]! };
+  };
+  return { admin: login('admin'), planner: login('planner'), couple: login('couple') };
+}
+
+export async function signIn(page: Page, email: string, secret: string) {
+  await page.goto('/login');
+  await page.getByLabel('Email').fill(email);
+  await page.getByLabel('Password').fill(secret);
+  await page.getByRole('button', { name: 'Sign in' }).click();
+}
+
+/** RFC 6238 code (SHA-1, 6 digits, 30 s) for a base32 secret, `offset` steps from now. */
+export function totp(secret: string, offset = 0): string {
+  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+  let bits = '';
+  for (const char of secret.replace(/=+$/, '')) {
+    bits += alphabet.indexOf(char).toString(2).padStart(5, '0');
+  }
+  const key = Buffer.from(bits.match(/.{8}/g)!.map((b) => parseInt(b, 2)));
+  const counter = Buffer.alloc(8);
+  counter.writeBigUInt64BE(BigInt(Math.floor(Date.now() / 30_000) + offset));
+  const hmac = createHmac('sha1', key).update(counter).digest();
+  const start = hmac[hmac.length - 1]! & 0xf;
+  const code = (hmac.readUInt32BE(start) & 0x7fffffff) % 1_000_000;
+  return String(code).padStart(6, '0');
 }

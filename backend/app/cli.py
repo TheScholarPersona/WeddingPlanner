@@ -61,6 +61,17 @@ async def _grant_platform_admin(email: str) -> None:
     print(f"{email} is now a platform admin. They must turn on two-factor authentication.")
 
 
+async def _seed_demo(name: str) -> None:
+    from app.demo import seed_demo
+
+    result = await seed_demo(name)
+    await dispose_engine()
+    print(f"Demo organization '{result['organization']}' is ready. Sign in at /login with:")
+    for role in ("admin", "planner", "couple"):
+        print(f"  {role:8} {result[role + '_email']}  /  {result[role + '_password']}")
+    print("Only invented data; email addresses use example.com and receive nothing.")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(prog="python -m app.cli")
     commands = parser.add_subparsers(dest="command", required=True)
@@ -71,11 +82,15 @@ def main() -> None:
     digests.add_argument("--now", action="store_true", required=True)
     grant = commands.add_parser("grant-platform-admin", help="Make an account a platform admin")
     grant.add_argument("--email", required=True)
+    demo = commands.add_parser("seed-demo", help="Create a demo organization with invented data")
+    demo.add_argument("--name", default="Atelier Lumière (Demo)")
     args = parser.parse_args()
 
     get_settings()
     if args.command == "create-organization":
         asyncio.run(_create_organization(args.name, args.admin_email))
+    elif args.command == "seed-demo":
+        asyncio.run(_seed_demo(args.name))
     elif args.command == "grant-platform-admin":
         asyncio.run(_grant_platform_admin(args.email))
     elif args.command == "send-digests":

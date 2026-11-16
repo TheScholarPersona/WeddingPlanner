@@ -4,12 +4,11 @@ A multi-tenant SaaS for wedding planners and their clients. Planners manage wedd
 vendors, tasks, budgets, calendars and documents in one place; couples follow and take part in
 their planning through a mobile-first client portal.
 
-> Status: **Sprint 5 – documents, calendar and notifications.** Planners run each wedding's
-> tasks, budget, documents (virus-scanned, versioned, shareable with the couple) and
-> appointments, see everything in one calendar and subscribe to it from their calendar app.
-> Couples use a mobile-first portal for their countdown, tasks, budget, files and appointments.
-> Email notifications (assignments, comments, documents, a daily overview) are on by default and
-> can be switched off per person. Next: hardening and data protection tools (Sprint 6).
+> Status: **Sprint 6 – ready for the pilot.** Planners run weddings end to end: clients, tasks,
+> budget, documents, appointments and a shared calendar; couples use a mobile-first portal.
+> Sprint 6 added two-factor authentication, GDPR tools (exports, erasure, consents, retention),
+> support access and a platform admin area, a demo organization, a security review
+> ([`docs/security-review.md`](docs/security-review.md)), a load test and an accessibility audit.
 
 ## Stack
 
@@ -72,6 +71,32 @@ To see one locally right away:
 docker compose exec worker python -m app.cli send-digests --now
 ```
 
+### Try it with demo data
+
+```bash
+make demo
+```
+
+This creates "Atelier Lumière (Demo)" with three weddings, budgets, appointments, documents and a
+couple's portal login, and prints the sign-in details for an admin, a planner and the couple.
+Everything is invented; the example.com addresses receive no email.
+
+### Security and data protection
+
+- **Two-factor authentication:** everyone can turn it on under **Account**. Organization admins
+  can require it for their team (**Settings → Security**). Platform admins must use it.
+- **Data requests:** on a client's page, organization admins can export everything stored about
+  the client (ZIP with data and files) or erase the client for good. Everyone can download their
+  own data or delete their account under **Account**.
+- **Consents:** couples decide in their portal (**Account → Privacy**) whether their wedding may be
+  used as a reference and whether they may be asked for a review; planners see the answers on
+  the wedding.
+- **Support access:** under **Settings → Support access** an admin lets platform support look in
+  read-only for 1 to 14 days; every look appears in the audit log.
+- **Platform admin:** `make admin email=you@example.com`, then sign in, turn on two-factor
+  authentication and open **Platform admin** in the sidebar (or `/admin`).
+- A cleanup job removes expired data every night (see the review document).
+
 ### Trust the local HTTPS certificate (optional)
 
 Caddy issues its own certificate for `https://localhost`. Until you trust it, the browser shows a
@@ -116,6 +141,7 @@ make e2e         # Playwright, desktop and phone viewports
 make lint        # ruff, eslint, prettier
 make typecheck   # mypy (strict), tsc
 make api-types   # regenerate the typed API client after backend changes
+make loadtest email=... password=...   # p95 per endpoint, 20 users for 30 s
 make migration m="describe change"
 ```
 

@@ -10,8 +10,10 @@ RUN pip install --no-cache-dir uv==0.11.32 \
     && useradd --create-home --uid 10001 app
 
 WORKDIR /app
+# Development tools (tests, linters) are left out of production images: --build-arg DEV=false
+ARG DEV=true
 COPY pyproject.toml uv.lock ./
-RUN uv sync --frozen --no-install-project
+RUN uv sync --frozen --no-install-project $([ "$DEV" = "true" ] || echo --no-dev)
 
 COPY . .
 

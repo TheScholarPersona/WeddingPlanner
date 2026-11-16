@@ -56,7 +56,7 @@ async def upload(
     visibility: Annotated[VisibilityT, Form()] = "internal",
     ctx: ProjectContext = require_project(ProjectPerm.DOCUMENTS_WRITE),
 ) -> DocumentDetailOut:
-    checked = await read_upload(file)
+    checked = await read_upload(file, ctx.user.id)
     return await service.upload(
         db, ctx, jobs, checked, title=title, category=category, visibility=visibility
     )
@@ -101,7 +101,7 @@ async def add_version(
     file: Annotated[UploadFile, File()],
     ctx: ProjectContext = require_project(ProjectPerm.DOCUMENTS_WRITE),
 ) -> DocumentDetailOut:
-    checked = await read_upload(file)
+    checked = await read_upload(file, ctx.user.id)
     return await service.add_version(db, ctx, jobs, document_id, checked)
 
 

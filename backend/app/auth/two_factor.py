@@ -54,12 +54,29 @@ async def _audit(db: AsyncSession, user: User, action: str) -> None:
     )
 
 
+def _matching_step(totp: TOTP, code: str) -> int | None:
+    """The time step whose code matches, allowing one step of clock drift either way."""
+    now = _now()
+    current = totp.timecode(now)
+    for drift in (0, -1, 1):
+        if secrets.compare_digest(totp.generate_otp(current + drift), code):
+            return current + drift
+    return None
+
+
 async def verify(db: AsyncSession, user: User, code: str) -> bool:
     """A current authenticator code, or an unused recovery code (which is then used up)."""
     code = code.strip().replace(" ", "")
     if code.isdigit() and len(code) == 6:
         totp = _totp(user)
-        return bool(totp and user.two_factor_enabled and totp.verify(code, valid_window=1))
+        if totp is None or not user.two_factor_enabled:
+            return False
+        step = _matching_step(totp, code)
+        # Each code works once, even within its 30 seconds (replay protection).
+        if step is None or (user.totp_last_step is not None and step <= user.totp_last_step):
+            return False
+        user.totp_last_step = step
+        return True
     normalized = _normalize_recovery(code)
     if len(normalized) != 10:
         return False
@@ -107,8 +124,10 @@ async def enable(db: AsyncSession, user: User, code: str) -> list[str]:
         raise ProblemError(
             409, "setup_not_started", "Start again", "Start the setup again to get a new code."
         )
-    if not totp.verify(code.strip().replace(" ", ""), valid_window=1):
+    step = _matching_step(totp, code.strip().replace(" ", ""))
+    if step is None:
         raise INVALID_CODE
+    user.totp_last_step = step
     user.totp_enabled_at = _now()
     codes = await _new_recovery_codes(db, user)
     await _audit(db, user, "auth.two_factor_enabled")
@@ -118,6 +137,7 @@ async def enable(db: AsyncSession, user: User, code: str) -> list[str]:
 async def disable(db: AsyncSession, user: User) -> None:
     user.totp_secret_enc = None
     user.totp_enabled_at = None
+    user.totp_last_step = None
     await db.execute(delete(RecoveryCode).where(RecoveryCode.user_id == user.id))
     await _audit(db, user, "auth.two_factor_disabled")
 

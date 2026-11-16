@@ -5,6 +5,7 @@ from dataclasses import dataclass
 
 from fastapi import UploadFile
 
+from app.core import ratelimit
 from app.core.config import get_settings
 from app.core.errors import ProblemError
 
@@ -71,7 +72,11 @@ def safe_filename(name: str | None) -> str:
     return name or "file"
 
 
-async def read_upload(upload: UploadFile) -> CheckedFile:
+UPLOADS_PER_MINUTE = 30
+
+
+async def read_upload(upload: UploadFile, user_id: object) -> CheckedFile:
+    await ratelimit.enforce([f"upload:user:{user_id}"], UPLOADS_PER_MINUTE)
     limit = get_settings().max_upload_mb * 1024 * 1024
     chunks: list[bytes] = []
     size = 0

@@ -12,6 +12,11 @@ localhost {
 		Referrer-Policy "strict-origin-when-cross-origin"
 		Permissions-Policy "camera=(), microphone=(), geolocation=()"
 		X-Frame-Options "DENY"
+		Cross-Origin-Opener-Policy "same-origin"
+		# Everything comes from this origin (fonts are bundled). 'unsafe-inline' for scripts and
+		# the websocket are only needed by the Vite dev server used in the local pilot; a
+		# production build drops both (see docs/security-review.md).
+		Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' wss://localhost; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
 		-Server
 	}
 

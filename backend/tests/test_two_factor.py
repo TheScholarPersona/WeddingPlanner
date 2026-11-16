@@ -1,5 +1,6 @@
 """Two-factor authentication: setup, sign-in with code or recovery code, organization policy."""
 
+import time
 from typing import Any
 
 import pyotp
@@ -32,6 +33,11 @@ async def turn_on(client: AsyncClient) -> tuple[pyotp.TOTP, list[str]]:
     enabled = await send(client, "POST", "/api/v1/me/2fa/enable", json={"code": totp.now()})
     assert enabled.status_code == 200, enabled.text
     return totp, enabled.json()["recovery_codes"]
+
+
+def next_code(totp: pyotp.TOTP) -> str:
+    """The next time step's code: the current one was used up when 2FA was switched on."""
+    return totp.at(time.time() + 30)
 
 
 async def login(app: FastAPI, email: str) -> tuple[AsyncClient, Any]:
@@ -73,7 +79,7 @@ async def test_sign_in_with_code(app: FastAPI, world: World, owner_engine: Async
 
     wrong = await send(client, "POST", "/api/v1/auth/2fa/verify", json={"code": "000000"})
     assert wrong.status_code == 400
-    ok = await send(client, "POST", "/api/v1/auth/2fa/verify", json={"code": totp.now()})
+    ok = await send(client, "POST", "/api/v1/auth/2fa/verify", json={"code": next_code(totp)})
     assert ok.status_code == 200
     assert ok.json()["email"] == "member@example.com"
     assert (await client.get("/api/v1/me")).status_code == 200
@@ -139,7 +145,10 @@ async def test_disable_needs_password_and_code(world: World) -> None:
         member, "POST", "/api/v1/me/2fa/disable", json={"password": "nope", "code": totp.now()}
     )
     ok = await send(
-        member, "POST", "/api/v1/me/2fa/disable", json={"password": PASSWORD, "code": totp.now()}
+        member,
+        "POST",
+        "/api/v1/me/2fa/disable",
+        json={"password": PASSWORD, "code": next_code(totp)},
     )
 
     assert wrong.status_code == 400
@@ -166,3 +175,17 @@ async def test_organization_can_require_two_factor(world: World) -> None:
     assert (await world["member"].client.get("/api/v1/me/2fa")).status_code == 200
     await turn_on(world["member"].client)
     assert (await world["member"].client.get(f"{path}/members")).status_code == 200
+
+
+async def test_a_code_works_only_once(app: FastAPI, world: World) -> None:
+    totp, _ = await turn_on(world["member"].client)
+    code = next_code(totp)
+
+    first, _ = await login(app, "member@example.com")
+    assert (
+        await send(first, "POST", "/api/v1/auth/2fa/verify", json={"code": code})
+    ).status_code == 200
+    second, _ = await login(app, "member@example.com")
+    replay = await send(second, "POST", "/api/v1/auth/2fa/verify", json={"code": code})
+
+    assert replay.status_code == 400

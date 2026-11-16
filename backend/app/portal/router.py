@@ -111,7 +111,7 @@ async def upload_document(
     title: Annotated[str | None, Form(max_length=200)] = None,
     access: PortalAccess = Access,
 ) -> list[PortalDocument]:
-    checked = await read_upload(file)
+    checked = await read_upload(file, access.ctx.user.id)
     await document_service.upload(
         db, access.ctx, jobs, checked, title=title, category="other", visibility="client"
     )

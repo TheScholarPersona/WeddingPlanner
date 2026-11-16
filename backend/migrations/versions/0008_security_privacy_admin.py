@@ -50,6 +50,8 @@ def upgrade() -> None:
     # --- Two-factor authentication ---------------------------------------------------------
     op.add_column("users", sa.Column("totp_secret_enc", sa.Text))
     op.add_column("users", sa.Column("totp_enabled_at", TZ))
+    # Time step of the last accepted code: a code cannot be used twice (RFC 6238, 5.2).
+    op.add_column("users", sa.Column("totp_last_step", sa.BigInteger))
     op.add_column("users", sa.Column("deleted_at", TZ))
     op.add_column(
         "sessions",
@@ -122,7 +124,8 @@ def upgrade() -> None:
     )
     op.execute("ALTER TABLE support_access_grants ENABLE ROW LEVEL SECURITY")
     op.execute(
-        f"CREATE POLICY access ON support_access_grants USING ({ORG} AND {NOT_CLIENT}) WITH CHECK ({ORG})"
+        "CREATE POLICY access ON support_access_grants "
+        f"USING ({ORG} AND {NOT_CLIENT}) WITH CHECK ({ORG})"
     )
 
     # --- Platform administration -----------------------------------------------------------
@@ -233,5 +236,6 @@ def downgrade() -> None:
     op.drop_column("sessions", "mfa_failures")
     op.drop_column("sessions", "mfa_pending")
     op.drop_column("users", "deleted_at")
+    op.drop_column("users", "totp_last_step")
     op.drop_column("users", "totp_enabled_at")
     op.drop_column("users", "totp_secret_enc")

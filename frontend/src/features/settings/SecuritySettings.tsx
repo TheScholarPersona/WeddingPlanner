@@ -68,7 +68,11 @@ export function SupportAccessCard({ orgId }: { orgId: string }) {
   const [days, setDays] = useState('3');
   const [reason, setReason] = useState('');
   const [error, setError] = useState<unknown>(null);
-  const refresh = () => queryClient.invalidateQueries({ queryKey: key });
+  const refresh = () =>
+    Promise.all([
+      queryClient.invalidateQueries({ queryKey: key }),
+      queryClient.invalidateQueries({ queryKey: ['org', orgId, 'audit'] }),
+    ]);
   const revoke = useMutation({
     mutationFn: (id: string) => api('DELETE', `${path}/${id}`),
     onSuccess: refresh,
