@@ -13,6 +13,8 @@ import { useActiveOrg } from '@/features/auth/useActiveOrg';
 import { api, type Schemas } from '@/lib/api/client';
 import { errorMessage } from '@/lib/api/errors';
 
+import { SupportAccessCard, TwoFactorPolicyCard } from './SecuritySettings';
+
 type Organization = Schemas['OrganizationOut'];
 type AuditPage = Schemas['AuditPageOut'];
 
@@ -41,6 +43,8 @@ export function SettingsPage() {
       ) : (
         <Spinner />
       )}
+      {isAdmin && org.data && <TwoFactorPolicyCard org={org.data} />}
+      {isAdmin && <SupportAccessCard orgId={orgId} />}
       {isAdmin && <AuditLog orgId={orgId} />}
     </div>
   );

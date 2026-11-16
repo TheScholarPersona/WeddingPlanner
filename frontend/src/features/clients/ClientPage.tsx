@@ -19,6 +19,7 @@ import { api, type Schemas } from '@/lib/api/client';
 import { errorMessage } from '@/lib/api/errors';
 import { formatDate } from '@/lib/format';
 
+import { ClientPrivacyCard } from './ClientPrivacyCard';
 import { CLIENT_STATUSES, statusTone } from './status';
 
 type ClientDetail = Schemas['ClientDetailOut'];
@@ -99,6 +100,7 @@ export function ClientPage() {
               ))}
             </ul>
           </Card>
+          {isAdmin && <ClientPrivacyCard org={org} clientId={data.id} name={data.display_name} />}
         </div>
       </div>
     </div>

@@ -13,7 +13,7 @@ import { errorMessage, fieldErrors } from '@/lib/api/errors';
 
 import { AuthLayout } from './AuthLayout';
 import { MIN_PASSWORD_LENGTH } from './password';
-import { homePathFor, meQueryKey, type Me } from './session';
+import { homePathFor, meQueryKey, needsSecondFactor, type SignInResult } from './session';
 
 type InvitationInfo = Schemas['InvitationInfoOut'];
 
@@ -33,13 +33,17 @@ export function AcceptInvitationPage() {
 
   const accept = useMutation({
     mutationFn: () =>
-      api<Me>('POST', `/auth/invitations/${encodeURIComponent(token)}/accept`, {
+      api<SignInResult>('POST', `/auth/invitations/${encodeURIComponent(token)}/accept`, {
         full_name: info.data?.account_exists ? null : fullName,
         password,
       }),
-    onSuccess: (me) => {
-      queryClient.setQueryData(meQueryKey, me);
-      void navigate(homePathFor(me), { replace: true });
+    onSuccess: (result) => {
+      if (needsSecondFactor(result)) {
+        void navigate('/login', { replace: true, state: { twoFactor: true } });
+        return;
+      }
+      queryClient.setQueryData(meQueryKey, result);
+      void navigate(homePathFor(result), { replace: true });
     },
   });
 

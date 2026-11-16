@@ -49,10 +49,211 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MeOut"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TwoFactorChallengeOut"
+                    }
+                  ],
+                  "title": "Response Login Api V1 Auth Login Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/2fa/verify": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Verify Two Factor",
+        "operationId": "verify_two_factor_api_v1_auth_2fa_verify_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TwoFactorCodeIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
                   "$ref": "#/components/schemas/MeOut"
                 }
               }
             }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/2fa/cancel": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Cancel Two Factor",
+        "operationId": "cancel_two_factor_api_v1_auth_2fa_cancel_post",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          }
+        }
+      }
+    },
+    "/api/v1/me/2fa": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Two Factor Status",
+        "operationId": "two_factor_status_api_v1_me_2fa_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwoFactorStatusOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/me/2fa/setup": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Two Factor Setup",
+        "operationId": "two_factor_setup_api_v1_me_2fa_setup_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TwoFactorSetupOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/me/2fa/enable": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Two Factor Enable",
+        "operationId": "two_factor_enable_api_v1_me_2fa_enable_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TwoFactorCodeIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecoveryCodesOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/me/2fa/recovery-codes": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Two Factor New Codes",
+        "operationId": "two_factor_new_codes_api_v1_me_2fa_recovery_codes_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecoveryCodesOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/me/2fa/disable": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Two Factor Disable",
+        "operationId": "two_factor_disable_api_v1_me_2fa_disable_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DisableTwoFactorIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
           },
           "422": {
             "description": "Validation Error",
@@ -264,7 +465,15 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/MeOut"
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MeOut"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TwoFactorChallengeOut"
+                    }
+                  ],
+                  "title": "Response Accept Invitation Api V1 Auth Invitations  Token  Accept Post"
                 }
               }
             }
@@ -7519,6 +7728,699 @@
           }
         }
       }
+    },
+    "/api/v1/orgs/{org_id}/clients/{client_id}/export": {
+      "get": {
+        "tags": [
+          "privacy"
+        ],
+        "summary": "Export Client",
+        "description": "Everything stored about a client, as a ZIP (data.json plus document files).",
+        "operationId": "export_client_api_v1_orgs__org_id__clients__client_id__export_get",
+        "parameters": [
+          {
+            "name": "client_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Client Id"
+            }
+          },
+          {
+            "name": "org_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Org Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/orgs/{org_id}/clients/{client_id}/erase": {
+      "post": {
+        "tags": [
+          "privacy"
+        ],
+        "summary": "Erase Client",
+        "operationId": "erase_client_api_v1_orgs__org_id__clients__client_id__erase_post",
+        "parameters": [
+          {
+            "name": "client_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Client Id"
+            }
+          },
+          {
+            "name": "org_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Org Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EraseClientIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EraseSummaryOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/orgs/{org_id}/projects/{project_id}/consents": {
+      "get": {
+        "tags": [
+          "privacy"
+        ],
+        "summary": "Couple Consents",
+        "operationId": "couple_consents_api_v1_orgs__org_id__projects__project_id__consents_get",
+        "parameters": [
+          {
+            "name": "org_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Org Id"
+            }
+          },
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Project Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CoupleConsentsOut"
+                  },
+                  "title": "Response Couple Consents Api V1 Orgs  Org Id  Projects  Project Id  Consents Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/portal/projects/{project_id}/consents": {
+      "get": {
+        "tags": [
+          "privacy"
+        ],
+        "summary": "My Consents",
+        "operationId": "my_consents_api_v1_portal_projects__project_id__consents_get",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Project Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ConsentOut"
+                  },
+                  "title": "Response My Consents Api V1 Portal Projects  Project Id  Consents Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "privacy"
+        ],
+        "summary": "Decide",
+        "operationId": "decide_api_v1_portal_projects__project_id__consents_put",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Project Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConsentIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ConsentOut"
+                  },
+                  "title": "Response Decide Api V1 Portal Projects  Project Id  Consents Put"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/me/export": {
+      "get": {
+        "tags": [
+          "privacy"
+        ],
+        "summary": "Export Me",
+        "operationId": "export_me_api_v1_me_export_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/me/delete": {
+      "post": {
+        "tags": [
+          "privacy"
+        ],
+        "summary": "Delete Account",
+        "operationId": "delete_account_api_v1_me_delete_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteAccountIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/organizations": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Organizations",
+        "operationId": "organizations_api_v1_admin_organizations_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AdminOrganizationOut"
+                  },
+                  "type": "array",
+                  "title": "Response Organizations Api V1 Admin Organizations Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Create Organization",
+        "operationId": "create_organization_api_v1_admin_organizations_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminOrganizationIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminOrganizationCreatedOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/organizations/{org_id}/suspend": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Suspend",
+        "operationId": "suspend_api_v1_admin_organizations__org_id__suspend_post",
+        "parameters": [
+          {
+            "name": "org_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Org Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminOrganizationOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/organizations/{org_id}/reactivate": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Reactivate",
+        "operationId": "reactivate_api_v1_admin_organizations__org_id__reactivate_post",
+        "parameters": [
+          {
+            "name": "org_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Org Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminOrganizationOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/organizations/{org_id}/support": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Support View",
+        "operationId": "support_view_api_v1_admin_organizations__org_id__support_get",
+        "parameters": [
+          {
+            "name": "org_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Org Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupportViewOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/users/reset-2fa": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Reset Two Factor",
+        "operationId": "reset_two_factor_api_v1_admin_users_reset_2fa_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetTwoFactorIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/orgs/{org_id}/support-access": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "List Grants",
+        "operationId": "list_grants_api_v1_orgs__org_id__support_access_get",
+        "parameters": [
+          {
+            "name": "org_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Org Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SupportGrantOut"
+                  },
+                  "title": "Response List Grants Api V1 Orgs  Org Id  Support Access Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Grant",
+        "operationId": "grant_api_v1_orgs__org_id__support_access_post",
+        "parameters": [
+          {
+            "name": "org_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Org Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SupportGrantIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupportGrantOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/orgs/{org_id}/support-access/{grant_id}": {
+      "delete": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Revoke",
+        "operationId": "revoke_api_v1_orgs__org_id__support_access__grant_id__delete",
+        "parameters": [
+          {
+            "name": "grant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Grant Id"
+            }
+          },
+          {
+            "name": "org_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Org Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -7649,6 +8551,111 @@
           "next_cursor"
         ],
         "title": "ActivityPageOut"
+      },
+      "AdminOrganizationCreatedOut": {
+        "properties": {
+          "organization": {
+            "$ref": "#/components/schemas/AdminOrganizationOut"
+          },
+          "invitation_link": {
+            "type": "string",
+            "title": "Invitation Link"
+          }
+        },
+        "type": "object",
+        "required": [
+          "organization",
+          "invitation_link"
+        ],
+        "title": "AdminOrganizationCreatedOut"
+      },
+      "AdminOrganizationIn": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "admin_email": {
+            "type": "string",
+            "format": "email",
+            "title": "Admin Email"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "admin_email"
+        ],
+        "title": "AdminOrganizationIn"
+      },
+      "AdminOrganizationOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "suspended"
+            ],
+            "title": "Status"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "require_2fa": {
+            "type": "boolean",
+            "title": "Require 2Fa"
+          },
+          "members": {
+            "type": "integer",
+            "title": "Members"
+          },
+          "clients": {
+            "type": "integer",
+            "title": "Clients"
+          },
+          "support_until": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Support Until"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "slug",
+          "status",
+          "created_at",
+          "require_2fa",
+          "members",
+          "clients",
+          "support_until"
+        ],
+        "title": "AdminOrganizationOut"
       },
       "AuditEntryOut": {
         "properties": {
@@ -8739,6 +9746,75 @@
         ],
         "title": "CommentUpdateIn"
       },
+      "ConsentIn": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "portfolio",
+              "reviews"
+            ],
+            "title": "Kind"
+          },
+          "granted": {
+            "type": "boolean",
+            "title": "Granted"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "granted"
+        ],
+        "title": "ConsentIn"
+      },
+      "ConsentOut": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "portfolio",
+              "reviews"
+            ],
+            "title": "Kind"
+          },
+          "granted": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Granted"
+          },
+          "decided_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decided At"
+          },
+          "outdated": {
+            "type": "boolean",
+            "title": "Outdated",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "granted",
+          "decided_at"
+        ],
+        "title": "ConsentOut"
+      },
       "ContactIn": {
         "properties": {
           "first_name": {
@@ -8957,6 +10033,27 @@
         "type": "object",
         "title": "ContactUpdateIn"
       },
+      "CoupleConsentsOut": {
+        "properties": {
+          "full_name": {
+            "type": "string",
+            "title": "Full Name"
+          },
+          "consents": {
+            "items": {
+              "$ref": "#/components/schemas/ConsentOut"
+            },
+            "type": "array",
+            "title": "Consents"
+          }
+        },
+        "type": "object",
+        "required": [
+          "full_name",
+          "consents"
+        ],
+        "title": "CoupleConsentsOut"
+      },
       "CoupleInvitationIn": {
         "properties": {
           "email": {
@@ -9083,6 +10180,49 @@
           "upcoming"
         ],
         "title": "DashboardOut"
+      },
+      "DeleteAccountIn": {
+        "properties": {
+          "password": {
+            "type": "string",
+            "maxLength": 1024,
+            "minLength": 1,
+            "title": "Password"
+          },
+          "confirm": {
+            "type": "string",
+            "const": "DELETE",
+            "title": "Confirm"
+          }
+        },
+        "type": "object",
+        "required": [
+          "password",
+          "confirm"
+        ],
+        "title": "DeleteAccountIn"
+      },
+      "DisableTwoFactorIn": {
+        "properties": {
+          "password": {
+            "type": "string",
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Password"
+          },
+          "code": {
+            "type": "string",
+            "maxLength": 20,
+            "minLength": 6,
+            "title": "Code"
+          }
+        },
+        "type": "object",
+        "required": [
+          "password",
+          "code"
+        ],
+        "title": "DisableTwoFactorIn"
       },
       "DocumentDetailOut": {
         "properties": {
@@ -9334,6 +10474,44 @@
         },
         "type": "object",
         "title": "DocumentUpdateIn"
+      },
+      "EraseClientIn": {
+        "properties": {
+          "confirm": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Confirm"
+          }
+        },
+        "type": "object",
+        "required": [
+          "confirm"
+        ],
+        "title": "EraseClientIn"
+      },
+      "EraseSummaryOut": {
+        "properties": {
+          "weddings": {
+            "type": "integer",
+            "title": "Weddings"
+          },
+          "files": {
+            "type": "integer",
+            "title": "Files"
+          },
+          "portal_accounts": {
+            "type": "integer",
+            "title": "Portal Accounts"
+          }
+        },
+        "type": "object",
+        "required": [
+          "weddings",
+          "files",
+          "portal_accounts"
+        ],
+        "title": "EraseSummaryOut"
       },
       "EventIn": {
         "properties": {
@@ -10219,6 +11397,16 @@
             },
             "type": "array",
             "title": "Memberships"
+          },
+          "two_factor_enabled": {
+            "type": "boolean",
+            "title": "Two Factor Enabled",
+            "default": false
+          },
+          "is_platform_admin": {
+            "type": "boolean",
+            "title": "Is Platform Admin",
+            "default": false
           }
         },
         "type": "object",
@@ -10831,6 +12019,10 @@
           "client_access_days_after_archive": {
             "type": "integer",
             "title": "Client Access Days After Archive"
+          },
+          "require_2fa": {
+            "type": "boolean",
+            "title": "Require 2Fa"
           }
         },
         "type": "object",
@@ -10841,7 +12033,8 @@
           "accent_color",
           "locale",
           "timezone",
-          "client_access_days_after_archive"
+          "client_access_days_after_archive",
+          "require_2fa"
         ],
         "title": "OrganizationOut"
       },
@@ -10919,6 +12112,17 @@
               }
             ],
             "title": "Client Access Days After Archive"
+          },
+          "require_2fa": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Require 2Fa"
           }
         },
         "type": "object",
@@ -12817,6 +14021,22 @@
         ],
         "title": "ReauthIn"
       },
+      "RecoveryCodesOut": {
+        "properties": {
+          "recovery_codes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Recovery Codes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "recovery_codes"
+        ],
+        "title": "RecoveryCodesOut"
+      },
       "ReorderIn": {
         "properties": {
           "items": {
@@ -12875,6 +14095,292 @@
           "password"
         ],
         "title": "ResetPasswordIn"
+      },
+      "ResetTwoFactorIn": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email"
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 300,
+            "minLength": 5,
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email",
+          "reason"
+        ],
+        "title": "ResetTwoFactorIn"
+      },
+      "SupportAuditOut": {
+        "properties": {
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "action": {
+            "type": "string",
+            "title": "Action"
+          },
+          "resource_type": {
+            "type": "string",
+            "title": "Resource Type"
+          },
+          "actor_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actor Name"
+          },
+          "actor_type": {
+            "type": "string",
+            "title": "Actor Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "created_at",
+          "action",
+          "resource_type",
+          "actor_name",
+          "actor_type"
+        ],
+        "title": "SupportAuditOut"
+      },
+      "SupportGrantIn": {
+        "properties": {
+          "days": {
+            "type": "integer",
+            "maximum": 14.0,
+            "minimum": 1.0,
+            "title": "Days",
+            "default": 3
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 300
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "title": "SupportGrantIn"
+      },
+      "SupportGrantOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "granted_by_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Granted By Name"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Expires At"
+          },
+          "revoked_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revoked At"
+          },
+          "active": {
+            "type": "boolean",
+            "title": "Active"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "granted_by_name",
+          "reason",
+          "created_at",
+          "expires_at",
+          "revoked_at",
+          "active"
+        ],
+        "title": "SupportGrantOut"
+      },
+      "SupportMemberOut": {
+        "properties": {
+          "full_name": {
+            "type": "string",
+            "title": "Full Name"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "two_factor_enabled": {
+            "type": "boolean",
+            "title": "Two Factor Enabled"
+          },
+          "last_login_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Login At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "full_name",
+          "email",
+          "role",
+          "status",
+          "two_factor_enabled",
+          "last_login_at"
+        ],
+        "title": "SupportMemberOut"
+      },
+      "SupportViewOut": {
+        "properties": {
+          "organization": {
+            "$ref": "#/components/schemas/AdminOrganizationOut"
+          },
+          "grant_expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Grant Expires At"
+          },
+          "members": {
+            "items": {
+              "$ref": "#/components/schemas/SupportMemberOut"
+            },
+            "type": "array",
+            "title": "Members"
+          },
+          "weddings": {
+            "items": {
+              "$ref": "#/components/schemas/SupportWeddingOut"
+            },
+            "type": "array",
+            "title": "Weddings"
+          },
+          "audit": {
+            "items": {
+              "$ref": "#/components/schemas/SupportAuditOut"
+            },
+            "type": "array",
+            "title": "Audit"
+          }
+        },
+        "type": "object",
+        "required": [
+          "organization",
+          "grant_expires_at",
+          "members",
+          "weddings",
+          "audit"
+        ],
+        "title": "SupportViewOut",
+        "description": "What platform support sees during an active grant: structure, not content."
+      },
+      "SupportWeddingOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "wedding_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wedding Date"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "team": {
+            "type": "integer",
+            "title": "Team"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "wedding_date",
+          "status",
+          "team"
+        ],
+        "title": "SupportWeddingOut"
       },
       "TaskDetailOut": {
         "properties": {
@@ -13982,6 +15488,88 @@
           "unplanned_cents"
         ],
         "title": "Totals"
+      },
+      "TwoFactorChallengeOut": {
+        "properties": {
+          "two_factor_required": {
+            "type": "boolean",
+            "const": true,
+            "title": "Two Factor Required",
+            "default": true
+          }
+        },
+        "type": "object",
+        "title": "TwoFactorChallengeOut",
+        "description": "Password accepted; the sign-in completes with POST /auth/2fa/verify."
+      },
+      "TwoFactorCodeIn": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "maxLength": 20,
+            "minLength": 6,
+            "title": "Code"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code"
+        ],
+        "title": "TwoFactorCodeIn"
+      },
+      "TwoFactorSetupOut": {
+        "properties": {
+          "secret": {
+            "type": "string",
+            "title": "Secret"
+          },
+          "otpauth_uri": {
+            "type": "string",
+            "title": "Otpauth Uri"
+          },
+          "qr_svg": {
+            "type": "string",
+            "title": "Qr Svg"
+          }
+        },
+        "type": "object",
+        "required": [
+          "secret",
+          "otpauth_uri",
+          "qr_svg"
+        ],
+        "title": "TwoFactorSetupOut"
+      },
+      "TwoFactorStatusOut": {
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled"
+          },
+          "enabled_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Enabled At"
+          },
+          "recovery_codes_left": {
+            "type": "integer",
+            "title": "Recovery Codes Left"
+          }
+        },
+        "type": "object",
+        "required": [
+          "enabled",
+          "enabled_at",
+          "recovery_codes_left"
+        ],
+        "title": "TwoFactorStatusOut"
       },
       "UpcomingPayment": {
         "properties": {

@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { NavLink, Outlet } from 'react-router';
 
+import { useMe } from '@/features/auth/session';
 import { useActiveOrg } from '@/features/auth/useActiveOrg';
 import { cn } from '@/lib/utils';
 
@@ -20,6 +21,7 @@ const footerNav = [
   { to: '/app/team', key: 'nav.team' },
   { to: '/app/settings', key: 'nav.settings' },
   { to: '/app/notifications', key: 'nav.notifications' },
+  { to: '/app/account', key: 'nav.account' },
 ] as const;
 
 function navClass({ isActive }: { isActive: boolean }) {
@@ -59,6 +61,7 @@ function OrganizationSwitcher() {
 
 export function PlannerLayout() {
   const { t } = useTranslation();
+  const { data: me } = useMe();
   return (
     <div className="flex min-h-screen flex-wrap bg-ground">
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:p-3">
@@ -83,6 +86,11 @@ export function PlannerLayout() {
                 {t(item.key)}
               </NavLink>
             ))}
+            {me?.is_platform_admin && (
+              <NavLink to="/admin" className={navClass}>
+                {t('nav.admin')}
+              </NavLink>
+            )}
           </div>
           <div className="border-t border-line pt-3">
             <UserMenu />
