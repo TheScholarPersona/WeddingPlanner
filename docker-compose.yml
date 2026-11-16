@@ -21,11 +21,14 @@ x-backend-env: &backend-env
 services:
   proxy:
     image: caddy:2-alpine
+    # The whole folder is mounted and watched: `git pull` replaces the Caddyfile, which a
+    # single-file mount would not show to the running container.
+    command: caddy run --config /etc/caddy/Caddyfile --adapter caddyfile --watch
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./docker/caddy:/etc/caddy:ro
       - caddy_data:/data
     depends_on:
       - api

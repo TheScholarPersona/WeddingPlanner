@@ -114,6 +114,16 @@ Then add the exported `caddy-root.crt` to your system:
 
 Firefox keeps its own certificate store: Settings → Privacy & Security → Certificates → Import.
 
+### If the app does not open
+
+- **Safari "can't connect to the server"** although everything runs: Safari remembers a failed
+  connection. Open https://localhost in a private window (Cmd + Shift + N) or quit Safari once.
+- **Check that everything is up:** `docker compose ps` lists every service as "Up";
+  `curl -sk https://localhost/api/v1/health` answers `{"status":"ok","database":"ok"}`.
+- **Blank page right after an update:** the frontend is still installing or bundling new
+  packages; wait a moment and reload with Cmd + Shift + R.
+- **Still stuck:** `docker compose logs --tail=40 proxy api frontend` shows what went wrong.
+
 ### Without `make` (e.g. Windows)
 
 ```bash
