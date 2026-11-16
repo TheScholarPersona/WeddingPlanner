@@ -1,7 +1,7 @@
 .DEFAULT_GOAL := help
 COMPOSE := docker compose
 
-.PHONY: help setup up down logs org demo admin loadtest migrate migration test test-backend test-frontend e2e lint format typecheck api-types trust-cert clean
+.PHONY: help setup up down logs org demo admin loadtest lan lan-off migrate migration test test-backend test-frontend e2e lint format typecheck api-types trust-cert clean
 
 help: ## Show available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}'
@@ -65,6 +65,12 @@ typecheck: ## Static type checks
 api-types: ## Regenerate the frontend API client types from the backend
 	cd backend && PYTHONPATH=. uv run python scripts/export_openapi.py ../frontend/openapi.json
 	cd frontend && npm run api:generate
+
+lan: ## Make the app reachable from phones in the same Wi-Fi (my-mac.local)
+	./scripts/lan.sh
+
+lan-off: ## Back to https://localhost only
+	./scripts/lan.sh off
 
 trust-cert: ## Export Caddy's local root certificate to ./caddy-root.crt (then trust it, see README)
 	$(COMPOSE) cp proxy:/data/caddy/pki/authorities/local/root.crt ./caddy-root.crt

@@ -11,6 +11,12 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    // Behind Caddy the browser's host name reaches Vite; besides localhost, allow the Mac's
+    // network name set by `make lan` (Vite blocks unknown hosts against DNS rebinding).
+    allowedHosts: (process.env.VITE_ALLOWED_HOSTS ?? '')
+      .split(',')
+      .map((h) => h.trim())
+      .filter(Boolean),
     // Behind Caddy in Docker the API is same-origin; for `npm run dev` on the host, proxy it.
     proxy: { '/api': process.env.VITE_API_PROXY ?? 'http://localhost:8000' },
   },
