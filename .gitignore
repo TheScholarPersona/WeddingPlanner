@@ -16,3 +16,7 @@ dist/
 playwright-report/
 test-results/
 *.tsbuildinfo
+
+# Test reports and the built feature catalog view
+reports/
+catalog/dist/

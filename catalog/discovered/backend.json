@@ -1,0 +1,2100 @@
+{
+  "generatedBy": "backend/tests/test_catalog_export.py",
+  "apiPrefix": "/api/v1",
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/admin/organizations",
+      "summary": "",
+      "handler": "backend/app/admin/router.py:organizations",
+      "roles": [
+        "platform admin"
+      ],
+      "permission": null
+    },
+    {
+      "method": "POST",
+      "path": "/admin/organizations",
+      "summary": "",
+      "handler": "backend/app/admin/router.py:create_organization",
+      "roles": [
+        "platform admin"
+      ],
+      "permission": null
+    },
+    {
+      "method": "POST",
+      "path": "/admin/organizations/{org_id}/reactivate",
+      "summary": "",
+      "handler": "backend/app/admin/router.py:reactivate",
+      "roles": [
+        "platform admin"
+      ],
+      "permission": null
+    },
+    {
+      "method": "GET",
+      "path": "/admin/organizations/{org_id}/support",
+      "summary": "",
+      "handler": "backend/app/admin/router.py:support_view",
+      "roles": [
+        "platform admin"
+      ],
+      "permission": null
+    },
+    {
+      "method": "POST",
+      "path": "/admin/organizations/{org_id}/suspend",
+      "summary": "",
+      "handler": "backend/app/admin/router.py:suspend",
+      "roles": [
+        "platform admin"
+      ],
+      "permission": null
+    },
+    {
+      "method": "POST",
+      "path": "/admin/users/reset-2fa",
+      "summary": "",
+      "handler": "backend/app/admin/router.py:reset_two_factor",
+      "roles": [
+        "platform admin"
+      ],
+      "permission": null
+    },
+    {
+      "method": "POST",
+      "path": "/auth/2fa/cancel",
+      "summary": "",
+      "handler": "backend/app/auth/router.py:cancel_two_factor",
+      "roles": [
+        "signed in"
+      ],
+      "permission": null
+    },
+    {
+      "method": "POST",
+      "path": "/auth/2fa/verify",
+      "summary": "",
+      "handler": "backend/app/auth/router.py:verify_two_factor",
+      "roles": [
+        "signed in"
+      ],
+      "permission": null
+    },
+    {
+      "method": "GET",
+      "path": "/auth/invitations/{token}",
+      "summary": "",
+      "handler": "backend/app/auth/router.py:get_invitation",
+      "roles": [
+        "public"
+      ],
+      "permission": null
+    },
+    {
+      "method": "POST",
+      "path": "/auth/invitations/{token}/accept",
+      "summary": "",
+      "handler": "backend/app/auth/router.py:accept_invitation",
+      "roles": [
+        "public"
+      ],
+      "permission": null
+    },
+    {
+      "method": "POST",
+      "path": "/auth/login",
+      "summary": "",
+      "handler": "backend/app/auth/router.py:login",
+      "roles": [
+        "public"
+      ],
+      "permission": null
+    },
+    {
+      "method": "POST",
+      "path": "/auth/logout",
+      "summary": "",
+      "handler": "backend/app/auth/router.py:logout",
+      "roles": [
+        "signed in"
+      ],
+      "permission": null
+    },
+    {
+      "method": "POST",
+      "path": "/auth/password/forgot",
+      "summary": "",
+      "handler": "backend/app/auth/router.py:forgot_password",
+      "roles": [
+        "public"
+      ],
+      "permission": null
+    },
+    {
+      "method": "POST",
+      "path": "/auth/password/reset",
+      "summary": "",
+      "handler": "backend/app/auth/router.py:reset_password",
+      "roles": [
+        "public"
+      ],
+      "permission": null
+    },
+    {
+      "method": "POST",
+      "path": "/auth/reauth",
+      "summary": "",
+      "handler": "backend/app/auth/router.py:reauth",
+      "roles": [
+        "signed in"
+      ],
+      "permission": null
+    },
+    {
+      "method": "GET",
+      "path": "/calendar-feeds/{token}.ics",
+      "summary": "Public subscription URL: the secret token in the path is the only credential.",
+      "handler": "backend/app/events/router.py:feed",
+      "roles": [
+        "public"
+      ],
+      "permission": null
+    },
+    {
+      "method": "GET",
+      "path": "/health",
+      "summary": "",
+      "handler": "backend/app/api/health.py:health",
+      "roles": [
+        "public"
+      ],
+      "permission": null
+    },
+    {
+      "method": "GET",
+      "path": "/me",
+      "summary": "",
+      "handler": "backend/app/auth/router.py:me",
+      "roles": [
+        "signed in"
+      ],
+      "permission": null
+    },
+    {
+      "method": "PATCH",
+      "path": "/me",
+      "summary": "",
+      "handler": "backend/app/auth/router.py:update_me",
+      "roles": [
+        "signed in"
+      ],
+      "permission": null
+    },
+    {
+      "method": "GET",
+      "path": "/me/2fa",
+      "summary": "",
+      "handler": "backend/app/auth/router.py:two_factor_status",
+      "roles": [
+        "signed in"
+      ],
+      "permission": null
+    },
+    {
+      "method": "POST",
+      "path": "/me/2fa/disable",
+      "summary": "",
+      "handler": "backend/app/auth/router.py:two_factor_disable",
+      "roles": [
+        "signed in"
+      ],
+      "permission": null
+    },
+    {
+      "method": "POST",
+      "path": "/me/2fa/enable",
+      "summary": "",
+      "handler": "backend/app/auth/router.py:two_factor_enable",
+      "roles": [
+        "signed in"
+      ],
+      "permission": null
+    },
+    {
+      "method": "POST",
+      "path": "/me/2fa/recovery-codes",
+      "summary": "",
+      "handler": "backend/app/auth/router.py:two_factor_new_codes",
+      "roles": [
+        "signed in"
+      ],
+      "permission": null
+    },
+    {
+      "method": "POST",
+      "path": "/me/2fa/setup",
+      "summary": "",
+      "handler": "backend/app/auth/router.py:two_factor_setup",
+      "roles": [
+        "signed in"
+      ],
+      "permission": null
+    },
+    {
+      "method": "POST",
+      "path": "/me/delete",
+      "summary": "",
+      "handler": "backend/app/privacy/router.py:delete_account",
+      "roles": [
+        "signed in"
+      ],
+      "permission": null
+    },
+    {
+      "method": "GET",
+      "path": "/me/export",
+      "summary": "",
+      "handler": "backend/app/privacy/router.py:export_me",
+      "roles": [
+        "signed in"
+      ],
+      "permission": null
+    },
+    {
+      "method": "POST",
+      "path": "/me/password",
+      "summary": "",
+      "handler": "backend/app/auth/router.py:change_password",
+      "roles": [
+        "signed in"
+      ],
+      "permission": null
+    },
+    {
+      "method": "GET",
+      "path": "/orgs/{org_id}",
+      "summary": "",
+      "handler": "backend/app/organizations/router.py:get_organization",
+      "roles": [
+        "org admin",
+        "team member",
+        "couple"
+      ],
+      "permission": "organization:read"
+    },
+    {
+      "method": "PATCH",
+      "path": "/orgs/{org_id}",
+      "summary": "",
+      "handler": "backend/app/organizations/router.py:update_organization",
+      "roles": [
+        "org admin"
+      ],
+      "permission": "organization:update"
+    },
+    {
+      "method": "GET",
+      "path": "/orgs/{org_id}/audit-log",
+      "summary": "",
+      "handler": "backend/app/organizations/router.py:audit_log",
+      "roles": [
+        "org admin"
+      ],
+      "permission": "audit:read"
+    },
+    {
+      "method": "GET",
+      "path": "/orgs/{org_id}/calendar",
+      "summary": "",
+      "handler": "backend/app/events/router.py:calendar",
+      "roles": [
+        "org admin",
+        "team member"
+      ],
+      "permission": "calendar:read"
+    },
+    {
+      "method": "DELETE",
+      "path": "/orgs/{org_id}/calendar/feed",
+      "summary": "",
+      "handler": "backend/app/events/router.py:revoke_feed",
+      "roles": [
+        "org admin",
+        "team member",
+        "couple"
+      ],
+      "permission": "organization:read"
+    },
+    {
+      "method": "GET",
+      "path": "/orgs/{org_id}/calendar/feed",
+      "summary": "",
+      "handler": "backend/app/events/router.py:get_feed",
+      "roles": [
+        "org admin",
+        "team member",
+        "couple"
+      ],
+      "permission": "organization:read"
+    },
+    {
+      "method": "POST",
+      "path": "/orgs/{org_id}/calendar/feed",
+      "summary": "",
+      "handler": "backend/app/events/router.py:create_feed",
+      "roles": [
+        "org admin",
+        "team member",
+        "couple"
+      ],
+      "permission": "organization:read"
+    },
+    {
+      "method": "GET",
+      "path": "/orgs/{org_id}/clients",
+      "summary": "",
+      "handler": "backend/app/clients/router.py:list_clients",
+      "roles": [
+        "org admin",
+        "team member"
+      ],
+      "permission": "clients:read"
+    },
+    {
+      "method": "POST",
+      "path": "/orgs/{org_id}/clients",
+      "summary": "",
+      "handler": "backend/app/clients/router.py:create_client",
+      "roles": [
+        "org admin",
+        "team member"
+      ],
+      "permission": "clients:write"
+    },
+    {
+      "method": "DELETE",
+      "path": "/orgs/{org_id}/clients/{client_id}",
+      "summary": "",
+      "handler": "backend/app/clients/router.py:delete_client",
+      "roles": [
+        "org admin"
+      ],
+      "permission": "clients:delete"
+    },
+    {
+      "method": "GET",
+      "path": "/orgs/{org_id}/clients/{client_id}",
+      "summary": "",
+      "handler": "backend/app/clients/router.py:get_client",
+      "roles": [
+        "org admin",
+        "team member"
+      ],
+      "permission": "clients:read"
+    },
+    {
+      "method": "PATCH",
+      "path": "/orgs/{org_id}/clients/{client_id}",
+      "summary": "",
+      "handler": "backend/app/clients/router.py:update_client",
+      "roles": [
+        "org admin",
+        "team member"
+      ],
+      "permission": "clients:write"
+    },
+    {
+      "method": "POST",
+      "path": "/orgs/{org_id}/clients/{client_id}/contacts",
+      "summary": "",
+      "handler": "backend/app/clients/router.py:add_contact",
+      "roles": [
+        "org admin",
+        "team member"
+      ],
+      "permission": "clients:write"
+    },
+    {
+      "method": "DELETE",
+      "path": "/orgs/{org_id}/clients/{client_id}/contacts/{contact_id}",
+      "summary": "",
+      "handler": "backend/app/clients/router.py:delete_contact",
+      "roles": [
+        "org admin",
+        "team member"
+      ],
+      "permission": "clients:write"
+    },
+    {
+      "method": "PATCH",
+      "path": "/orgs/{org_id}/clients/{client_id}/contacts/{contact_id}",
+      "summary": "",
+      "handler": "backend/app/clients/router.py:update_contact",
+      "roles": [
+        "org admin",
+        "team member"
+      ],
+      "permission": "clients:write"
+    },
+    {
+      "method": "POST",
+      "path": "/orgs/{org_id}/clients/{client_id}/erase",
+      "summary": "",
+      "handler": "backend/app/privacy/router.py:erase_client",
+      "roles": [
+        "org admin"
+      ],
+      "permission": "privacy:manage"
+    },
+    {
+      "method": "GET",
+      "path": "/orgs/{org_id}/clients/{client_id}/export",
+      "summary": "Everything stored about a client, as a ZIP (data.json plus document files).",
+      "handler": "backend/app/privacy/router.py:export_client",
+      "roles": [
+        "org admin"
+      ],
+      "permission": "privacy:manage"
+    },
+    {
+      "method": "GET",
+      "path": "/orgs/{org_id}/dashboard",
+      "summary": "",
+      "handler": "backend/app/projects/router.py:dashboard",
+      "roles": [
+        "org admin",
+        "team member"
+      ],
+      "permission": "dashboard:read"
+    },
+    {
+      "method": "GET",
+      "path": "/orgs/{org_id}/invitations",
+      "summary": "",
+      "handler": "backend/app/organizations/router.py:list_invitations",
+      "roles": [
+        "org admin"
+      ],
+      "permission": "invitations:manage"
+    },
+    {
+      "method": "POST",
+      "path": "/orgs/{org_id}/invitations",
+      "summary": "",
+      "handler": "backend/app/organizations/router.py:create_invitation",
+      "roles": [
+        "org admin"
+      ],
+      "permission": "invitations:manage"
+    },
+    {
+      "method": "DELETE",
+      "path": "/orgs/{org_id}/invitations/{invitation_id}",
+      "summary": "",
+      "handler": "backend/app/organizations/router.py:revoke_invitation",
+      "roles": [
+        "org admin"
+      ],
+      "permission": "invitations:manage"
+    },
+    {
+      "method": "POST",
+      "path": "/orgs/{org_id}/invitations/{invitation_id}/resend",
+      "summary": "",
+      "handler": "backend/app/organizations/router.py:resend_invitation",
+      "roles": [
+        "org admin"
+      ],
+      "permission": "invitations:manage"
+    },
+    {
+      "method": "GET",
+      "path": "/orgs/{org_id}/members",
+      "summary": "",
+      "handler": "backend/app/organizations/router.py:list_members",
+      "roles": [
+        "org admin",
+        "team member"
+      ],
+      "permission": "members:read"
+    },
+    {
+      "method": "PATCH",
+      "path": "/orgs/{org_id}/members/{membership_id}",
+      "summary": "",
+      "handler": "backend/app/organizations/router.py:update_member",
+      "roles": [
+        "org admin"
+      ],
+      "permission": "members:manage"
+    },
+    {
+      "method": "GET",
+      "path": "/orgs/{org_id}/notification-preferences",
+      "summary": "",
+      "handler": "backend/app/notifications/router.py:get_preferences",
+      "roles": [
+        "org admin",
+        "team member",
+        "couple"
+      ],
+      "permission": "organization:read"
+    },
+    {
+      "method": "PATCH",
+      "path": "/orgs/{org_id}/notification-preferences",
+      "summary": "",
+      "handler": "backend/app/notifications/router.py:update_preferences",
+      "roles": [
+        "org admin",
+        "team member",
+        "couple"
+      ],
+      "permission": "organization:read"
+    },
+    {
+      "method": "GET",
+      "path": "/orgs/{org_id}/projects",
+      "summary": "",
+      "handler": "backend/app/projects/router.py:list_projects",
+      "roles": [
+        "org admin",
+        "team member"
+      ],
+      "permission": "projects:list"
+    },
+    {
+      "method": "POST",
+      "path": "/orgs/{org_id}/projects",
+      "summary": "",
+      "handler": "backend/app/projects/router.py:create_project",
+      "roles": [
+        "org admin",
+        "team member"
+      ],
+      "permission": "projects:create"
+    },
+    {
+      "method": "DELETE",
+      "path": "/orgs/{org_id}/projects/{project_id}",
+      "summary": "",
+      "handler": "backend/app/projects/router.py:delete_project",
+      "roles": [
+        "org admin"
+      ],
+      "permission": "project:delete"
+    },
+    {
+      "method": "GET",
+      "path": "/orgs/{org_id}/projects/{project_id}",
+      "summary": "",
+      "handler": "backend/app/projects/router.py:get_project",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner",
+        "viewer"
+      ],
+      "permission": "project:read"
+    },
+    {
+      "method": "PATCH",
+      "path": "/orgs/{org_id}/projects/{project_id}",
+      "summary": "",
+      "handler": "backend/app/projects/router.py:update_project",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner"
+      ],
+      "permission": "project:update"
+    },
+    {
+      "method": "GET",
+      "path": "/orgs/{org_id}/projects/{project_id}/activity",
+      "summary": "",
+      "handler": "backend/app/tasks/router.py:activity",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner",
+        "viewer"
+      ],
+      "permission": "project:read"
+    },
+    {
+      "method": "POST",
+      "path": "/orgs/{org_id}/projects/{project_id}/archive",
+      "summary": "",
+      "handler": "backend/app/projects/router.py:archive_project",
+      "roles": [
+        "org admin",
+        "lead"
+      ],
+      "permission": "project:archive"
+    },
+    {
+      "method": "GET",
+      "path": "/orgs/{org_id}/projects/{project_id}/budget",
+      "summary": "",
+      "handler": "backend/app/budget/router.py:get_budget",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner",
+        "viewer"
+      ],
+      "permission": "budget:read"
+    },
+    {
+      "method": "PATCH",
+      "path": "/orgs/{org_id}/projects/{project_id}/budget",
+      "summary": "",
+      "handler": "backend/app/budget/router.py:update_budget",
+      "roles": [
+        "org admin",
+        "lead"
+      ],
+      "permission": "budget:set_total"
+    },
+    {
+      "method": "POST",
+      "path": "/orgs/{org_id}/projects/{project_id}/budget/categories",
+      "summary": "",
+      "handler": "backend/app/budget/router.py:add_category",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner"
+      ],
+      "permission": "budget:write"
+    },
+    {
+      "method": "DELETE",
+      "path": "/orgs/{org_id}/projects/{project_id}/budget/categories/{category_id}",
+      "summary": "",
+      "handler": "backend/app/budget/router.py:delete_category",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner"
+      ],
+      "permission": "budget:write"
+    },
+    {
+      "method": "PATCH",
+      "path": "/orgs/{org_id}/projects/{project_id}/budget/categories/{category_id}",
+      "summary": "",
+      "handler": "backend/app/budget/router.py:update_category",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner"
+      ],
+      "permission": "budget:write"
+    },
+    {
+      "method": "POST",
+      "path": "/orgs/{org_id}/projects/{project_id}/budget/items",
+      "summary": "",
+      "handler": "backend/app/budget/router.py:add_item",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner"
+      ],
+      "permission": "budget:write"
+    },
+    {
+      "method": "DELETE",
+      "path": "/orgs/{org_id}/projects/{project_id}/budget/items/{item_id}",
+      "summary": "",
+      "handler": "backend/app/budget/router.py:delete_item",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner"
+      ],
+      "permission": "budget:write"
+    },
+    {
+      "method": "PATCH",
+      "path": "/orgs/{org_id}/projects/{project_id}/budget/items/{item_id}",
+      "summary": "",
+      "handler": "backend/app/budget/router.py:update_item",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner"
+      ],
+      "permission": "budget:write"
+    },
+    {
+      "method": "POST",
+      "path": "/orgs/{org_id}/projects/{project_id}/budget/items/{item_id}/payments",
+      "summary": "",
+      "handler": "backend/app/budget/router.py:add_payment",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner"
+      ],
+      "permission": "budget:write"
+    },
+    {
+      "method": "DELETE",
+      "path": "/orgs/{org_id}/projects/{project_id}/budget/items/{item_id}/payments/{payment_id}",
+      "summary": "",
+      "handler": "backend/app/budget/router.py:delete_payment",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner"
+      ],
+      "permission": "budget:write"
+    },
+    {
+      "method": "PATCH",
+      "path": "/orgs/{org_id}/projects/{project_id}/budget/items/{item_id}/payments/{payment_id}",
+      "summary": "",
+      "handler": "backend/app/budget/router.py:update_payment",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner"
+      ],
+      "permission": "budget:write"
+    },
+    {
+      "method": "GET",
+      "path": "/orgs/{org_id}/projects/{project_id}/client-access",
+      "summary": "",
+      "handler": "backend/app/projects/router.py:get_client_access",
+      "roles": [
+        "org admin",
+        "lead"
+      ],
+      "permission": "client_access:manage"
+    },
+    {
+      "method": "POST",
+      "path": "/orgs/{org_id}/projects/{project_id}/client-access/invitations",
+      "summary": "",
+      "handler": "backend/app/projects/router.py:invite_couple",
+      "roles": [
+        "org admin",
+        "lead"
+      ],
+      "permission": "client_access:manage"
+    },
+    {
+      "method": "DELETE",
+      "path": "/orgs/{org_id}/projects/{project_id}/client-access/invitations/{invitation_id}",
+      "summary": "",
+      "handler": "backend/app/projects/router.py:revoke_couple_invitation",
+      "roles": [
+        "org admin",
+        "lead"
+      ],
+      "permission": "client_access:manage"
+    },
+    {
+      "method": "DELETE",
+      "path": "/orgs/{org_id}/projects/{project_id}/client-access/{member_id}",
+      "summary": "",
+      "handler": "backend/app/projects/router.py:revoke_couple_login",
+      "roles": [
+        "org admin",
+        "lead"
+      ],
+      "permission": "client_access:manage"
+    },
+    {
+      "method": "GET",
+      "path": "/orgs/{org_id}/projects/{project_id}/comments",
+      "summary": "",
+      "handler": "backend/app/tasks/router.py:list_comments",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner",
+        "viewer"
+      ],
+      "permission": "tasks:read"
+    },
+    {
+      "method": "POST",
+      "path": "/orgs/{org_id}/projects/{project_id}/comments",
+      "summary": "",
+      "handler": "backend/app/tasks/router.py:add_comment",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner",
+        "viewer"
+      ],
+      "permission": "comments:write"
+    },
+    {
+      "method": "DELETE",
+      "path": "/orgs/{org_id}/projects/{project_id}/comments/{comment_id}",
+      "summary": "",
+      "handler": "backend/app/tasks/router.py:delete_comment",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner",
+        "viewer"
+      ],
+      "permission": "comments:write"
+    },
+    {
+      "method": "PATCH",
+      "path": "/orgs/{org_id}/projects/{project_id}/comments/{comment_id}",
+      "summary": "",
+      "handler": "backend/app/tasks/router.py:update_comment",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner",
+        "viewer"
+      ],
+      "permission": "comments:write"
+    },
+    {
+      "method": "GET",
+      "path": "/orgs/{org_id}/projects/{project_id}/consents",
+      "summary": "",
+      "handler": "backend/app/privacy/router.py:couple_consents",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner",
+        "viewer"
+      ],
+      "permission": "project:read"
+    },
+    {
+      "method": "GET",
+      "path": "/orgs/{org_id}/projects/{project_id}/documents",
+      "summary": "",
+      "handler": "backend/app/documents/router.py:list_documents",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner",
+        "viewer"
+      ],
+      "permission": "documents:read"
+    },
+    {
+      "method": "POST",
+      "path": "/orgs/{org_id}/projects/{project_id}/documents",
+      "summary": "",
+      "handler": "backend/app/documents/router.py:upload",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner"
+      ],
+      "permission": "documents:write"
+    },
+    {
+      "method": "DELETE",
+      "path": "/orgs/{org_id}/projects/{project_id}/documents/{document_id}",
+      "summary": "",
+      "handler": "backend/app/documents/router.py:delete_document",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner"
+      ],
+      "permission": "documents:write"
+    },
+    {
+      "method": "GET",
+      "path": "/orgs/{org_id}/projects/{project_id}/documents/{document_id}",
+      "summary": "",
+      "handler": "backend/app/documents/router.py:get_document",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner",
+        "viewer"
+      ],
+      "permission": "documents:read"
+    },
+    {
+      "method": "PATCH",
+      "path": "/orgs/{org_id}/projects/{project_id}/documents/{document_id}",
+      "summary": "",
+      "handler": "backend/app/documents/router.py:update_document",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner"
+      ],
+      "permission": "documents:write"
+    },
+    {
+      "method": "GET",
+      "path": "/orgs/{org_id}/projects/{project_id}/documents/{document_id}/download",
+      "summary": "",
+      "handler": "backend/app/documents/router.py:download",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner",
+        "viewer"
+      ],
+      "permission": "documents:read"
+    },
+    {
+      "method": "POST",
+      "path": "/orgs/{org_id}/projects/{project_id}/documents/{document_id}/versions",
+      "summary": "",
+      "handler": "backend/app/documents/router.py:add_version",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner"
+      ],
+      "permission": "documents:write"
+    },
+    {
+      "method": "GET",
+      "path": "/orgs/{org_id}/projects/{project_id}/events",
+      "summary": "",
+      "handler": "backend/app/events/router.py:list_events",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner",
+        "viewer"
+      ],
+      "permission": "project:read"
+    },
+    {
+      "method": "POST",
+      "path": "/orgs/{org_id}/projects/{project_id}/events",
+      "summary": "",
+      "handler": "backend/app/events/router.py:create_event",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner"
+      ],
+      "permission": "events:write"
+    },
+    {
+      "method": "DELETE",
+      "path": "/orgs/{org_id}/projects/{project_id}/events/{event_id}",
+      "summary": "",
+      "handler": "backend/app/events/router.py:delete_event",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner"
+      ],
+      "permission": "events:write"
+    },
+    {
+      "method": "PUT",
+      "path": "/orgs/{org_id}/projects/{project_id}/events/{event_id}",
+      "summary": "",
+      "handler": "backend/app/events/router.py:update_event",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner"
+      ],
+      "permission": "events:write"
+    },
+    {
+      "method": "GET",
+      "path": "/orgs/{org_id}/projects/{project_id}/members",
+      "summary": "",
+      "handler": "backend/app/projects/router.py:list_members",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner",
+        "viewer"
+      ],
+      "permission": "project:read"
+    },
+    {
+      "method": "POST",
+      "path": "/orgs/{org_id}/projects/{project_id}/members",
+      "summary": "",
+      "handler": "backend/app/projects/router.py:add_member",
+      "roles": [
+        "org admin",
+        "lead"
+      ],
+      "permission": "project:manage_team"
+    },
+    {
+      "method": "DELETE",
+      "path": "/orgs/{org_id}/projects/{project_id}/members/{member_id}",
+      "summary": "",
+      "handler": "backend/app/projects/router.py:remove_member",
+      "roles": [
+        "org admin",
+        "lead"
+      ],
+      "permission": "project:manage_team"
+    },
+    {
+      "method": "PATCH",
+      "path": "/orgs/{org_id}/projects/{project_id}/members/{member_id}",
+      "summary": "",
+      "handler": "backend/app/projects/router.py:update_member",
+      "roles": [
+        "org admin",
+        "lead"
+      ],
+      "permission": "project:manage_team"
+    },
+    {
+      "method": "GET",
+      "path": "/orgs/{org_id}/projects/{project_id}/milestones",
+      "summary": "",
+      "handler": "backend/app/tasks/router.py:list_milestones",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner",
+        "viewer"
+      ],
+      "permission": "tasks:read"
+    },
+    {
+      "method": "POST",
+      "path": "/orgs/{org_id}/projects/{project_id}/milestones",
+      "summary": "",
+      "handler": "backend/app/tasks/router.py:create_milestone",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner"
+      ],
+      "permission": "tasks:write"
+    },
+    {
+      "method": "DELETE",
+      "path": "/orgs/{org_id}/projects/{project_id}/milestones/{milestone_id}",
+      "summary": "",
+      "handler": "backend/app/tasks/router.py:delete_milestone",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner"
+      ],
+      "permission": "tasks:write"
+    },
+    {
+      "method": "PATCH",
+      "path": "/orgs/{org_id}/projects/{project_id}/milestones/{milestone_id}",
+      "summary": "",
+      "handler": "backend/app/tasks/router.py:update_milestone",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner"
+      ],
+      "permission": "tasks:write"
+    },
+    {
+      "method": "GET",
+      "path": "/orgs/{org_id}/projects/{project_id}/moodboards",
+      "summary": "",
+      "handler": "backend/app/moodboards/router.py:list_boards",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner",
+        "viewer"
+      ],
+      "permission": "moodboards:read"
+    },
+    {
+      "method": "POST",
+      "path": "/orgs/{org_id}/projects/{project_id}/moodboards",
+      "summary": "",
+      "handler": "backend/app/moodboards/router.py:create_board",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner"
+      ],
+      "permission": "moodboards:write"
+    },
+    {
+      "method": "DELETE",
+      "path": "/orgs/{org_id}/projects/{project_id}/moodboards/{board_id}",
+      "summary": "",
+      "handler": "backend/app/moodboards/router.py:delete_board",
+      "roles": [
+        "org admin",
+        "lead"
+      ],
+      "permission": "moodboards:delete"
+    },
+    {
+      "method": "GET",
+      "path": "/orgs/{org_id}/projects/{project_id}/moodboards/{board_id}",
+      "summary": "",
+      "handler": "backend/app/moodboards/router.py:get_board",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner",
+        "viewer"
+      ],
+      "permission": "moodboards:read"
+    },
+    {
+      "method": "PATCH",
+      "path": "/orgs/{org_id}/projects/{project_id}/moodboards/{board_id}",
+      "summary": "",
+      "handler": "backend/app/moodboards/router.py:update_board",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner"
+      ],
+      "permission": "moodboards:write"
+    },
+    {
+      "method": "GET",
+      "path": "/orgs/{org_id}/projects/{project_id}/moodboards/{board_id}/export.pdf",
+      "summary": "PDF for vendors; the planner sends it on (vendors get no access to the platform).",
+      "handler": "backend/app/moodboards/router.py:export_pdf",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner",
+        "viewer"
+      ],
+      "permission": "moodboards:read"
+    },
+    {
+      "method": "POST",
+      "path": "/orgs/{org_id}/projects/{project_id}/moodboards/{board_id}/items",
+      "summary": "",
+      "handler": "backend/app/moodboards/router.py:upload",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner"
+      ],
+      "permission": "moodboards:write"
+    },
+    {
+      "method": "DELETE",
+      "path": "/orgs/{org_id}/projects/{project_id}/moodboards/{board_id}/items/{item_id}",
+      "summary": "",
+      "handler": "backend/app/moodboards/router.py:delete_item",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner"
+      ],
+      "permission": "moodboards:write"
+    },
+    {
+      "method": "PATCH",
+      "path": "/orgs/{org_id}/projects/{project_id}/moodboards/{board_id}/items/{item_id}",
+      "summary": "",
+      "handler": "backend/app/moodboards/router.py:update_item",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner"
+      ],
+      "permission": "moodboards:write"
+    },
+    {
+      "method": "DELETE",
+      "path": "/orgs/{org_id}/projects/{project_id}/moodboards/{board_id}/items/{item_id}/heart",
+      "summary": "",
+      "handler": "backend/app/moodboards/router.py:unheart",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner",
+        "viewer"
+      ],
+      "permission": "moodboards:read"
+    },
+    {
+      "method": "PUT",
+      "path": "/orgs/{org_id}/projects/{project_id}/moodboards/{board_id}/items/{item_id}/heart",
+      "summary": "",
+      "handler": "backend/app/moodboards/router.py:heart",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner",
+        "viewer"
+      ],
+      "permission": "moodboards:read"
+    },
+    {
+      "method": "GET",
+      "path": "/orgs/{org_id}/projects/{project_id}/moodboards/{board_id}/items/{item_id}/image",
+      "summary": "",
+      "handler": "backend/app/moodboards/router.py:item_image",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner",
+        "viewer"
+      ],
+      "permission": "moodboards:read"
+    },
+    {
+      "method": "POST",
+      "path": "/orgs/{org_id}/projects/{project_id}/moodboards/{board_id}/reorder",
+      "summary": "",
+      "handler": "backend/app/moodboards/router.py:reorder",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner"
+      ],
+      "permission": "moodboards:write"
+    },
+    {
+      "method": "POST",
+      "path": "/orgs/{org_id}/projects/{project_id}/moodboards/{board_id}/sections",
+      "summary": "",
+      "handler": "backend/app/moodboards/router.py:add_section",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner"
+      ],
+      "permission": "moodboards:write"
+    },
+    {
+      "method": "DELETE",
+      "path": "/orgs/{org_id}/projects/{project_id}/moodboards/{board_id}/sections/{section_id}",
+      "summary": "",
+      "handler": "backend/app/moodboards/router.py:delete_section",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner"
+      ],
+      "permission": "moodboards:write"
+    },
+    {
+      "method": "PATCH",
+      "path": "/orgs/{org_id}/projects/{project_id}/moodboards/{board_id}/sections/{section_id}",
+      "summary": "",
+      "handler": "backend/app/moodboards/router.py:rename_section",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner"
+      ],
+      "permission": "moodboards:write"
+    },
+    {
+      "method": "POST",
+      "path": "/orgs/{org_id}/projects/{project_id}/restore",
+      "summary": "",
+      "handler": "backend/app/projects/router.py:restore_project",
+      "roles": [
+        "org admin",
+        "lead"
+      ],
+      "permission": "project:archive"
+    },
+    {
+      "method": "GET",
+      "path": "/orgs/{org_id}/projects/{project_id}/tasks",
+      "summary": "",
+      "handler": "backend/app/tasks/router.py:list_tasks",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner",
+        "viewer"
+      ],
+      "permission": "tasks:read"
+    },
+    {
+      "method": "POST",
+      "path": "/orgs/{org_id}/projects/{project_id}/tasks",
+      "summary": "",
+      "handler": "backend/app/tasks/router.py:create_task",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner"
+      ],
+      "permission": "tasks:write"
+    },
+    {
+      "method": "POST",
+      "path": "/orgs/{org_id}/projects/{project_id}/tasks/reorder",
+      "summary": "",
+      "handler": "backend/app/tasks/router.py:reorder_tasks",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner"
+      ],
+      "permission": "tasks:write"
+    },
+    {
+      "method": "DELETE",
+      "path": "/orgs/{org_id}/projects/{project_id}/tasks/{task_id}",
+      "summary": "",
+      "handler": "backend/app/tasks/router.py:delete_task",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner"
+      ],
+      "permission": "tasks:write"
+    },
+    {
+      "method": "GET",
+      "path": "/orgs/{org_id}/projects/{project_id}/tasks/{task_id}",
+      "summary": "",
+      "handler": "backend/app/tasks/router.py:get_task",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner",
+        "viewer"
+      ],
+      "permission": "tasks:read"
+    },
+    {
+      "method": "PATCH",
+      "path": "/orgs/{org_id}/projects/{project_id}/tasks/{task_id}",
+      "summary": "",
+      "handler": "backend/app/tasks/router.py:update_task",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner"
+      ],
+      "permission": "tasks:write"
+    },
+    {
+      "method": "POST",
+      "path": "/orgs/{org_id}/projects/{project_id}/tasks/{task_id}/checklist",
+      "summary": "",
+      "handler": "backend/app/tasks/router.py:add_checklist_item",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner"
+      ],
+      "permission": "tasks:write"
+    },
+    {
+      "method": "DELETE",
+      "path": "/orgs/{org_id}/projects/{project_id}/tasks/{task_id}/checklist/{item_id}",
+      "summary": "",
+      "handler": "backend/app/tasks/router.py:delete_checklist_item",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner"
+      ],
+      "permission": "tasks:write"
+    },
+    {
+      "method": "PATCH",
+      "path": "/orgs/{org_id}/projects/{project_id}/tasks/{task_id}/checklist/{item_id}",
+      "summary": "",
+      "handler": "backend/app/tasks/router.py:update_checklist_item",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner"
+      ],
+      "permission": "tasks:write"
+    },
+    {
+      "method": "POST",
+      "path": "/orgs/{org_id}/projects/{project_id}/tasks/{task_id}/complete",
+      "summary": "",
+      "handler": "backend/app/tasks/router.py:complete_task",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner"
+      ],
+      "permission": "tasks:write"
+    },
+    {
+      "method": "POST",
+      "path": "/orgs/{org_id}/projects/{project_id}/tasks/{task_id}/reopen",
+      "summary": "",
+      "handler": "backend/app/tasks/router.py:reopen_task",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner"
+      ],
+      "permission": "tasks:write"
+    },
+    {
+      "method": "GET",
+      "path": "/orgs/{org_id}/projects/{project_id}/vendors",
+      "summary": "",
+      "handler": "backend/app/projects/router.py:list_vendors",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner",
+        "viewer"
+      ],
+      "permission": "project_vendors:read"
+    },
+    {
+      "method": "POST",
+      "path": "/orgs/{org_id}/projects/{project_id}/vendors",
+      "summary": "",
+      "handler": "backend/app/projects/router.py:add_vendor",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner"
+      ],
+      "permission": "project_vendors:manage"
+    },
+    {
+      "method": "DELETE",
+      "path": "/orgs/{org_id}/projects/{project_id}/vendors/{link_id}",
+      "summary": "",
+      "handler": "backend/app/projects/router.py:remove_vendor",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner"
+      ],
+      "permission": "project_vendors:manage"
+    },
+    {
+      "method": "PATCH",
+      "path": "/orgs/{org_id}/projects/{project_id}/vendors/{link_id}",
+      "summary": "",
+      "handler": "backend/app/projects/router.py:update_vendor",
+      "roles": [
+        "org admin",
+        "lead",
+        "planner"
+      ],
+      "permission": "project_vendors:manage"
+    },
+    {
+      "method": "GET",
+      "path": "/orgs/{org_id}/support-access",
+      "summary": "",
+      "handler": "backend/app/admin/router.py:list_grants",
+      "roles": [
+        "org admin"
+      ],
+      "permission": "support_access:manage"
+    },
+    {
+      "method": "POST",
+      "path": "/orgs/{org_id}/support-access",
+      "summary": "",
+      "handler": "backend/app/admin/router.py:grant",
+      "roles": [
+        "org admin"
+      ],
+      "permission": "support_access:manage"
+    },
+    {
+      "method": "DELETE",
+      "path": "/orgs/{org_id}/support-access/{grant_id}",
+      "summary": "",
+      "handler": "backend/app/admin/router.py:revoke",
+      "roles": [
+        "org admin"
+      ],
+      "permission": "support_access:manage"
+    },
+    {
+      "method": "GET",
+      "path": "/orgs/{org_id}/tasks",
+      "summary": "",
+      "handler": "backend/app/tasks/router.py:my_tasks",
+      "roles": [
+        "org admin",
+        "team member"
+      ],
+      "permission": "tasks:mine"
+    },
+    {
+      "method": "GET",
+      "path": "/orgs/{org_id}/templates",
+      "summary": "",
+      "handler": "backend/app/templates/router.py:list_templates",
+      "roles": [
+        "org admin",
+        "team member"
+      ],
+      "permission": "templates:read"
+    },
+    {
+      "method": "POST",
+      "path": "/orgs/{org_id}/templates",
+      "summary": "",
+      "handler": "backend/app/templates/router.py:create_template",
+      "roles": [
+        "org admin"
+      ],
+      "permission": "templates:manage"
+    },
+    {
+      "method": "DELETE",
+      "path": "/orgs/{org_id}/templates/{template_id}",
+      "summary": "",
+      "handler": "backend/app/templates/router.py:delete_template",
+      "roles": [
+        "org admin"
+      ],
+      "permission": "templates:manage"
+    },
+    {
+      "method": "GET",
+      "path": "/orgs/{org_id}/templates/{template_id}",
+      "summary": "",
+      "handler": "backend/app/templates/router.py:get_template",
+      "roles": [
+        "org admin",
+        "team member"
+      ],
+      "permission": "templates:read"
+    },
+    {
+      "method": "PATCH",
+      "path": "/orgs/{org_id}/templates/{template_id}",
+      "summary": "",
+      "handler": "backend/app/templates/router.py:update_template",
+      "roles": [
+        "org admin"
+      ],
+      "permission": "templates:manage"
+    },
+    {
+      "method": "POST",
+      "path": "/orgs/{org_id}/templates/{template_id}/items",
+      "summary": "",
+      "handler": "backend/app/templates/router.py:add_item",
+      "roles": [
+        "org admin"
+      ],
+      "permission": "templates:manage"
+    },
+    {
+      "method": "DELETE",
+      "path": "/orgs/{org_id}/templates/{template_id}/items/{item_id}",
+      "summary": "",
+      "handler": "backend/app/templates/router.py:delete_item",
+      "roles": [
+        "org admin"
+      ],
+      "permission": "templates:manage"
+    },
+    {
+      "method": "PATCH",
+      "path": "/orgs/{org_id}/templates/{template_id}/items/{item_id}",
+      "summary": "",
+      "handler": "backend/app/templates/router.py:update_item",
+      "roles": [
+        "org admin"
+      ],
+      "permission": "templates:manage"
+    },
+    {
+      "method": "GET",
+      "path": "/orgs/{org_id}/vendors",
+      "summary": "",
+      "handler": "backend/app/vendors/router.py:list_vendors",
+      "roles": [
+        "org admin",
+        "team member"
+      ],
+      "permission": "vendors:read"
+    },
+    {
+      "method": "POST",
+      "path": "/orgs/{org_id}/vendors",
+      "summary": "",
+      "handler": "backend/app/vendors/router.py:create_vendor",
+      "roles": [
+        "org admin",
+        "team member"
+      ],
+      "permission": "vendors:write"
+    },
+    {
+      "method": "DELETE",
+      "path": "/orgs/{org_id}/vendors/{vendor_id}",
+      "summary": "",
+      "handler": "backend/app/vendors/router.py:delete_vendor",
+      "roles": [
+        "org admin",
+        "team member"
+      ],
+      "permission": "vendors:write"
+    },
+    {
+      "method": "GET",
+      "path": "/orgs/{org_id}/vendors/{vendor_id}",
+      "summary": "",
+      "handler": "backend/app/vendors/router.py:get_vendor",
+      "roles": [
+        "org admin",
+        "team member"
+      ],
+      "permission": "vendors:read"
+    },
+    {
+      "method": "PATCH",
+      "path": "/orgs/{org_id}/vendors/{vendor_id}",
+      "summary": "",
+      "handler": "backend/app/vendors/router.py:update_vendor",
+      "roles": [
+        "org admin",
+        "team member"
+      ],
+      "permission": "vendors:write"
+    },
+    {
+      "method": "GET",
+      "path": "/portal/projects",
+      "summary": "",
+      "handler": "backend/app/portal/router.py:projects",
+      "roles": [
+        "signed in"
+      ],
+      "permission": null
+    },
+    {
+      "method": "GET",
+      "path": "/portal/projects/{project_id}",
+      "summary": "",
+      "handler": "backend/app/portal/router.py:overview",
+      "roles": [
+        "couple"
+      ],
+      "permission": null
+    },
+    {
+      "method": "GET",
+      "path": "/portal/projects/{project_id}/budget",
+      "summary": "",
+      "handler": "backend/app/portal/router.py:budget",
+      "roles": [
+        "couple"
+      ],
+      "permission": null
+    },
+    {
+      "method": "GET",
+      "path": "/portal/projects/{project_id}/calendar",
+      "summary": "",
+      "handler": "backend/app/portal/router.py:calendar",
+      "roles": [
+        "couple"
+      ],
+      "permission": null
+    },
+    {
+      "method": "DELETE",
+      "path": "/portal/projects/{project_id}/calendar/feed",
+      "summary": "",
+      "handler": "backend/app/portal/router.py:revoke_feed",
+      "roles": [
+        "couple"
+      ],
+      "permission": null
+    },
+    {
+      "method": "GET",
+      "path": "/portal/projects/{project_id}/calendar/feed",
+      "summary": "",
+      "handler": "backend/app/portal/router.py:get_feed",
+      "roles": [
+        "couple"
+      ],
+      "permission": null
+    },
+    {
+      "method": "POST",
+      "path": "/portal/projects/{project_id}/calendar/feed",
+      "summary": "",
+      "handler": "backend/app/portal/router.py:create_feed",
+      "roles": [
+        "couple"
+      ],
+      "permission": null
+    },
+    {
+      "method": "GET",
+      "path": "/portal/projects/{project_id}/consents",
+      "summary": "",
+      "handler": "backend/app/privacy/router.py:my_consents",
+      "roles": [
+        "couple"
+      ],
+      "permission": null
+    },
+    {
+      "method": "PUT",
+      "path": "/portal/projects/{project_id}/consents",
+      "summary": "",
+      "handler": "backend/app/privacy/router.py:decide",
+      "roles": [
+        "couple"
+      ],
+      "permission": null
+    },
+    {
+      "method": "GET",
+      "path": "/portal/projects/{project_id}/documents",
+      "summary": "",
+      "handler": "backend/app/portal/router.py:documents",
+      "roles": [
+        "couple"
+      ],
+      "permission": null
+    },
+    {
+      "method": "POST",
+      "path": "/portal/projects/{project_id}/documents",
+      "summary": "",
+      "handler": "backend/app/portal/router.py:upload_document",
+      "roles": [
+        "couple"
+      ],
+      "permission": null
+    },
+    {
+      "method": "DELETE",
+      "path": "/portal/projects/{project_id}/documents/{document_id}",
+      "summary": "",
+      "handler": "backend/app/portal/router.py:delete_document",
+      "roles": [
+        "couple"
+      ],
+      "permission": null
+    },
+    {
+      "method": "GET",
+      "path": "/portal/projects/{project_id}/documents/{document_id}/download",
+      "summary": "",
+      "handler": "backend/app/portal/router.py:download_document",
+      "roles": [
+        "couple"
+      ],
+      "permission": null
+    },
+    {
+      "method": "GET",
+      "path": "/portal/projects/{project_id}/moodboards",
+      "summary": "",
+      "handler": "backend/app/moodboards/router.py:portal_boards",
+      "roles": [
+        "couple"
+      ],
+      "permission": null
+    },
+    {
+      "method": "POST",
+      "path": "/portal/projects/{project_id}/moodboards",
+      "summary": "",
+      "handler": "backend/app/moodboards/router.py:portal_create",
+      "roles": [
+        "couple"
+      ],
+      "permission": null
+    },
+    {
+      "method": "DELETE",
+      "path": "/portal/projects/{project_id}/moodboards/{board_id}",
+      "summary": "",
+      "handler": "backend/app/moodboards/router.py:portal_delete",
+      "roles": [
+        "couple"
+      ],
+      "permission": null
+    },
+    {
+      "method": "GET",
+      "path": "/portal/projects/{project_id}/moodboards/{board_id}",
+      "summary": "",
+      "handler": "backend/app/moodboards/router.py:portal_board",
+      "roles": [
+        "couple"
+      ],
+      "permission": null
+    },
+    {
+      "method": "PATCH",
+      "path": "/portal/projects/{project_id}/moodboards/{board_id}",
+      "summary": "",
+      "handler": "backend/app/moodboards/router.py:portal_rename",
+      "roles": [
+        "couple"
+      ],
+      "permission": null
+    },
+    {
+      "method": "POST",
+      "path": "/portal/projects/{project_id}/moodboards/{board_id}/items",
+      "summary": "",
+      "handler": "backend/app/moodboards/router.py:portal_upload",
+      "roles": [
+        "couple"
+      ],
+      "permission": null
+    },
+    {
+      "method": "DELETE",
+      "path": "/portal/projects/{project_id}/moodboards/{board_id}/items/{item_id}",
+      "summary": "",
+      "handler": "backend/app/moodboards/router.py:portal_delete_item",
+      "roles": [
+        "couple"
+      ],
+      "permission": null
+    },
+    {
+      "method": "PATCH",
+      "path": "/portal/projects/{project_id}/moodboards/{board_id}/items/{item_id}",
+      "summary": "",
+      "handler": "backend/app/moodboards/router.py:portal_update_item",
+      "roles": [
+        "couple"
+      ],
+      "permission": null
+    },
+    {
+      "method": "GET",
+      "path": "/portal/projects/{project_id}/moodboards/{board_id}/items/{item_id}/comments",
+      "summary": "",
+      "handler": "backend/app/moodboards/router.py:portal_comments",
+      "roles": [
+        "couple"
+      ],
+      "permission": null
+    },
+    {
+      "method": "POST",
+      "path": "/portal/projects/{project_id}/moodboards/{board_id}/items/{item_id}/comments",
+      "summary": "",
+      "handler": "backend/app/moodboards/router.py:portal_comment",
+      "roles": [
+        "couple"
+      ],
+      "permission": null
+    },
+    {
+      "method": "DELETE",
+      "path": "/portal/projects/{project_id}/moodboards/{board_id}/items/{item_id}/heart",
+      "summary": "",
+      "handler": "backend/app/moodboards/router.py:portal_unheart",
+      "roles": [
+        "couple"
+      ],
+      "permission": null
+    },
+    {
+      "method": "PUT",
+      "path": "/portal/projects/{project_id}/moodboards/{board_id}/items/{item_id}/heart",
+      "summary": "",
+      "handler": "backend/app/moodboards/router.py:portal_heart",
+      "roles": [
+        "couple"
+      ],
+      "permission": null
+    },
+    {
+      "method": "GET",
+      "path": "/portal/projects/{project_id}/moodboards/{board_id}/items/{item_id}/image",
+      "summary": "",
+      "handler": "backend/app/moodboards/router.py:portal_image",
+      "roles": [
+        "couple"
+      ],
+      "permission": null
+    },
+    {
+      "method": "POST",
+      "path": "/portal/projects/{project_id}/moodboards/{board_id}/reorder",
+      "summary": "",
+      "handler": "backend/app/moodboards/router.py:portal_reorder",
+      "roles": [
+        "couple"
+      ],
+      "permission": null
+    },
+    {
+      "method": "POST",
+      "path": "/portal/projects/{project_id}/moodboards/{board_id}/sections",
+      "summary": "",
+      "handler": "backend/app/moodboards/router.py:portal_add_section",
+      "roles": [
+        "couple"
+      ],
+      "permission": null
+    },
+    {
+      "method": "GET",
+      "path": "/portal/projects/{project_id}/notification-preferences",
+      "summary": "",
+      "handler": "backend/app/portal/router.py:get_preferences",
+      "roles": [
+        "couple"
+      ],
+      "permission": null
+    },
+    {
+      "method": "PATCH",
+      "path": "/portal/projects/{project_id}/notification-preferences",
+      "summary": "",
+      "handler": "backend/app/portal/router.py:update_preferences",
+      "roles": [
+        "couple"
+      ],
+      "permission": null
+    },
+    {
+      "method": "GET",
+      "path": "/portal/projects/{project_id}/tasks",
+      "summary": "",
+      "handler": "backend/app/portal/router.py:tasks",
+      "roles": [
+        "couple"
+      ],
+      "permission": null
+    },
+    {
+      "method": "PATCH",
+      "path": "/portal/projects/{project_id}/tasks/{task_id}/checklist/{item_id}",
+      "summary": "",
+      "handler": "backend/app/portal/router.py:tick",
+      "roles": [
+        "couple"
+      ],
+      "permission": null
+    },
+    {
+      "method": "GET",
+      "path": "/portal/projects/{project_id}/tasks/{task_id}/comments",
+      "summary": "",
+      "handler": "backend/app/portal/router.py:comments",
+      "roles": [
+        "couple"
+      ],
+      "permission": null
+    },
+    {
+      "method": "POST",
+      "path": "/portal/projects/{project_id}/tasks/{task_id}/comments",
+      "summary": "",
+      "handler": "backend/app/portal/router.py:add_comment",
+      "roles": [
+        "couple"
+      ],
+      "permission": null
+    },
+    {
+      "method": "POST",
+      "path": "/portal/projects/{project_id}/tasks/{task_id}/complete",
+      "summary": "",
+      "handler": "backend/app/portal/router.py:complete",
+      "roles": [
+        "couple"
+      ],
+      "permission": null
+    },
+    {
+      "method": "POST",
+      "path": "/portal/projects/{project_id}/tasks/{task_id}/reopen",
+      "summary": "",
+      "handler": "backend/app/portal/router.py:reopen",
+      "roles": [
+        "couple"
+      ],
+      "permission": null
+    }
+  ],
+  "jobs": [
+    {
+      "name": "heartbeat",
+      "kind": "task",
+      "schedule": null,
+      "handler": "backend/app/jobs/worker.py"
+    },
+    {
+      "name": "process_moodboard_image",
+      "kind": "task",
+      "schedule": null,
+      "handler": "backend/app/moodboards/service.py"
+    },
+    {
+      "name": "purge",
+      "kind": "cron",
+      "schedule": "03:17",
+      "handler": "backend/app/jobs/retention.py"
+    },
+    {
+      "name": "scan_document",
+      "kind": "task",
+      "schedule": null,
+      "handler": "backend/app/documents/service.py"
+    },
+    {
+      "name": "send_daily_digests",
+      "kind": "cron",
+      "schedule": "*:05",
+      "handler": "backend/app/notifications/digest.py"
+    },
+    {
+      "name": "send_email",
+      "kind": "task",
+      "schedule": null,
+      "handler": "backend/app/notifications/mailer.py"
+    }
+  ],
+  "commands": [
+    {
+      "name": "create-organization",
+      "summary": "Create an organization",
+      "file": "backend/app/cli.py"
+    },
+    {
+      "name": "grant-platform-admin",
+      "summary": "Make an account a platform admin",
+      "file": "backend/app/cli.py"
+    },
+    {
+      "name": "seed-demo",
+      "summary": "Create a demo organization with invented data",
+      "file": "backend/app/cli.py"
+    },
+    {
+      "name": "send-digests",
+      "summary": "Send today's daily overview emails",
+      "file": "backend/app/cli.py"
+    }
+  ]
+}

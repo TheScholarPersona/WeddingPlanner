@@ -1,0 +1,283 @@
+area: catalog
+features:
+  - id: catalog.data-model
+    title: Catalog data model
+    group: catalog.tool
+    summary: "Areas, groups and features live as YAML in `catalog/`; everything else is generated from it."
+    description: |
+      One source of truth: `catalog/catalog.yaml` (areas, what they own, test runs, exclusions),
+      `catalog/features/*.yaml` (features) and `catalog/review.yaml` (features not proven yet).
+      A strict schema refuses unknown keys, so typos do not silently drop information.
+    usage:
+      - channel: development
+        text: "Edit the YAML files; `make catalog` checks them."
+    rules:
+      - Unknown keys and invalid values are errors.
+      - "Every feature has acceptance criteria and evidence; others go to `review.yaml` with a reason."
+    technical:
+      components:
+        - tools/feature_catalog/feature_catalog/model.py
+        - tools/feature_catalog/feature_catalog/catalog.py
+      notes:
+        - Pydantic models with `extra="forbid"`; YAML read with ruamel.yaml (safe loader).
+    acceptance:
+      - id: real-catalog-valid
+        kind: effect
+        text: The catalog of this repository loads and checks without errors.
+      - id: unknown-keys
+        kind: rule
+        text: A feature with an unknown key is reported as a schema error.
+        code: SCHEMA
+    evidence:
+      - kind: unit
+        file: tools/feature_catalog/tests/test_check.py
+        test: test_real_catalog_has_no_errors
+        covers: [real-catalog-valid]
+      - kind: unit
+        file: tools/feature_catalog/tests/test_check.py
+        test: test_schema_rejects_unknown_keys
+        covers: [unknown-keys]
+
+  - id: catalog.discovery
+    title: Discover the app's parts
+    group: catalog.tool
+    summary: Tests export endpoints with their roles, worker jobs, CLI commands and pages, so the catalog never copies them by hand.
+    description: |
+      The application code stays untouched. A backend test reads all routes from FastAPI, derives
+      the roles from the permission of each route and writes `catalog/discovered/backend.json`; a
+      frontend test does the same for the router. Both fail when the file is out of date.
+    usage:
+      - channel: development
+        text: "After changing routes, jobs or pages: `make catalog-export`."
+    rules:
+      - An outdated export fails the backend or frontend tests.
+    technical:
+      components:
+        - backend/tests/test_catalog_export.py
+        - backend/tests/routes.py
+        - frontend/src/app/routes.catalog.test.tsx
+      notes:
+        - "`UPDATE_SNAPSHOTS=1` rewrites the export files."
+    acceptance:
+      - id: backend-export-current
+        kind: effect
+        text: The committed backend export equals what the app reports, with at least 150 endpoints.
+      - id: frontend-export-current
+        kind: effect
+        text: The committed export of the planner, portal and admin pages equals the router.
+      - id: route-check-finds-routes
+        kind: rule
+        text: The route protection check sees all routes of the app, so it cannot pass on an empty list.
+    evidence:
+      - kind: integration
+        file: backend/tests/test_catalog_export.py
+        test: test_catalog_export_is_current
+        covers: [backend-export-current]
+      - kind: unit
+        file: frontend/src/app/routes.catalog.test.tsx
+        test: keeps catalog/discovered/frontend-routes.json current
+        covers: [frontend-export-current]
+      - kind: integration
+        file: backend/tests/test_route_protection.py
+        test: test_finds_all_routes
+        covers: [route-check-finds-routes]
+
+  - id: catalog.code-check
+    title: Compare the catalog with the code
+    group: catalog.tool
+    summary: Every endpoint, job, command and page belongs to an area and, in catalogued areas, to a feature.
+    description: |
+      The check reports parts nobody claims, parts of catalogued areas without a feature and
+      references to things that no longer exist. It only reports: it never adds features.
+    usage:
+      - channel: development
+        text: "`make catalog` (or `python -m feature_catalog check`)."
+    rules:
+      - "An area prefix `/guests` claims `/guests/…` but not `/guests-export`; the most specific area wins."
+      - Unassigned parts of open areas are notes; of catalogued areas, errors.
+    technical:
+      components:
+        - tools/feature_catalog/feature_catalog/analysis.py
+        - tools/feature_catalog/feature_catalog/calls.py
+    acceptance:
+      - id: all-owned
+        kind: effect
+        text: Every discovered part of this repository is owned by an area.
+      - id: never-adds
+        kind: rule
+        text: A new, unassigned endpoint is reported; check and build leave the YAML files unchanged.
+        code: UNASSIGNED
+      - id: open-area-notes
+        kind: rule
+        text: Unassigned parts of an open area are notes, not errors.
+      - id: prefix-rule
+        kind: rule
+        text: "`/guests` does not claim `/guests-export`."
+      - id: removed-parts
+        kind: rule
+        text: References to a removed endpoint, file, test or feature are reported.
+        code: UNKNOWN_ENDPOINT
+      - id: calls-with-method
+        kind: effect
+        text: Test calls are recognized with their method, also through helper functions, but a bare list of paths is not a call.
+    evidence:
+      - kind: unit
+        file: tools/feature_catalog/tests/test_check.py
+        test: test_assigns_every_discovered_part_to_an_area
+        covers: [all-owned]
+      - kind: unit
+        file: tools/feature_catalog/tests/test_check.py
+        test: test_never_adds_features
+        covers: [never-adds]
+      - kind: unit
+        file: tools/feature_catalog/tests/test_check.py
+        test: test_unassigned_parts_of_open_areas_are_notes
+        covers: [open-area-notes]
+      - kind: unit
+        file: tools/feature_catalog/tests/test_check.py
+        test: test_area_prefix_does_not_claim_similar_paths
+        covers: [prefix-rule]
+      - kind: unit
+        file: tools/feature_catalog/tests/test_check.py
+        test: test_reports_references_to_removed_parts
+        covers: [removed-parts]
+      - kind: unit
+        file: tools/feature_catalog/tests/test_check.py
+        test: test_recognizes_calls_with_method_but_not_bare_path_lists
+        covers: [calls-with-method]
+
+  - id: catalog.evidence
+    title: Evidence from the test runs
+    group: catalog.tool
+    summary: A feature counts as proven only when every acceptance criterion has a test that asserts it and passed in the last run.
+    description: |
+      The check reads the JUnit reports of all test runs and inspects each test's code: does it
+      assert something beyond a status code, does it touch the feature, does it assert the error
+      code of a rule? Failed, skipped and missing tests never count.
+    usage:
+      - channel: development
+        text: "`python -m feature_catalog check --reports reports` in CI."
+    rules:
+      - "Evidence must say which criteria it covers (`covers`)."
+      - Skipped tests and tests that did not run are not evidence.
+      - "Every rule with an error code has a criterion, and its tests assert that code."
+    technical:
+      components:
+        - tools/feature_catalog/feature_catalog/analysis.py
+        - tools/feature_catalog/feature_catalog/junit.py
+        - tools/feature_catalog/feature_catalog/testcode.py
+    acceptance:
+      - id: proven
+        kind: effect
+        text: With passing reports for all criteria the feature is proven.
+      - id: failed-skipped-missing
+        kind: rule
+        text: Failed, skipped and missing tests are reported and leave the feature partly proven.
+        code: EVIDENCE_SKIPPED
+      - id: parametrized
+        kind: rule
+        text: A parametrized test counts only when every instance passed.
+      - id: by-content
+        kind: rule
+        text: A report is recognized by its suite, not by its file name.
+        code: REPORT_MISSING
+      - id: every-criterion
+        kind: rule
+        text: A criterion without passed evidence is reported.
+        code: ACCEPTANCE_UNCOVERED
+      - id: covers-required
+        kind: rule
+        text: Evidence without covered criteria is reported.
+        code: EVIDENCE_UNLINKED
+      - id: weak-tests
+        kind: rule
+        text: Tests without assertion, with only status checks or without a link to the feature are reported.
+        code: EVIDENCE_NO_ASSERTION
+      - id: rule-code
+        kind: rule
+        text: A rule's error code must appear in its tests, and every rule code needs a criterion.
+        code: RULE_CODE_NOT_ASSERTED
+      - id: effect-required
+        kind: rule
+        text: A feature without a criterion of kind effect is reported.
+        code: ACCEPTANCE_MISSING
+      - id: evidence-required
+        kind: rule
+        text: A feature without evidence is reported.
+        code: EVIDENCE_MISSING
+    evidence:
+      - kind: unit
+        file: tools/feature_catalog/tests/test_check.py
+        test: test_correct_catalog_is_proven_with_passing_reports
+        covers: [proven]
+      - kind: unit
+        file: tools/feature_catalog/tests/test_check.py
+        test: test_flags_failed_skipped_and_missing_evidence
+        covers: [failed-skipped-missing]
+      - kind: unit
+        file: tools/feature_catalog/tests/test_check.py
+        test: test_parametrized_tests_need_every_instance_to_pass
+        covers: [parametrized]
+      - kind: unit
+        file: tools/feature_catalog/tests/test_check.py
+        test: test_recognizes_reports_by_content_not_name
+        covers: [by-content]
+      - kind: unit
+        file: tools/feature_catalog/tests/test_check.py
+        test: test_requires_passed_evidence_for_every_criterion
+        covers: [every-criterion]
+      - kind: unit
+        file: tools/feature_catalog/tests/test_check.py
+        test: test_evidence_needs_covers
+        covers: [covers-required]
+      - kind: unit
+        file: tools/feature_catalog/tests/test_check.py
+        test: test_flags_evidence_without_assertion_status_only_or_unrelated
+        covers: [weak-tests]
+      - kind: unit
+        file: tools/feature_catalog/tests/test_check.py
+        test: test_requires_rule_code_as_assertion
+        covers: [rule-code]
+      - kind: unit
+        file: tools/feature_catalog/tests/test_check.py
+        test: test_criterion_of_kind_effect_is_required
+        covers: [effect-required]
+      - kind: unit
+        file: tools/feature_catalog/tests/test_check.py
+        test: test_requires_evidence
+        covers: [evidence-required]
+
+  - id: catalog.view
+    title: Catalog view
+    group: catalog.tool
+    summary: One HTML page with search, filters and expandable technical details, built in CI.
+    description: |
+      The page needs no server and loads nothing from the internet. It shows key figures, areas
+      and groups, the review list and all errors and warnings; filters by role, channel and
+      evidence. Light and dark, readable on a phone.
+    usage:
+      - channel: development
+        text: "`make catalog-full` runs all tests and writes `catalog/dist/index.html`; CI uploads it as artifact `feature-catalog`."
+    rules:
+      - "`check` exits with an error code when there are errors, so CI fails."
+    technical:
+      components:
+        - tools/feature_catalog/feature_catalog/view.py
+        - tools/feature_catalog/feature_catalog/view.html
+        - tools/feature_catalog/feature_catalog/cli.py
+    acceptance:
+      - id: self-contained
+        kind: effect
+        text: The built page contains the features and loads no external scripts or styles.
+      - id: exit-code
+        kind: rule
+        text: "`check` returns 0 for a clean catalog and 1 when there are errors."
+    evidence:
+      - kind: unit
+        file: tools/feature_catalog/tests/test_check.py
+        test: test_builds_a_self_contained_view
+        covers: [self-contained]
+      - kind: unit
+        file: tools/feature_catalog/tests/test_check.py
+        test: test_check_exits_with_an_error_code
+        covers: [exit-code]

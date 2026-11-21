@@ -1,0 +1,244 @@
+# Feature catalog: areas, groups, which parts of the app each area claims, test runs.
+# Rules and upkeep: docs/feature-katalog.md. Check: make catalog
+schemaVersion: 1
+title: Wedding Planner – feature catalog
+
+channels:
+  web: Planner app in the browser (/app)
+  portal: Couple's portal (/portal), phone first
+  api: REST API (/api/v1)
+  email: Emails sent by the platform
+  calendar: Calendar subscription (iCal feed)
+  batch: Background and scheduled jobs (worker)
+  development: Developer and operator tools (CLI, make, CI)
+
+testRuns:
+  - id: backend
+    title: Backend tests (pytest, PostgreSQL with row-level security)
+    kind: integration
+    format: pytest
+    root: backend
+    suite: backend
+  - id: catalog-tool
+    title: Feature catalog tool tests (pytest)
+    kind: unit
+    format: pytest
+    root: tools/feature_catalog
+    suite: feature-catalog
+  - id: frontend-unit
+    title: Frontend unit tests (vitest)
+    kind: unit
+    format: vitest
+    root: frontend
+    suite: frontend-unit
+  - id: e2e
+    title: End-to-end tests (Playwright, desktop and phone)
+    kind: e2e
+    format: playwright
+    root: frontend/e2e
+
+areas:
+  - id: account
+    title: Account & sign-in
+    summary: Signing in, passwords, invitations and two-factor authentication.
+    status: open
+    owns:
+      endpoints: ["/auth", "/me"]
+      uiRoutes: ["/login", "/forgot-password", "/reset-password", "/invite", "/no-access",
+                 "/app/account", "/portal/account", "/admin/account"]
+    groups:
+      - { id: account.sign-in, title: Sign-in and sessions }
+      - { id: account.two-factor, title: Two-factor authentication }
+      - { id: account.profile, title: Profile and password }
+
+  - id: organization
+    title: Organization & team
+    summary: The planning studio, its team members, roles, invitations, audit log and dashboard.
+    status: open
+    owns:
+      endpoints: ["GET /orgs/{org_id}", "PATCH /orgs/{org_id}", "/orgs/{org_id}/members",
+                  "/orgs/{org_id}/invitations", "/orgs/{org_id}/audit-log",
+                  "/orgs/{org_id}/dashboard"]
+      uiRoutes: ["/app", "/app/team", "/app/settings"]
+    groups:
+      - { id: organization.settings, title: Organization settings }
+      - { id: organization.team, title: Team and roles }
+      - { id: organization.overview, title: Dashboard and audit log }
+
+  - id: clients
+    title: Clients
+    summary: Couples as clients with their contacts.
+    status: open
+    owns:
+      endpoints: ["/orgs/{org_id}/clients"]
+      uiRoutes: ["/app/clients"]
+    groups:
+      - { id: clients.records, title: Clients and contacts }
+
+  - id: weddings
+    title: Weddings
+    summary: Weddings with date, venue, team, milestones, activity and archive.
+    status: open
+    owns:
+      endpoints: ["/orgs/{org_id}/projects"]
+      uiRoutes: ["/app/weddings"]
+    groups:
+      - { id: weddings.records, title: Weddings }
+      - { id: weddings.team, title: Wedding team }
+      - { id: weddings.milestones, title: Milestones and activity }
+
+  - id: tasks
+    title: Tasks & templates
+    summary: Tasks with checklists for team and couple, my tasks, and reusable templates.
+    status: open
+    owns:
+      endpoints: ["/orgs/{org_id}/projects/{project_id}/tasks", "/orgs/{org_id}/tasks",
+                  "/orgs/{org_id}/templates", "/portal/projects/{project_id}/tasks"]
+      uiRoutes: ["/app/tasks", "/app/weddings/:id/tasks", "/app/templates", "/portal/tasks"]
+    groups:
+      - { id: tasks.wedding, title: Wedding tasks }
+      - { id: tasks.couple, title: Tasks for the couple }
+      - { id: tasks.templates, title: Templates }
+
+  - id: budget
+    title: Budget
+    summary: Budget with categories, items and payments; a view for the couple.
+    status: open
+    owns:
+      endpoints: ["/orgs/{org_id}/projects/{project_id}/budget",
+                  "/portal/projects/{project_id}/budget"]
+      uiRoutes: ["/app/weddings/:id/budget", "/portal/budget"]
+    groups:
+      - { id: budget.planning, title: Budget planning }
+      - { id: budget.couple, title: Budget for the couple }
+
+  - id: vendors
+    title: Vendors
+    summary: The studio's vendor directory and the vendors booked for a wedding.
+    status: open
+    owns:
+      endpoints: ["/orgs/{org_id}/vendors", "/orgs/{org_id}/projects/{project_id}/vendors"]
+      uiRoutes: ["/app/vendors"]
+    groups:
+      - { id: vendors.directory, title: Vendor directory }
+      - { id: vendors.wedding, title: Vendors of a wedding }
+
+  - id: documents
+    title: Documents
+    summary: Contracts and files per wedding with versions and virus scan.
+    status: open
+    owns:
+      endpoints: ["/orgs/{org_id}/projects/{project_id}/documents",
+                  "/portal/projects/{project_id}/documents"]
+      jobs: ["scan_document"]
+      uiRoutes: ["/app/weddings/:id/documents", "/portal/files"]
+    groups:
+      - { id: documents.files, title: Files and versions }
+      - { id: documents.safety, title: Virus scan }
+
+  - id: calendar
+    title: Calendar
+    summary: Appointments per wedding, the studio calendar and calendar subscriptions.
+    status: open
+    owns:
+      endpoints: ["/orgs/{org_id}/calendar", "/orgs/{org_id}/projects/{project_id}/events",
+                  "/calendar-feeds", "/portal/projects/{project_id}/calendar"]
+      uiRoutes: ["/app/calendar", "/app/weddings/:id/calendar", "/portal/calendar"]
+    groups:
+      - { id: calendar.events, title: Appointments }
+      - { id: calendar.feeds, title: Calendar subscriptions }
+
+  - id: moodboards
+    title: Moodboards
+    summary: Inspiration boards that planner and couple fill together, with a PDF for vendors.
+    status: catalogued
+    owns:
+      endpoints: ["/orgs/{org_id}/projects/{project_id}/moodboards",
+                  "/portal/projects/{project_id}/moodboards"]
+      jobs: ["process_moodboard_image"]
+      uiRoutes: ["/app/weddings/:id/moodboards", "/portal/inspiration"]
+    groups:
+      - id: moodboards.boards
+        title: Boards and sections
+        summary: Creating boards, sharing them with the couple, sections and the color palette.
+      - id: moodboards.images
+        title: Images
+        summary: Uploading, processing, arranging and deciding on images.
+      - id: moodboards.feedback
+        title: Feedback
+        summary: Hearts and comments between planner and couple.
+      - id: moodboards.export
+        title: Export and privacy
+        summary: The vendor PDF, data export and deletion.
+
+  - id: communication
+    title: Comments & notifications
+    summary: Comments, in-app and email notifications, the daily overview email.
+    status: open
+    owns:
+      endpoints: ["/orgs/{org_id}/projects/{project_id}/comments",
+                  "/orgs/{org_id}/notification-preferences",
+                  "/portal/projects/{project_id}/notification-preferences"]
+      jobs: ["send_email", "send_daily_digests"]
+      commands: ["send-digests"]
+      uiRoutes: ["/app/notifications", "/portal/notifications"]
+    groups:
+      - { id: communication.comments, title: Comments }
+      - { id: communication.notifications, title: Notifications and emails }
+
+  - id: portal
+    title: Couple's portal
+    summary: Inviting the couple, their access and the portal's home page.
+    status: open
+    owns:
+      endpoints: ["GET /portal/projects", "GET /portal/projects/{project_id}",
+                  "/orgs/{org_id}/projects/{project_id}/client-access"]
+      uiRoutes: ["/portal", "/portal/more"]
+    groups:
+      - { id: portal.access, title: Access for the couple }
+      - { id: portal.home, title: Portal home }
+
+  - id: privacy
+    title: Data protection
+    summary: Data export, erasure, consents and retention periods.
+    status: open
+    owns:
+      endpoints: ["GET /me/export", "POST /me/delete", "/orgs/{org_id}/clients/{client_id}/export",
+                  "/orgs/{org_id}/clients/{client_id}/erase",
+                  "/orgs/{org_id}/projects/{project_id}/consents",
+                  "/portal/projects/{project_id}/consents"]
+      jobs: ["purge"]
+      uiRoutes: ["/portal/privacy"]
+    groups:
+      - { id: privacy.rights, title: Export and erasure }
+      - { id: privacy.consents, title: Consents }
+      - { id: privacy.retention, title: Retention periods }
+
+  - id: platform
+    title: Platform operations
+    summary: Platform admins, support access, organization setup and demo data.
+    status: open
+    owns:
+      endpoints: ["/admin", "/orgs/{org_id}/support-access"]
+      commands: ["create-organization", "grant-platform-admin", "seed-demo"]
+      uiRoutes: ["/admin"]
+    groups:
+      - { id: platform.admin, title: Platform admin }
+      - { id: platform.support, title: Support access }
+      - { id: platform.setup, title: Setup and demo }
+
+  - id: catalog
+    title: Feature catalog
+    summary: This catalog and the tool that checks it against the code and the test reports.
+    status: catalogued
+    groups:
+      - { id: catalog.tool, title: Catalog tool }
+
+exclusions:
+  endpoints:
+    - { item: "GET /health", reason: "Health check for operations and monitoring, not a feature" }
+  jobs:
+    - { item: heartbeat, reason: "Worker liveness check, not a feature" }
+  uiRoutes:
+    - { item: "/", reason: Redirect to the sign-in page }
+    - { item: "/*", reason: Not-found page }

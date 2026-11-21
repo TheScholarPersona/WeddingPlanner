@@ -26,5 +26,12 @@ export default defineConfig({
     setupFiles: ['./src/test/setup.ts'],
     include: ['src/**/*.test.{ts,tsx}'],
     css: false,
+    // JUNIT_DIR=../reports also writes a JUnit report for the feature catalog check.
+    reporters: process.env.JUNIT_DIR
+      ? ['default', ['junit', { suiteName: 'frontend-unit' }]]
+      : ['default'],
+    outputFile: process.env.JUNIT_DIR
+      ? { junit: path.join(process.env.JUNIT_DIR, 'frontend-unit.xml') }
+      : undefined,
   },
 });

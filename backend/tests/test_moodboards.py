@@ -203,6 +203,7 @@ async def test_couple_boards_stay_shared(
         headers={"If-Match": f'"{team_view["version"]}"'},
     )
     assert hide.status_code == 409
+    assert hide.json()["code"] == "couple_board"
     palette = await send(
         couple,
         "PATCH",
@@ -361,3 +362,227 @@ async def test_pdf_export_for_vendors(
     assert exports == 2
     # The couple cannot export.
     assert (await world["client"].client.get(f"{base}/export.pdf")).status_code == 404
+
+
+# --- Added for the feature catalog: criteria that had no test yet -------------------------
+
+
+async def test_board_limit_per_wedding(
+    world: World, wedding: dict[str, Any], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from app.moodboards import service
+
+    monkeypatch.setattr(service, "MAX_BOARDS_PER_WEDDING", 1)
+    lead = world["member"].client
+    await new_board(lead, MB(world, wedding))
+
+    response = await send(lead, "POST", MB(world, wedding), json={"title": "One too many"})
+
+    assert response.status_code == 409
+    assert response.json()["code"] == "too_many_boards"
+    assert len((await lead.get(MB(world, wedding))).json()) == 1
+
+
+async def test_sections_add_rename_delete(
+    world: World, wedding: dict[str, Any], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    lead = world["member"].client
+    board = await new_board(lead, MB(world, wedding))
+    base = MB(world, wedding, f"/{board['id']}")
+
+    added = await send(lead, "POST", f"{base}/sections", json={"title": "Stationery"})
+    stationery = next(s for s in added.json()["sections"] if s["title"] == "Stationery")
+    renamed = await send(
+        lead, "PATCH", f"{base}/sections/{stationery['id']}", json={"title": "Invitations"}
+    )
+    assert "Invitations" in [s["title"] for s in renamed.json()["sections"]]
+
+    board = await add_images(lead, base, 1, stationery["id"])
+    deleted = await send(lead, "DELETE", f"{base}/sections/{stationery['id']}")
+    after = deleted.json()
+    assert stationery["id"] not in [s["id"] for s in after["sections"]]
+    assert [i["section_id"] for i in after["items"]] == [None]  # images move to "Unsorted"
+
+    from app.moodboards import service
+
+    monkeypatch.setattr(service, "MAX_SECTIONS_PER_BOARD", len(after["sections"]))
+    full = await send(lead, "POST", f"{base}/sections", json={"title": "Favors"})
+    assert full.status_code == 409
+    assert full.json()["code"] == "too_many_sections"
+
+
+async def test_couple_adds_sections_only_to_own_boards(
+    world: World, wedding: dict[str, Any], couple: AsyncClient
+) -> None:
+    team = await new_board(world["member"].client, MB(world, wedding), visibility="client")
+    own = await new_board(couple, portal(wedding), title="Our ideas")
+
+    blocked = await send(
+        couple, "POST", portal(wedding, f"/{team['id']}/sections"), json={"title": "Shoes"}
+    )
+    added = await send(
+        couple, "POST", portal(wedding, f"/{own['id']}/sections"), json={"title": "Shoes"}
+    )
+
+    assert blocked.status_code == 403
+    assert "Shoes" in [s["title"] for s in added.json()["sections"]]
+
+
+async def test_image_limits(
+    world: World, wedding: dict[str, Any], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from app.moodboards import images, service
+
+    lead = world["member"].client
+    board = await new_board(lead, MB(world, wedding))
+    base = MB(world, wedding, f"/{board['id']}")
+    await add_images(lead, base, 2)
+
+    monkeypatch.setattr(service, "MAX_ITEMS_PER_WEDDING", 2)
+    full = await send(
+        lead, "POST", f"{base}/items", files=[("files", ("c.jpg", photo(), "image/jpeg"))]
+    )
+    assert full.status_code == 409
+    assert full.json()["code"] == "too_many_images"
+
+    monkeypatch.setattr(service, "MAX_ITEMS_PER_WEDDING", 300)
+    monkeypatch.setattr(images, "MAX_IMAGE_MB", 0)
+    large = await send(
+        lead, "POST", f"{base}/items", files=[("files", ("d.jpg", photo(), "image/jpeg"))]
+    )
+    assert large.status_code == 413
+    assert large.json()["code"] == "file_too_large"
+    assert (await lead.get(base)).json()["item_count"] == 2
+
+
+async def test_caption_and_section_of_an_image(world: World, wedding: dict[str, Any]) -> None:
+    lead = world["member"].client
+    board = await new_board(lead, MB(world, wedding))
+    cake = next(s["id"] for s in board["sections"] if s["title"] == "Cake")
+    base = MB(world, wedding, f"/{board['id']}")
+    item = (await add_images(lead, base))["items"][0]["id"]
+
+    moved = await send(
+        lead, "PATCH", f"{base}/items/{item}", json={"caption": "Naked cake", "section_id": cake}
+    )
+    assert moved.json()["items"][0]["caption"] == "Naked cake"
+    assert moved.json()["items"][0]["section_id"] == cake
+
+    unsorted = await send(lead, "PATCH", f"{base}/items/{item}", json={"move_to_unsorted": True})
+    assert unsorted.json()["items"][0]["section_id"] is None
+
+
+async def test_team_hearts_and_takes_them_back(world: World, wedding: dict[str, Any]) -> None:
+    lead = world["member"].client
+    board = await new_board(lead, MB(world, wedding))
+    base = MB(world, wedding, f"/{board['id']}")
+    item = (await add_images(lead, base))["items"][0]["id"]
+
+    hearted = (await send(lead, "PUT", f"{base}/items/{item}/heart")).json()["items"][0]
+    assert hearted["hearted_by_me"] is True and hearted["heart_names"] == ["Max Member"]
+
+    undone = (await send(lead, "DELETE", f"{base}/items/{item}/heart")).json()["items"][0]
+    assert undone["hearted_by_me"] is False and undone["heart_names"] == []
+
+
+async def test_couple_takes_a_heart_back(
+    world: World, wedding: dict[str, Any], couple: AsyncClient
+) -> None:
+    board = await new_board(world["member"].client, MB(world, wedding), visibility="client")
+    item = (await add_images(world["member"].client, MB(world, wedding, f"/{board['id']}")))[
+        "items"
+    ][0]["id"]
+    heart = portal(wedding, f"/{board['id']}/items/{item}/heart")
+    await send(couple, "PUT", heart)
+
+    undone = (await send(couple, "DELETE", heart)).json()["items"][0]
+
+    assert undone["hearted_by_me"] is False and undone["heart_names"] == []
+
+
+async def test_couple_gets_display_versions_but_not_originals(
+    world: World, wedding: dict[str, Any], couple: AsyncClient
+) -> None:
+    board = await new_board(world["member"].client, MB(world, wedding), visibility="client")
+    item = (await add_images(world["member"].client, MB(world, wedding, f"/{board['id']}")))[
+        "items"
+    ][0]["id"]
+    image = portal(wedding, f"/{board['id']}/items/{item}/image")
+
+    display = await couple.get(image, params={"size": "display"})
+    original = await couple.get(image, params={"size": "original"})
+
+    assert display.headers["content-type"] == "image/webp"
+    assert dict(Image.open(io.BytesIO(display.content)).getexif()) == {}  # no GPS data
+    assert original.status_code == 422
+
+
+async def test_couple_arranges_only_own_boards(
+    world: World, wedding: dict[str, Any], couple: AsyncClient
+) -> None:
+    team = await new_board(world["member"].client, MB(world, wedding), visibility="client")
+    own = await new_board(couple, portal(wedding), title="Our ideas")
+    own = await add_images(couple, portal(wedding, f"/{own['id']}"))
+    item = own["items"][0]["id"]
+    venue = next(s["id"] for s in own["sections"] if s["title"] == "Venue")
+
+    blocked = await send(
+        couple,
+        "POST",
+        portal(wedding, f"/{team['id']}/reorder"),
+        json={"sections": [], "items": {}},
+    )
+    moved = await send(
+        couple,
+        "POST",
+        portal(wedding, f"/{own['id']}/reorder"),
+        json={"sections": [], "items": {venue: [item]}},
+    )
+
+    assert blocked.status_code == 403
+    assert moved.json()["items"][0]["section_id"] == venue
+
+
+async def test_couple_deletes_own_boards_only(
+    world: World, wedding: dict[str, Any], couple: AsyncClient
+) -> None:
+    team = await new_board(world["member"].client, MB(world, wedding), visibility="client")
+    own = await new_board(couple, portal(wedding), title="Our ideas")
+    await add_images(couple, portal(wedding, f"/{own['id']}"))
+
+    blocked = await send(couple, "DELETE", portal(wedding, f"/{team['id']}"))
+    deleted = await send(couple, "DELETE", portal(wedding, f"/{own['id']}"))
+
+    assert blocked.status_code == 403
+    assert deleted.status_code == 204
+    assert [b["title"] for b in (await couple.get(portal(wedding))).json()] == ["Overall look"]
+    assert storage.MEMORY == {}  # the board's images are gone too
+
+
+async def test_team_only_comments_stay_hidden_on_shared_boards(
+    world: World, wedding: dict[str, Any], couple: AsyncClient
+) -> None:
+    lead = world["member"].client
+    board = await new_board(lead, MB(world, wedding), visibility="client")
+    item = (await add_images(lead, MB(world, wedding, f"/{board['id']}")))["items"][0]["id"]
+    for body, visibility in (("Shall we show the peonies?", "internal"), ("Peonies?", "client")):
+        await send(
+            lead,
+            "POST",
+            P(world, wedding, "/comments"),
+            json={
+                "target_type": "moodboard_item",
+                "target_id": item,
+                "body": body,
+                "visibility": visibility,
+            },
+        )
+
+    team = await lead.get(
+        P(world, wedding, "/comments"),
+        params={"target_type": "moodboard_item", "target_id": item},
+    )
+    seen = await couple.get(portal(wedding, f"/{board['id']}/items/{item}/comments"))
+
+    assert sorted(c["body"] for c in team.json()) == ["Peonies?", "Shall we show the peonies?"]
+    assert [c["body"] for c in seen.json()] == ["Peonies?"]

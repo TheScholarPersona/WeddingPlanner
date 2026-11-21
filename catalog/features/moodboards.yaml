@@ -1,0 +1,684 @@
+area: moodboards
+features:
+  # --- Boards and sections -------------------------------------------------------------
+  - id: moodboards.browse
+    title: Browse boards
+    group: moodboards.boards
+    summary: Planners and couples see the boards of a wedding with previews, counts and their images.
+    description: |
+      Every wedding has its own boards. The overview shows each board with a few preview images,
+      how many images it holds and how many are selected. Opening a board shows its sections with
+      the images in a grid. The team sees every board; the couple only the boards shared with them.
+    usage:
+      - channel: web
+        text: Wedding → **Moodboards**, then open a board.
+      - channel: portal
+        text: "**Inspiration** in the bottom navigation."
+      - channel: api
+        text: "`GET …/projects/{project_id}/moodboards` and `GET …/moodboards/{board_id}`; images with `?size=thumb|display|original`."
+    rules:
+      - Viewers can look at boards but not change them.
+      - Other organizations do not even learn that a board exists (`404`).
+    technical:
+      components:
+        - backend/app/moodboards/router.py
+        - backend/app/moodboards/service.py
+        - frontend/src/features/moodboards/BoardList.tsx
+        - frontend/src/features/moodboards/BoardView.tsx
+        - frontend/src/features/moodboards/pages.tsx
+      endpoints:
+        - "GET /orgs/{org_id}/projects/{project_id}/moodboards"
+        - "GET /orgs/{org_id}/projects/{project_id}/moodboards/{board_id}"
+        - "GET /orgs/{org_id}/projects/{project_id}/moodboards/{board_id}/items/{item_id}/image"
+        - "GET /portal/projects/{project_id}/moodboards"
+        - "GET /portal/projects/{project_id}/moodboards/{board_id}"
+      uiRoutes:
+        - /app/weddings/:id/moodboards
+        - /app/weddings/:id/moodboards/:boardId
+        - /portal/inspiration
+        - /portal/inspiration/:boardId
+      notes:
+        - Tables `moodboards`, `moodboard_sections`, `moodboard_items` with row-level security per organization; couples see only shared boards (restrictive policy).
+    acceptance:
+      - id: board-with-counts
+        kind: effect
+        text: A board with two images shows both images, an image count of two and two previews.
+      - id: overview-shows-sharing
+        kind: effect
+        text: The planner's overview links each board and shows whether it is shared and how many images are selected.
+      - id: viewer-reads-only
+        kind: rule
+        text: A viewer of the wedding can open a board but cannot upload images or delete it.
+      - id: other-tenants-404
+        kind: rule
+        text: A user of another organization gets "not found" for the board.
+        code: "404"
+    evidence:
+      - kind: integration
+        file: backend/tests/test_moodboards.py
+        test: test_board_from_template_with_processed_images
+        covers: [board-with-counts]
+      - kind: unit
+        file: frontend/src/features/moodboards/moodboards.test.tsx
+        test: lists boards with previews and sharing state
+        covers: [overview-shows-sharing]
+      - kind: integration
+        file: backend/tests/test_moodboards.py
+        test: test_roles_and_tenants
+        covers: [viewer-reads-only, other-tenants-404]
+
+  - id: moodboards.create-board
+    title: Create a board
+    group: moodboards.boards
+    summary: Planner or couple starts a board that already has the usual sections of a wedding.
+    description: |
+      A new board comes with sections such as Overall look, Venue, Flowers and Cake, so images
+      can be sorted right away. Boards created by the couple are always visible to the team.
+    usage:
+      - channel: web
+        text: Moodboards → **New board**.
+      - channel: portal
+        text: Inspiration → **New board**.
+      - channel: api
+        text: "`POST …/moodboards` with `title` and optionally `visibility`."
+    rules:
+      - Up to 30 boards per wedding (`too_many_boards`).
+    technical:
+      components:
+        - backend/app/moodboards/service.py
+        - frontend/src/features/moodboards/BoardList.tsx
+      endpoints:
+        - "POST /orgs/{org_id}/projects/{project_id}/moodboards"
+        - "POST /portal/projects/{project_id}/moodboards"
+    acceptance:
+      - id: default-sections
+        kind: effect
+        text: A new board starts with the sections "Overall look", "Venue" and "Flowers".
+      - id: couple-board-shared
+        kind: effect
+        text: A board the couple creates is marked as theirs, is shared with the team and can be managed by the couple.
+      - id: board-limit
+        kind: rule
+        text: When a wedding has reached its board limit, another board is refused and none is added.
+        code: too_many_boards
+    evidence:
+      - kind: integration
+        file: backend/tests/test_moodboards.py
+        test: test_board_from_template_with_processed_images
+        covers: [default-sections]
+      - kind: integration
+        file: backend/tests/test_moodboards.py
+        test: test_couple_boards_stay_shared
+        covers: [couple-board-shared]
+      - kind: integration
+        file: backend/tests/test_moodboards.py
+        test: test_board_limit_per_wedding
+        covers: [board-limit]
+
+  - id: moodboards.share-board
+    title: Share a board with the couple
+    group: moodboards.boards
+    summary: The team decides which boards the couple sees; the couple's own boards stay shared.
+    description: |
+      Boards are team-internal by default, for example a vendor shortlist. Sharing a board makes it
+      appear in the couple's portal. The couple never sees internal boards, internal notes or the
+      sharing setting itself.
+    usage:
+      - channel: web
+        text: Open a board → **Share with couple**.
+      - channel: api
+        text: "`PATCH …/moodboards/{board_id}` with `visibility: client|internal` and `If-Match`."
+    rules:
+      - Boards created by the couple cannot be made internal (`couple_board`).
+      - Changes need the current version (`If-Match`), so two people cannot overwrite each other.
+    technical:
+      components:
+        - backend/app/moodboards/service.py
+        - backend/app/moodboards/router.py
+      endpoints:
+        - "PATCH /orgs/{org_id}/projects/{project_id}/moodboards/{board_id}"
+    acceptance:
+      - id: couple-sees-shared-only
+        kind: effect
+        text: Of an internal and a shared board, the couple lists only the shared one and gets "not found" for the internal one.
+      - id: couple-board-stays-shared
+        kind: rule
+        text: The team cannot make a board created by the couple internal.
+        code: couple_board
+    evidence:
+      - kind: integration
+        file: backend/tests/test_moodboards.py
+        test: test_couple_sees_only_shared_boards_without_internal_notes
+        covers: [couple-sees-shared-only]
+      - kind: integration
+        file: backend/tests/test_moodboards.py
+        test: test_couple_boards_stay_shared
+        covers: [couple-board-stays-shared]
+
+  - id: moodboards.board-details
+    title: Color palette and internal notes
+    group: moodboards.boards
+    summary: A board carries the wedding's colors and notes that only the team reads.
+    description: |
+      The palette holds up to a few hex colors and appears on the board and in the vendor PDF.
+      Internal notes are for the team only (for example "budget is tight"). Couples rename their
+      own boards; palette, notes and sharing are the team's.
+    usage:
+      - channel: web
+        text: Open a board → **Palette** and **Notes for the team**.
+      - channel: api
+        text: "`PATCH …/moodboards/{board_id}` with `palette`, `notes_internal`, `title`."
+    rules:
+      - Colors are stored as lowercase hex values.
+      - The couple cannot change the palette of a board.
+    technical:
+      components:
+        - backend/app/moodboards/service.py
+        - frontend/src/features/moodboards/Palette.tsx
+      endpoints:
+        - "PATCH /orgs/{org_id}/projects/{project_id}/moodboards/{board_id}"
+        - "PATCH /portal/projects/{project_id}/moodboards/{board_id}"
+    acceptance:
+      - id: palette-saved
+        kind: effect
+        text: A palette saved as "#C9A9A6, #4F6354" is shown to the couple as "#c9a9a6, #4f6354".
+      - id: notes-hidden
+        kind: rule
+        text: The couple's view of a shared board contains neither the internal notes nor the sharing setting.
+      - id: couple-no-palette
+        kind: rule
+        text: The couple's attempt to change the palette is refused.
+        code: "403"
+    evidence:
+      - kind: integration
+        file: backend/tests/test_moodboards.py
+        test: test_couple_sees_only_shared_boards_without_internal_notes
+        covers: [palette-saved, notes-hidden]
+      - kind: integration
+        file: backend/tests/test_moodboards.py
+        test: test_couple_boards_stay_shared
+        covers: [couple-no-palette]
+
+  - id: moodboards.sections
+    title: Organize a board in sections
+    group: moodboards.boards
+    summary: Add, rename and remove sections; images of a removed section move to "Unsorted".
+    usage:
+      - channel: web
+        text: Open a board → **Add section**, or the section's menu to rename or delete it.
+      - channel: portal
+        text: On their own boards the couple adds sections too.
+      - channel: api
+        text: "`POST …/sections`, `PATCH …/sections/{section_id}`, `DELETE …/sections/{section_id}`."
+    rules:
+      - Up to 20 sections per board (`too_many_sections`).
+      - The couple changes sections only on boards they created.
+    technical:
+      components:
+        - backend/app/moodboards/service.py
+        - frontend/src/features/moodboards/BoardView.tsx
+      endpoints:
+        - "POST /orgs/{org_id}/projects/{project_id}/moodboards/{board_id}/sections"
+        - "PATCH /orgs/{org_id}/projects/{project_id}/moodboards/{board_id}/sections/{section_id}"
+        - "DELETE /orgs/{org_id}/projects/{project_id}/moodboards/{board_id}/sections/{section_id}"
+        - "POST /portal/projects/{project_id}/moodboards/{board_id}/sections"
+    acceptance:
+      - id: add-rename
+        kind: effect
+        text: A section added as "Stationery" and renamed to "Invitations" appears under its new name.
+      - id: delete-keeps-images
+        kind: effect
+        text: Deleting a section removes it; its images remain on the board as unsorted.
+      - id: section-limit
+        kind: rule
+        text: A board at its section limit refuses another section.
+        code: too_many_sections
+      - id: couple-own-boards
+        kind: rule
+        text: The couple can add sections to their own board but not to a board of the team.
+        code: "403"
+    evidence:
+      - kind: integration
+        file: backend/tests/test_moodboards.py
+        test: test_sections_add_rename_delete
+        covers: [add-rename, delete-keeps-images, section-limit]
+      - kind: integration
+        file: backend/tests/test_moodboards.py
+        test: test_couple_adds_sections_only_to_own_boards
+        covers: [couple-own-boards]
+
+  - id: moodboards.delete-board
+    title: Delete a board
+    group: moodboards.boards
+    summary: Leads and admins delete boards, couples their own; all image files are removed.
+    usage:
+      - channel: web
+        text: Open a board → menu → **Delete board**.
+      - channel: portal
+        text: On their own boards → **Delete board**.
+      - channel: api
+        text: "`DELETE …/moodboards/{board_id}`."
+    rules:
+      - Viewers and planners cannot delete boards; org admins and the wedding's lead can.
+      - The couple deletes only boards they created.
+      - Deleting is recorded in the audit log.
+    technical:
+      components:
+        - backend/app/moodboards/service.py
+      endpoints:
+        - "DELETE /orgs/{org_id}/projects/{project_id}/moodboards/{board_id}"
+        - "DELETE /portal/projects/{project_id}/moodboards/{board_id}"
+    acceptance:
+      - id: couple-deletes-own
+        kind: effect
+        text: When the couple deletes their own board, it disappears from their list and its image files are gone from storage.
+      - id: only-own-or-lead
+        kind: rule
+        text: The couple cannot delete a team board, a viewer cannot delete any board, an org admin can.
+        code: "403"
+    evidence:
+      - kind: integration
+        file: backend/tests/test_moodboards.py
+        test: test_couple_deletes_own_boards_only
+        covers: [couple-deletes-own, only-own-or-lead]
+      - kind: integration
+        file: backend/tests/test_moodboards.py
+        test: test_roles_and_tenants
+        covers: [only-own-or-lead]
+
+  # --- Images ----------------------------------------------------------------------------
+  - id: moodboards.upload-images
+    title: Upload images
+    group: moodboards.images
+    summary: Several photos at once into a section; web-friendly versions without location data are made in the background.
+    description: |
+      Planner and couple upload JPG, PNG, WebP or HEIC photos, also straight from a phone. The
+      worker creates a small thumbnail and a display version as WebP and strips all metadata, so
+      GPS data of phone photos never reaches other viewers. Only the team can download the
+      original. When the couple adds images, the wedding team is notified.
+    usage:
+      - channel: web
+        text: In a section → **Add images**, several files at once.
+      - channel: portal
+        text: On shared boards → **Add images**; the camera roll opens on phones.
+      - channel: api
+        text: "`POST …/items` as multipart with `files` and optional `section_id`."
+      - channel: batch
+        text: "Job `process_moodboard_image` creates the versions after the upload is committed."
+      - channel: email
+        text: The team receives "New inspiration" when the couple adds images.
+    rules:
+      - Only real images are accepted, checked by content and not just the name (`unsupported_image`).
+      - Up to 15 MB per image (`file_too_large`).
+      - Up to 300 images per wedding (`too_many_images`).
+      - The couple gets thumbnail and display versions only, never the original.
+    technical:
+      components:
+        - backend/app/moodboards/images.py
+        - backend/app/moodboards/service.py
+        - backend/app/notifications/service.py
+        - frontend/src/features/moodboards/BoardView.tsx
+      endpoints:
+        - "POST /orgs/{org_id}/projects/{project_id}/moodboards/{board_id}/items"
+        - "POST /portal/projects/{project_id}/moodboards/{board_id}/items"
+        - "GET /portal/projects/{project_id}/moodboards/{board_id}/items/{item_id}/image"
+      jobs: [process_moodboard_image]
+      settings:
+        - "`MAX_IMAGE_MB`, `MAX_ITEMS_PER_WEDDING` in the moodboards module."
+      notes:
+        - Images are stored in S3 (original, thumbnail 400 px, display 1600 px).
+    acceptance:
+      - id: versions-without-metadata
+        kind: effect
+        text: An uploaded phone photo is processed into a 400 px WebP thumbnail and a display version without EXIF data; the original keeps its GPS data and downloads as an attachment.
+      - id: into-section
+        kind: effect
+        text: Images uploaded into the "Flowers" section are listed in that section.
+      - id: couple-upload-notifies
+        kind: effect
+        text: When the couple uploads an image, it is marked as theirs and the lead gets a "New inspiration" email.
+      - id: couple-no-originals
+        kind: rule
+        text: The couple receives the display version without metadata, and a request for the original is refused.
+        code: "422"
+      - id: only-images
+        kind: rule
+        text: A PDF, broken data or a JPEG named ".png" is refused.
+        code: unsupported_image
+      - id: size-limit
+        kind: rule
+        text: An image above the size limit is refused and not added.
+        code: file_too_large
+      - id: wedding-limit
+        kind: rule
+        text: An upload beyond the image limit of the wedding is refused.
+        code: too_many_images
+      - id: upload-ui
+        kind: effect
+        text: In the planner app, choosing two files in the "Cake" section sends one upload with the section.
+    evidence:
+      - kind: integration
+        file: backend/tests/test_moodboards.py
+        test: test_board_from_template_with_processed_images
+        covers: [versions-without-metadata, into-section]
+      - kind: integration
+        file: backend/tests/test_moodboards.py
+        test: test_couple_uploads_hearts_and_comments
+        covers: [couple-upload-notifies]
+      - kind: integration
+        file: backend/tests/test_moodboards.py
+        test: test_couple_gets_display_versions_but_not_originals
+        covers: [couple-no-originals]
+      - kind: integration
+        file: backend/tests/test_moodboards.py
+        test: test_rejects_non_images
+        covers: [only-images]
+      - kind: integration
+        file: backend/tests/test_moodboards.py
+        test: test_image_limits
+        covers: [size-limit, wedding-limit]
+      - kind: unit
+        file: frontend/src/features/moodboards/moodboards.test.tsx
+        test: uploads several images into a section
+        covers: [upload-ui]
+
+  - id: moodboards.arrange
+    title: Arrange images by drag and drop
+    group: moodboards.images
+    summary: Move images within and between sections and reorder sections.
+    usage:
+      - channel: web
+        text: Drag an image or a section to its new place (keyboard works too).
+      - channel: portal
+        text: On their own boards the couple arranges images the same way.
+      - channel: api
+        text: "`POST …/reorder` with the section order and the images per section."
+    rules:
+      - The couple arranges only boards they created.
+    technical:
+      components:
+        - backend/app/moodboards/service.py
+        - frontend/src/features/moodboards/BoardView.tsx
+      endpoints:
+        - "POST /orgs/{org_id}/projects/{project_id}/moodboards/{board_id}/reorder"
+        - "POST /portal/projects/{project_id}/moodboards/{board_id}/reorder"
+    acceptance:
+      - id: moved-between-sections
+        kind: effect
+        text: Moving one image to "Cake" and another to "Unsorted" puts each of them there.
+      - id: couple-arranges-own
+        kind: rule
+        text: The couple can move an image on their own board but cannot rearrange a team board.
+        code: "403"
+    evidence:
+      - kind: integration
+        file: backend/tests/test_moodboards.py
+        test: test_reorder_moves_images_between_sections
+        covers: [moved-between-sections]
+      - kind: integration
+        file: backend/tests/test_moodboards.py
+        test: test_couple_arranges_only_own_boards
+        covers: [couple-arranges-own]
+
+  - id: moodboards.decide
+    title: Decide on images
+    group: moodboards.images
+    summary: The planner marks images as selected, proposed or discarded; the couple sees what was chosen.
+    description: |
+      The decision is the planner's call after talking with the couple. Selected images are
+      counted per board and are what the vendor PDF contains by default.
+    usage:
+      - channel: web
+        text: Open an image → **Selected**, **Proposed** or **Discarded**.
+      - channel: api
+        text: "`PATCH …/items/{item_id}` with `status`."
+    rules:
+      - Only the team decides; the couple cannot change the status.
+    technical:
+      components:
+        - backend/app/moodboards/service.py
+        - frontend/src/features/moodboards/ItemDialog.tsx
+      endpoints:
+        - "PATCH /orgs/{org_id}/projects/{project_id}/moodboards/{board_id}/items/{item_id}"
+    acceptance:
+      - id: selected-counted
+        kind: effect
+        text: After the planner selects an image, the board counts one selected image.
+      - id: planner-selects-in-ui
+        kind: effect
+        text: In the large view the planner clicks "Selected" and the choice is saved for that image.
+      - id: couple-cannot-decide
+        kind: rule
+        text: The couple's attempt to select an image is refused, and the portal shows no decision buttons.
+        code: "403"
+    evidence:
+      - kind: integration
+        file: backend/tests/test_moodboards.py
+        test: test_couple_uploads_hearts_and_comments
+        covers: [selected-counted, couple-cannot-decide]
+      - kind: unit
+        file: frontend/src/features/moodboards/moodboards.test.tsx
+        test: the planner selects an image in the large view
+        covers: [planner-selects-in-ui]
+      - kind: unit
+        file: frontend/src/features/moodboards/moodboards.test.tsx
+        test: couples heart and comment but do not decide
+        covers: [couple-cannot-decide]
+
+  - id: moodboards.edit-images
+    title: Caption, move and delete images
+    group: moodboards.images
+    summary: Give an image a caption, move it to another section or delete it with all its versions.
+    usage:
+      - channel: web
+        text: Open an image → caption, section, **Delete image**.
+      - channel: portal
+        text: The couple edits and deletes the images they uploaded.
+      - channel: api
+        text: "`PATCH …/items/{item_id}` with `caption`, `section_id` or `move_to_unsorted`; `DELETE …/items/{item_id}`."
+    rules:
+      - The couple changes and deletes only their own images.
+    technical:
+      components:
+        - backend/app/moodboards/service.py
+        - frontend/src/features/moodboards/ItemDialog.tsx
+      endpoints:
+        - "PATCH /orgs/{org_id}/projects/{project_id}/moodboards/{board_id}/items/{item_id}"
+        - "PATCH /portal/projects/{project_id}/moodboards/{board_id}/items/{item_id}"
+        - "DELETE /orgs/{org_id}/projects/{project_id}/moodboards/{board_id}/items/{item_id}"
+        - "DELETE /portal/projects/{project_id}/moodboards/{board_id}/items/{item_id}"
+    acceptance:
+      - id: caption-and-section
+        kind: effect
+        text: An image captioned "Naked cake" and moved to "Cake" shows both; "move to unsorted" takes it out of the section again.
+      - id: delete-removes-files
+        kind: effect
+        text: Deleting an image removes its original, thumbnail and display version from storage.
+      - id: couple-own-images
+        kind: rule
+        text: The couple can delete an image they uploaded but not one of the team.
+        code: "403"
+    evidence:
+      - kind: integration
+        file: backend/tests/test_moodboards.py
+        test: test_caption_and_section_of_an_image
+        covers: [caption-and-section]
+      - kind: integration
+        file: backend/tests/test_moodboards.py
+        test: test_deleting_removes_files_and_erasure_covers_moodboards
+        covers: [delete-removes-files]
+      - kind: integration
+        file: backend/tests/test_moodboards.py
+        test: test_couple_uploads_hearts_and_comments
+        covers: [couple-own-images]
+
+  # --- Feedback --------------------------------------------------------------------------
+  - id: moodboards.hearts
+    title: Heart images
+    group: moodboards.feedback
+    summary: Team and couple mark favorites; everyone sees who loves an image.
+    usage:
+      - channel: web
+        text: Open an image → **Heart**.
+      - channel: portal
+        text: Open an image → **Heart**.
+      - channel: api
+        text: "`PUT …/items/{item_id}/heart`, `DELETE …/items/{item_id}/heart`."
+    technical:
+      components:
+        - backend/app/moodboards/service.py
+        - frontend/src/features/moodboards/ItemDialog.tsx
+      endpoints:
+        - "PUT /orgs/{org_id}/projects/{project_id}/moodboards/{board_id}/items/{item_id}/heart"
+        - "DELETE /orgs/{org_id}/projects/{project_id}/moodboards/{board_id}/items/{item_id}/heart"
+        - "PUT /portal/projects/{project_id}/moodboards/{board_id}/items/{item_id}/heart"
+        - "DELETE /portal/projects/{project_id}/moodboards/{board_id}/items/{item_id}/heart"
+    acceptance:
+      - id: couple-hearts
+        kind: effect
+        text: After the bride hearts an image, it is hearted by her and lists her name.
+      - id: team-hearts-and-undoes
+        kind: effect
+        text: A planner's heart shows the planner's name; taking it back removes the name again.
+      - id: couple-undoes
+        kind: effect
+        text: When the couple takes their heart back, the image is no longer hearted by them.
+    evidence:
+      - kind: integration
+        file: backend/tests/test_moodboards.py
+        test: test_couple_uploads_hearts_and_comments
+        covers: [couple-hearts]
+      - kind: integration
+        file: backend/tests/test_moodboards.py
+        test: test_team_hearts_and_takes_them_back
+        covers: [team-hearts-and-undoes]
+      - kind: integration
+        file: backend/tests/test_moodboards.py
+        test: test_couple_takes_a_heart_back
+        covers: [couple-undoes]
+
+  - id: moodboards.comments
+    title: Comment on images
+    group: moodboards.feedback
+    summary: Planner and couple discuss single images; the team can also leave notes only the team sees.
+    usage:
+      - channel: web
+        text: Open an image → **Comments**; tick **Team only** for internal remarks.
+      - channel: portal
+        text: Open an image → write a comment.
+      - channel: api
+        text: "Couple: `…/items/{item_id}/comments`. Team: `…/projects/{project_id}/comments` with `target_type: moodboard_item`."
+    rules:
+      - Team-only comments never reach the couple.
+      - Comments on internal boards stay hidden from the couple, even at database level.
+    dependsOn: [moodboards.share-board]
+    technical:
+      components:
+        - backend/app/moodboards/router.py
+        - backend/app/tasks/service.py
+        - frontend/src/features/moodboards/ItemDialog.tsx
+      endpoints:
+        - "GET /portal/projects/{project_id}/moodboards/{board_id}/items/{item_id}/comments"
+        - "POST /portal/projects/{project_id}/moodboards/{board_id}/items/{item_id}/comments"
+      notes:
+        - "Team comments use the shared comments endpoints of the wedding (area Comments & notifications)."
+        - Restrictive policy `moodboard_scope` on `comments` for the couple.
+    acceptance:
+      - id: couple-comments
+        kind: effect
+        text: A comment the couple writes on an image is listed for that image.
+      - id: team-only-hidden
+        kind: rule
+        text: Of a team-only and a shared comment, the team sees both and the couple only the shared one.
+      - id: internal-board-hidden
+        kind: rule
+        text: Comments on images of an internal board are invisible to the couple, also directly in the database.
+        code: "404"
+    evidence:
+      - kind: integration
+        file: backend/tests/test_moodboards.py
+        test: test_couple_uploads_hearts_and_comments
+        covers: [couple-comments]
+      - kind: integration
+        file: backend/tests/test_moodboards.py
+        test: test_team_only_comments_stay_hidden_on_shared_boards
+        covers: [team-only-hidden]
+      - kind: integration
+        file: backend/tests/test_moodboards.py
+        test: test_comments_on_internal_boards_stay_hidden_from_the_couple
+        covers: [internal-board-hidden]
+
+  # --- Export and privacy ----------------------------------------------------------------
+  - id: moodboards.vendor-pdf
+    title: PDF for vendors
+    group: moodboards.export
+    summary: A PDF of the selected images with captions and palette that the planner sends to florist, baker and others.
+    description: |
+      Vendors get no access to the platform. The planner exports a board, or one section, and
+      sends the PDF. By default it holds only the selected images and leaves out comments,
+      hearts, internal notes, uploader names and the couple's name.
+    usage:
+      - channel: web
+        text: "Open a board → **PDF: selected** or **PDF: all ideas**."
+      - channel: api
+        text: "`GET …/moodboards/{board_id}/export.pdf?selected_only=&section=&include_couple=`."
+    rules:
+      - Anyone in the wedding team, including viewers, may export; the couple cannot.
+      - Every export is recorded in the audit log.
+    technical:
+      components:
+        - backend/app/moodboards/pdf.py
+        - backend/app/moodboards/pdf.css
+      endpoints:
+        - "GET /orgs/{org_id}/projects/{project_id}/moodboards/{board_id}/export.pdf"
+      notes:
+        - WeasyPrint with bundled fonts; needs Pango and HarfBuzz in the image.
+    acceptance:
+      - id: pdf-selected
+        kind: effect
+        text: A viewer downloads a PDF attachment of the selected images; the "all ideas" PDF of the same board is larger and discarded images are left out.
+      - id: export-audited
+        kind: effect
+        text: Each of the two exports is recorded in the audit log.
+      - id: couple-no-pdf
+        kind: rule
+        text: The couple cannot download the vendor PDF.
+        code: "404"
+    evidence:
+      - kind: integration
+        file: backend/tests/test_moodboards.py
+        test: test_pdf_export_for_vendors
+        covers: [pdf-selected, export-audited, couple-no-pdf]
+
+  - id: moodboards.privacy
+    title: Moodboards in data export and erasure
+    group: moodboards.export
+    summary: Moodboard images are part of the couple's data export and are deleted with their data.
+    usage:
+      - channel: web
+        text: Client → **Data protection** → export or erase.
+      - channel: api
+        text: "`GET …/clients/{client_id}/export`, `POST …/clients/{client_id}/erase`."
+    dependsOn: [moodboards.upload-images]
+    technical:
+      components:
+        - backend/app/privacy/service.py
+      endpoints:
+        - "GET /orgs/{org_id}/clients/{client_id}/export"
+        - "POST /orgs/{org_id}/clients/{client_id}/erase"
+    acceptance:
+      - id: in-export
+        kind: effect
+        text: The client export ZIP contains the original moodboard images under "moodboards/".
+      - id: erased
+        kind: effect
+        text: Erasing the client's data deletes all moodboard image files.
+    evidence:
+      - kind: integration
+        file: backend/tests/test_moodboards.py
+        test: test_client_export_contains_moodboard_images
+        covers: [in-export]
+      - kind: integration
+        file: backend/tests/test_moodboards.py
+        test: test_deleting_removes_files_and_erasure_covers_moodboards
+        covers: [erased]
