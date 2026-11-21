@@ -69,6 +69,15 @@ describe('route guards', () => {
     expect(router.state.location.pathname).toBe('/portal');
   });
 
+  it('sends accounts without any organization or wedding to the no-access page', async () => {
+    mockApi({ 'GET /me': [200, { ...meFixture('member'), memberships: [] }] });
+    const { router } = renderRoute('/app');
+
+    await screen.findByRole('heading', { name: 'No access yet' });
+    expect(router.state.location.pathname).toBe('/no-access');
+    expect(screen.getByRole('button', { name: 'Sign out' })).toBeInTheDocument();
+  });
+
   it('shows the planner navigation with the organization and sign-out', async () => {
     mockApi({ 'GET /me': [200, meFixture('member')] });
     renderRoute('/app');

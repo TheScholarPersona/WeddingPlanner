@@ -79,6 +79,7 @@ async def test_sign_in_with_code(app: FastAPI, world: World, owner_engine: Async
 
     wrong = await send(client, "POST", "/api/v1/auth/2fa/verify", json={"code": "000000"})
     assert wrong.status_code == 400
+    assert wrong.json()["code"] == "invalid_code"
     ok = await send(client, "POST", "/api/v1/auth/2fa/verify", json={"code": next_code(totp)})
     assert ok.status_code == 200
     assert ok.json()["email"] == "member@example.com"
@@ -103,6 +104,7 @@ async def test_recovery_codes_work_once(app: FastAPI, world: World) -> None:
     again, _ = await login(app, "member@example.com")
     reused = await send(again, "POST", "/api/v1/auth/2fa/verify", json={"code": codes[0]})
     assert reused.status_code == 400
+    assert reused.json()["code"] == "invalid_code"
     status = (await client.get("/api/v1/me/2fa")).json()
     assert status["recovery_codes_left"] == 9
 
@@ -152,6 +154,7 @@ async def test_disable_needs_password_and_code(world: World) -> None:
     )
 
     assert wrong.status_code == 400
+    assert wrong.json()["code"] == "invalid_current_password"
     assert ok.status_code == 204
     assert (await member.get("/api/v1/me")).json()["two_factor_enabled"] is False
 
@@ -189,3 +192,57 @@ async def test_a_code_works_only_once(app: FastAPI, world: World) -> None:
     replay = await send(second, "POST", "/api/v1/auth/2fa/verify", json={"code": code})
 
     assert replay.status_code == 400
+
+
+# --- Added for the feature catalog: criteria that had no test yet -------------------------
+
+
+async def test_cancelling_the_code_step_ends_the_half_finished_session(
+    app: FastAPI, world: World
+) -> None:
+    totp, _ = await turn_on(world["member"].client)
+    client, _ = await login(app, "member@example.com")
+
+    cancelled = await send(client, "POST", "/api/v1/auth/2fa/cancel")
+    later = await send(client, "POST", "/api/v1/auth/2fa/verify", json={"code": next_code(totp)})
+
+    assert cancelled.status_code == 204
+    assert later.status_code == 401
+    assert later.json()["code"] == "not_authenticated"  # no longer waiting for a code
+
+
+async def test_new_recovery_codes_replace_the_old_ones(app: FastAPI, world: World) -> None:
+    member = world["member"].client
+    _, old_codes = await turn_on(member)
+
+    fresh = await send(member, "POST", "/api/v1/me/2fa/recovery-codes")
+    new_codes = fresh.json()["recovery_codes"]
+    assert len(new_codes) == 10 and not set(new_codes) & set(old_codes)
+
+    client, _ = await login(app, "member@example.com")
+    old = await send(client, "POST", "/api/v1/auth/2fa/verify", json={"code": old_codes[0]})
+    new = await send(client, "POST", "/api/v1/auth/2fa/verify", json={"code": new_codes[0]})
+    assert old.status_code == 400
+    assert new.status_code == 200
+
+
+async def test_platform_admins_cannot_turn_off_two_factor(
+    world: World, owner_engine: AsyncEngine
+) -> None:
+    member = world["member"].client
+    totp, _ = await turn_on(member)
+    async with owner_engine.begin() as conn:
+        await conn.execute(
+            text("UPDATE users SET is_platform_admin = true WHERE email = 'member@example.com'")
+        )
+
+    response = await send(
+        member,
+        "POST",
+        "/api/v1/me/2fa/disable",
+        json={"password": PASSWORD, "code": next_code(totp)},
+    )
+
+    assert response.status_code == 409
+    assert response.json()["code"] == "two_factor_mandatory"
+    assert (await member.get("/api/v1/me")).json()["two_factor_enabled"] is True

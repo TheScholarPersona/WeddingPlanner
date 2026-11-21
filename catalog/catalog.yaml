@@ -41,7 +41,7 @@ areas:
   - id: account
     title: Account & sign-in
     summary: Signing in, passwords, invitations and two-factor authentication.
-    status: open
+    status: catalogued
     owns:
       endpoints: ["/auth", "/me"]
       uiRoutes: ["/login", "/forgot-password", "/reset-password", "/invite", "/no-access",

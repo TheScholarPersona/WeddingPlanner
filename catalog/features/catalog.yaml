@@ -205,6 +205,9 @@ features:
         kind: rule
         text: A feature without evidence is reported.
         code: EVIDENCE_MISSING
+      - id: imported-helpers
+        kind: effect
+        text: A test that calls the feature through a helper imported from another test module counts as touching the feature.
     evidence:
       - kind: unit
         file: tools/feature_catalog/tests/test_check.py
@@ -246,6 +249,10 @@ features:
         file: tools/feature_catalog/tests/test_check.py
         test: test_requires_evidence
         covers: [evidence-required]
+      - kind: unit
+        file: tools/feature_catalog/tests/test_check.py
+        test: test_follows_helpers_imported_from_other_test_modules
+        covers: [imported-helpers]
 
   - id: catalog.view
     title: Catalog view

@@ -5,7 +5,7 @@ from pathlib import Path
 from feature_catalog.analysis import Analysis
 from feature_catalog.calls import PythonCalls, ts_calls
 from feature_catalog.cli import main, run
-from tests.conftest import DISCOVERED, FEATURES, Repo
+from tests.conftest import DISCOVERED, FEATURES, TESTS, Repo
 
 ROOT = Path(__file__).resolve().parents[3]
 
@@ -236,3 +236,23 @@ def test_check_exits_with_an_error_code(repo: Repo) -> None:
     assert main(["check", "--root", str(repo.root)]) == 0
     repo.features(FEATURES.split("    evidence:")[0])
     assert main(["check", "--root", str(repo.root)]) == 1
+
+
+def test_follows_helpers_imported_from_other_test_modules(repo: Repo) -> None:
+    repo.write(
+        "backend/tests/helpers.py",
+        """
+        def reply(client, guest):
+            return client.post(f"/api/v1/guests/{guest}/rsvp", json={"plus_one": True})
+        """,
+    )
+    repo.write(
+        "backend/tests/test_rsvp.py",
+        TESTS.replace(
+            "def test_unrelated(client):",
+            "from tests.helpers import reply\n\n\ndef test_unrelated(client):\n"
+            "    assert reply(client, 'g1').json()['count'] == 2\n\n\ndef test_old(client):",
+        ),
+    )
+    repo.features(FEATURES.replace("test: test_saves_rsvp_with_plus_one", "test: test_unrelated"))
+    assert "EVIDENCE_UNRELATED" not in codes(check(repo))

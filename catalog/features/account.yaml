@@ -1,0 +1,629 @@
+area: account
+features:
+  # --- Sign-in and sessions --------------------------------------------------------------
+  - id: account.sign-in
+    title: Sign in
+    group: account.sign-in
+    summary: "Planners, couples and platform admins sign in with email and password and land on their start page."
+    description: |
+      After signing in, team members open the planner dashboard, couples their portal and
+      platform admins the admin area. Wrong passwords and unknown addresses get the same answer,
+      so nobody can find out who has an account. Repeated failures lock the account for a while,
+      and too many attempts from one place are slowed down.
+    usage:
+      - channel: web
+        text: "`/login` with email and password; after signing in the app opens where you wanted to go."
+      - channel: portal
+        text: "Couples use the same `/login` and land in their portal."
+      - channel: api
+        text: "`POST /auth/login` with `email` and `password`; returns the profile or `two_factor_required`."
+    rules:
+      - "Wrong password and unknown email give the same answer (`invalid_credentials`)."
+      - Too many failed sign-ins lock the account for a while, even for the right password.
+      - "Too many attempts per minute are refused (`429`)."
+    dependsOn: [account.two-factor-sign-in]
+    technical:
+      components:
+        - backend/app/auth/router.py
+        - backend/app/auth/service.py
+        - frontend/src/features/auth/LoginPage.tsx
+        - frontend/src/features/auth/session.ts
+      endpoints:
+        - "POST /auth/login"
+      uiRoutes:
+        - /login
+      settings:
+        - "`max_failed_logins`, `lockout_minutes`, `login_rate_limit_per_minute`"
+      notes:
+        - Passwords are hashed with Argon2id; every success and failure is in the audit log.
+    acceptance:
+      - id: lands-on-dashboard
+        kind: effect
+        text: "Signing in with the right credentials sends the planner to the dashboard."
+      - id: profile-after-sign-in
+        kind: effect
+        text: "After accepting an invitation and signing in, the profile lists the email and the organization membership."
+      - id: same-answer
+        kind: rule
+        text: "A wrong password and an unknown email get the identical refusal."
+        code: invalid_credentials
+      - id: lockout
+        kind: rule
+        text: "After the allowed number of failures the account refuses even the right password."
+        code: "401"
+      - id: rate-limit
+        kind: rule
+        text: "The sixth attempt within a minute is refused."
+        code: "429"
+      - id: clear-message
+        kind: effect
+        text: "The sign-in page shows a clear message when the credentials are wrong."
+    evidence:
+      - kind: unit
+        file: frontend/src/features/auth/auth.test.tsx
+        test: signs in and opens the planner dashboard
+        covers: [lands-on-dashboard]
+      - kind: integration
+        file: backend/tests/test_auth.py
+        test: test_accepting_an_invitation_creates_account_membership_and_session
+        covers: [profile-after-sign-in]
+      - kind: integration
+        file: backend/tests/test_auth.py
+        test: test_wrong_password_and_unknown_email_look_identical
+        covers: [same-answer]
+      - kind: integration
+        file: backend/tests/test_auth.py
+        test: test_account_locks_after_repeated_failures
+        covers: [lockout]
+      - kind: integration
+        file: backend/tests/test_auth.py
+        test: test_login_is_rate_limited
+        covers: [rate-limit]
+      - kind: unit
+        file: frontend/src/features/auth/auth.test.tsx
+        test: shows a clear message when the credentials are wrong
+        covers: [clear-message]
+
+  - id: account.sessions
+    title: Secure sessions and signing out
+    group: account.sign-in
+    summary: "A session lives in hardened cookies, every change needs a CSRF token, and signing out ends it on the server."
+    usage:
+      - channel: web
+        text: "**Sign out** in the navigation."
+      - channel: api
+        text: "`POST /auth/logout`; state-changing requests send the `X-CSRF-Token` header."
+    rules:
+      - "Session cookies are `HttpOnly`, `Secure`, `SameSite=Lax` and bound to the host."
+      - "Requests that change something without the CSRF token are refused (`csrf_failed`)."
+    technical:
+      components:
+        - backend/app/auth/service.py
+        - backend/app/authz/deps.py
+      endpoints:
+        - "POST /auth/login"
+        - "POST /auth/logout"
+    acceptance:
+      - id: hardened-cookies
+        kind: effect
+        text: "Signing in sets an HttpOnly, Secure, SameSite=Lax session cookie and a readable CSRF cookie."
+      - id: logout-ends-session
+        kind: effect
+        text: "After signing out, the old session is no longer signed in."
+      - id: csrf
+        kind: rule
+        text: "A sign-out request without the CSRF header is refused."
+        code: csrf_failed
+    evidence:
+      - kind: integration
+        file: backend/tests/test_auth.py
+        test: test_login_sets_hardened_cookies
+        covers: [hardened-cookies]
+      - kind: integration
+        file: backend/tests/test_auth.py
+        test: test_logout_ends_the_session
+        covers: [logout-ends-session]
+      - kind: integration
+        file: backend/tests/test_auth.py
+        test: test_state_changing_requests_need_the_csrf_header
+        covers: [csrf]
+
+  - id: account.route-guards
+    title: Right start page for every account
+    group: account.sign-in
+    summary: "The app sends each person to the part they may use and back to sign-in when the session is gone."
+    description: |
+      Anonymous visitors go to the sign-in page, which remembers where they wanted to go. Couples
+      never see the planner app. Accounts without any organization or wedding see a short
+      explanation instead of an empty app.
+    usage:
+      - channel: web
+        text: "Automatic; `/no-access` explains a missing membership."
+    rules:
+      - "After sign-in, only same-site relative paths are followed."
+    technical:
+      components:
+        - frontend/src/features/auth/guards.tsx
+        - frontend/src/features/auth/session.ts
+        - frontend/src/features/auth/NoAccessPage.tsx
+        - frontend/src/app/router.tsx
+      uiRoutes:
+        - /no-access
+    acceptance:
+      - id: anonymous-to-login
+        kind: effect
+        text: "An anonymous visitor of /app/team lands on /login with the page to return to."
+      - id: couples-to-portal
+        kind: effect
+        text: "A couple opening /app lands in the portal."
+      - id: no-access
+        kind: effect
+        text: "An account without any membership lands on /no-access and can sign out there."
+      - id: safe-next
+        kind: rule
+        text: "Links to other sites are ignored as return paths."
+    evidence:
+      - kind: unit
+        file: frontend/src/features/auth/auth.test.tsx
+        test: sends anonymous visitors to the login page and remembers where they wanted to go
+        covers: [anonymous-to-login]
+      - kind: unit
+        file: frontend/src/features/auth/auth.test.tsx
+        test: keeps clients out of the planner app
+        covers: [couples-to-portal]
+      - kind: unit
+        file: frontend/src/features/auth/auth.test.tsx
+        test: sends accounts without any organization or wedding to the no-access page
+        covers: [no-access]
+      - kind: unit
+        file: frontend/src/features/auth/auth.test.tsx
+        test: only allows same-site relative paths
+        covers: [safe-next]
+
+  - id: account.join-invitation
+    title: Join through an invitation
+    group: account.sign-in
+    summary: "An invitation link creates the account, or adds an existing account to another organization or wedding."
+    description: |
+      New people choose their name and a password of at least 12 characters. Someone who already
+      has an account confirms it with their password. Each link works once and expires.
+    usage:
+      - channel: web
+        text: "Open the link from the invitation email (`/invite/…`)."
+      - channel: email
+        text: "The invitation email holds the personal link."
+      - channel: api
+        text: "`GET /auth/invitations/{token}`, `POST /auth/invitations/{token}/accept`."
+    rules:
+      - "Used or expired links are refused (`invitation_invalid`)."
+      - "New passwords need at least 12 characters (`422`)."
+      - Existing accounts must confirm their password.
+    dependsOn: [account.two-factor-sign-in]
+    technical:
+      components:
+        - backend/app/auth/service.py
+        - frontend/src/features/auth/AcceptInvitationPage.tsx
+      endpoints:
+        - "GET /auth/invitations/{token}"
+        - "POST /auth/invitations/{token}/accept"
+      uiRoutes:
+        - /invite/:token
+    acceptance:
+      - id: new-account
+        kind: effect
+        text: "Accepting an invitation creates the account with its membership and signs the person in."
+      - id: existing-account
+        kind: effect
+        text: "An existing account joins a second organization after confirming its password, and then has two memberships."
+      - id: once-only
+        kind: rule
+        text: "A used link can neither be shown nor accepted again."
+        code: "404"
+      - id: expired
+        kind: rule
+        text: "An expired link is refused."
+        code: invitation_invalid
+      - id: long-password
+        kind: rule
+        text: "A new account with a short password is refused with the password field named."
+        code: "422"
+      - id: join-form
+        kind: effect
+        text: "The invitation page asks new people for their full name and a password of at least 12 characters."
+      - id: invalid-link-message
+        kind: effect
+        text: "An invalid link shows a message asking for a new invitation."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_auth.py
+        test: test_accepting_an_invitation_creates_account_membership_and_session
+        covers: [new-account]
+      - kind: integration
+        file: backend/tests/test_auth.py
+        test: test_existing_account_must_confirm_its_password_to_join
+        covers: [existing-account]
+      - kind: integration
+        file: backend/tests/test_auth.py
+        test: test_invitation_can_be_used_only_once
+        covers: [once-only]
+      - kind: integration
+        file: backend/tests/test_auth.py
+        test: test_expired_invitation_is_rejected
+        covers: [expired]
+      - kind: integration
+        file: backend/tests/test_auth.py
+        test: test_new_account_needs_a_long_password
+        covers: [long-password]
+      - kind: unit
+        file: frontend/src/features/auth/auth.test.tsx
+        test: asks new users for their name and a password
+        covers: [join-form]
+      - kind: unit
+        file: frontend/src/features/auth/auth.test.tsx
+        test: explains when an invitation is no longer valid
+        covers: [invalid-link-message]
+
+  - id: account.password-reset
+    title: Reset a forgotten password
+    group: account.sign-in
+    summary: "A one-time email link sets a new password and signs out every other session."
+    usage:
+      - channel: web
+        text: "`/forgot-password`, then the link from the email (`/reset-password`)."
+      - channel: email
+        text: "The reset email holds a link that works once."
+      - channel: api
+        text: "`POST /auth/password/forgot`, `POST /auth/password/reset`."
+    rules:
+      - The answer is the same whether an account exists or not; unknown addresses get no email.
+      - "A used or expired link is refused (`invalid_token`)."
+    technical:
+      components:
+        - backend/app/auth/service.py
+        - frontend/src/features/auth/ForgotPasswordPage.tsx
+        - frontend/src/features/auth/ResetPasswordPage.tsx
+      endpoints:
+        - "POST /auth/password/forgot"
+        - "POST /auth/password/reset"
+      uiRoutes:
+        - /forgot-password
+        - /reset-password
+    acceptance:
+      - id: reset-works
+        kind: effect
+        text: "With the emailed link a new password is set; it signs in, and the old session is signed out."
+      - id: link-once
+        kind: rule
+        text: "The same link cannot be used a second time."
+        code: invalid_token
+      - id: no-hint
+        kind: rule
+        text: "For an unknown address the request is accepted but no email is sent."
+      - id: neutral-message
+        kind: effect
+        text: "The page confirms the request without saying whether the account exists."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_auth.py
+        test: test_password_reset_flow
+        covers: [reset-works, link-once]
+      - kind: integration
+        file: backend/tests/test_auth.py
+        test: test_password_reset_for_unknown_email_sends_nothing
+        covers: [no-hint]
+      - kind: unit
+        file: frontend/src/features/auth/auth.test.tsx
+        test: confirms without revealing whether the account exists
+        covers: [neutral-message]
+
+  # --- Profile and password ----------------------------------------------------------------
+  - id: account.profile
+    title: Profile
+    group: account.profile
+    summary: "Everyone sees their account with name, email and memberships, and can change their name."
+    usage:
+      - channel: web
+        text: "**Account** in the navigation (`/app/account`, `/admin/account`)."
+      - channel: portal
+        text: "More → **Account** (`/portal/account`)."
+      - channel: api
+        text: "`GET /me`, `PATCH /me` with `full_name`."
+    rules:
+      - Name changes are recorded in the audit log.
+    technical:
+      components:
+        - backend/app/auth/router.py
+        - frontend/src/features/account/AccountPage.tsx
+      endpoints:
+        - "GET /me"
+        - "PATCH /me"
+      uiRoutes:
+        - /app/account
+        - /portal/account
+        - /admin/account
+    acceptance:
+      - id: name-changed
+        kind: effect
+        text: "A name entered with spaces around it is saved trimmed and shown from then on."
+      - id: audited
+        kind: effect
+        text: "The name change is recorded in the audit log."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_auth.py
+        test: test_profile_name_can_be_changed_and_is_audited
+        covers: [name-changed, audited]
+
+  - id: account.change-password
+    title: Change the password
+    group: account.profile
+    summary: "With the current password, everyone sets a new one; all other sessions are signed out."
+    usage:
+      - channel: web
+        text: "Account → **Change password**."
+      - channel: api
+        text: "`POST /me/password` with `current_password` and `new_password`."
+    rules:
+      - "A wrong current password is refused (`invalid_current_password`)."
+    technical:
+      components:
+        - backend/app/auth/router.py
+        - frontend/src/features/account/AccountPage.tsx
+      endpoints:
+        - "POST /me/password"
+    acceptance:
+      - id: others-signed-out
+        kind: effect
+        text: "After the change the current session stays signed in and a second session is signed out."
+      - id: wrong-current
+        kind: rule
+        text: "A wrong current password is refused."
+        code: invalid_current_password
+    evidence:
+      - kind: integration
+        file: backend/tests/test_auth.py
+        test: test_changing_password_signs_out_other_sessions
+        covers: [others-signed-out, wrong-current]
+
+  - id: account.reauth
+    title: Confirm the password for sensitive actions
+    group: account.profile
+    summary: "Turning on two-factor authentication, changing roles and similar actions need a password confirmation from the last few minutes."
+    usage:
+      - channel: web
+        text: "The app asks for the password when needed and then continues."
+      - channel: api
+        text: "`POST /auth/reauth` with `password`; otherwise `403 reauth_required`."
+    rules:
+      - "Without a recent confirmation the action is refused (`reauth_required`)."
+      - "A wrong password is refused and recorded (`invalid_credentials`)."
+    technical:
+      components:
+        - backend/app/auth/router.py
+        - backend/app/authz/deps.py
+      endpoints:
+        - "POST /auth/reauth"
+        - "POST /me/2fa/setup"
+      settings:
+        - "`reauth_window_minutes`"
+    acceptance:
+      - id: needs-recent
+        kind: rule
+        text: "Two-factor setup with a confirmation older than the window is refused."
+        code: reauth_required
+      - id: wrong-password
+        kind: rule
+        text: "A confirmation with the wrong password is refused and lands in the audit log; the right one is accepted."
+        code: invalid_credentials
+      - id: asks-in-app
+        kind: effect
+        text: "When the confirmation is too old, the app asks for the password first and then shows the setup."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_two_factor.py
+        test: test_setup_needs_a_recent_password_confirmation
+        covers: [needs-recent]
+      - kind: integration
+        file: backend/tests/test_auth.py
+        test: test_reauth_with_a_wrong_password_is_refused_and_audited
+        covers: [wrong-password]
+      - kind: unit
+        file: frontend/src/features/account/account.test.tsx
+        test: setup asks for the password first when the last confirmation is too old
+        covers: [asks-in-app]
+
+  # --- Two-factor authentication -----------------------------------------------------------
+  - id: account.two-factor-setup
+    title: Turn on two-factor authentication
+    group: account.two-factor
+    summary: "Scan a QR code with an authenticator app, confirm with a code and keep ten recovery codes."
+    description: |
+      Works with any TOTP app (for example 1Password, Google Authenticator). The secret is stored
+      encrypted; recovery codes are shown once and stored only as hashes.
+    usage:
+      - channel: web
+        text: "Account → **Two-factor authentication** → **Turn on**."
+      - channel: api
+        text: "`POST /me/2fa/setup`, then `POST /me/2fa/enable` with `code`; `GET /me/2fa` for the status."
+    rules:
+      - Needs a recent password confirmation.
+    dependsOn: [account.reauth]
+    technical:
+      components:
+        - backend/app/auth/two_factor.py
+        - backend/app/core/crypto.py
+        - frontend/src/features/account/TwoFactorCard.tsx
+      endpoints:
+        - "GET /me/2fa"
+        - "POST /me/2fa/setup"
+        - "POST /me/2fa/enable"
+    acceptance:
+      - id: turned-on
+        kind: effect
+        text: "After setup with a valid code the account has two-factor authentication on and ten recovery codes; the secret is stored encrypted."
+      - id: shown-once
+        kind: effect
+        text: "The app shows the QR code during setup and the recovery codes once afterwards."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_two_factor.py
+        test: test_sign_in_with_code
+        covers: [turned-on]
+      - kind: unit
+        file: frontend/src/features/account/account.test.tsx
+        test: turning on two-factor authentication shows the QR code and recovery codes once
+        covers: [shown-once]
+
+  - id: account.two-factor-sign-in
+    title: Sign in with a second factor
+    group: account.two-factor
+    summary: "With two-factor authentication on, sign-in asks for a code from the app or a recovery code."
+    description: |
+      Until the code is entered, the session can reach nothing else. Each code works once,
+      wrong codes are limited, and invitations do not skip this step.
+    usage:
+      - channel: web
+        text: "After the password the sign-in page asks for the **Authentication code**."
+      - channel: api
+        text: "`POST /auth/2fa/verify` with `code`; `POST /auth/2fa/cancel` to give up."
+    rules:
+      - "Until verified, every other request is refused (`two_factor_pending`)."
+      - "Wrong or reused codes are refused (`invalid_code`)."
+      - After five wrong codes the attempt ends and the person signs in again.
+      - Recovery codes work once each.
+    technical:
+      components:
+        - backend/app/auth/router.py
+        - backend/app/auth/two_factor.py
+        - frontend/src/features/auth/LoginPage.tsx
+      endpoints:
+        - "POST /auth/2fa/verify"
+        - "POST /auth/2fa/cancel"
+    acceptance:
+      - id: code-signs-in
+        kind: effect
+        text: "After the password, the right code completes the sign-in and the profile is available."
+      - id: pending-blocked
+        kind: rule
+        text: "Before the code, the profile and organization data are refused."
+        code: two_factor_pending
+      - id: wrong-code
+        kind: rule
+        text: "A wrong code is refused."
+        code: invalid_code
+      - id: code-once
+        kind: rule
+        text: "A code that was already used cannot sign in a second session."
+        code: "400"
+      - id: recovery-once
+        kind: rule
+        text: "A recovery code signs in once, and nine remain; the same code is refused next time."
+        code: invalid_code
+      - id: too-many-wrong
+        kind: rule
+        text: "After five wrong codes the half-finished session ends."
+        code: "401"
+      - id: invitation-no-skip
+        kind: rule
+        text: "Accepting an invitation with an account that has two-factor on still asks for the code."
+      - id: cancel
+        kind: effect
+        text: "Cancelling the code step ends the half-finished session."
+      - id: code-ui
+        kind: effect
+        text: "The sign-in page asks for the code, explains a wrong one and accepts the right one."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_two_factor.py
+        test: test_sign_in_with_code
+        covers: [code-signs-in, pending-blocked, wrong-code]
+      - kind: integration
+        file: backend/tests/test_two_factor.py
+        test: test_a_code_works_only_once
+        covers: [code-once]
+      - kind: integration
+        file: backend/tests/test_two_factor.py
+        test: test_recovery_codes_work_once
+        covers: [recovery-once]
+      - kind: integration
+        file: backend/tests/test_two_factor.py
+        test: test_too_many_wrong_codes_end_the_attempt
+        covers: [too-many-wrong]
+      - kind: integration
+        file: backend/tests/test_two_factor.py
+        test: test_invitation_acceptance_does_not_skip_the_second_factor
+        covers: [invitation-no-skip]
+      - kind: integration
+        file: backend/tests/test_two_factor.py
+        test: test_cancelling_the_code_step_ends_the_half_finished_session
+        covers: [cancel]
+      - kind: unit
+        file: frontend/src/features/account/account.test.tsx
+        test: signing in with two-factor authentication asks for the code
+        covers: [code-ui]
+
+  - id: account.recovery-codes
+    title: New recovery codes
+    group: account.two-factor
+    summary: "Ten fresh recovery codes replace the old ones, for example when some were used up."
+    usage:
+      - channel: web
+        text: "Account → Two-factor authentication → **New recovery codes**."
+      - channel: api
+        text: "`POST /me/2fa/recovery-codes` (needs a recent password confirmation)."
+    dependsOn: [account.two-factor-setup]
+    technical:
+      components:
+        - backend/app/auth/two_factor.py
+        - frontend/src/features/account/TwoFactorCard.tsx
+      endpoints:
+        - "POST /me/2fa/recovery-codes"
+    acceptance:
+      - id: replaced
+        kind: effect
+        text: "New codes differ from the old ones; an old code no longer signs in, a new one does."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_two_factor.py
+        test: test_new_recovery_codes_replace_the_old_ones
+        covers: [replaced]
+
+  - id: account.two-factor-disable
+    title: Turn off two-factor authentication
+    group: account.two-factor
+    summary: "With password and a current code, people turn it off again; platform admins cannot."
+    usage:
+      - channel: web
+        text: "Account → Two-factor authentication → **Turn off**."
+      - channel: api
+        text: "`POST /me/2fa/disable` with `password` and `code`."
+    rules:
+      - "A wrong password is refused (`invalid_current_password`)."
+      - "Platform admins must keep it on (`two_factor_mandatory`)."
+    technical:
+      components:
+        - backend/app/auth/router.py
+        - backend/app/auth/two_factor.py
+      endpoints:
+        - "POST /me/2fa/disable"
+    acceptance:
+      - id: turned-off
+        kind: effect
+        text: "With the right password and code, two-factor authentication is off afterwards."
+      - id: wrong-password
+        kind: rule
+        text: "A wrong password is refused."
+        code: invalid_current_password
+      - id: admins-keep-it
+        kind: rule
+        text: "A platform admin cannot turn it off; it stays on."
+        code: two_factor_mandatory
+    evidence:
+      - kind: integration
+        file: backend/tests/test_two_factor.py
+        test: test_disable_needs_password_and_code
+        covers: [turned-off, wrong-password]
+      - kind: integration
+        file: backend/tests/test_two_factor.py
+        test: test_platform_admins_cannot_turn_off_two_factor
+        covers: [admins-keep-it]
