@@ -68,6 +68,7 @@ async def test_wrong_password_and_unknown_email_look_identical(app: FastAPI) -> 
 
     assert wrong.status_code == unknown.status_code == 401
     assert wrong.json() == unknown.json()
+    assert wrong.json()["code"] == "invalid_credentials"
 
 
 async def test_account_locks_after_repeated_failures(app: FastAPI, monkeypatch) -> None:  # type: ignore[no-untyped-def]
@@ -95,7 +96,9 @@ async def test_logout_ends_the_session(app: FastAPI) -> None:
     client = await _signed_up(app)
 
     assert (await send(client, "POST", "/api/v1/auth/logout")).status_code == 204
-    assert (await client.get("/api/v1/me")).status_code == 401
+    after = await client.get("/api/v1/me")
+    assert after.status_code == 401
+    assert after.json()["code"] == "not_authenticated"
 
 
 async def test_state_changing_requests_need_the_csrf_header(app: FastAPI) -> None:
@@ -123,6 +126,7 @@ async def test_password_reset_flow(app: FastAPI) -> None:
     assert forgot.status_code == 202
     assert reset.status_code == 204
     assert reused.status_code == 400
+    assert reused.json()["code"] == "invalid_token"
     assert (await old_session.get("/api/v1/me")).status_code == 401
     assert await _login(client, "a brand new password") == 200
 
@@ -213,6 +217,48 @@ async def test_changing_password_signs_out_other_sessions(app: FastAPI) -> None:
     )
 
     assert wrong.status_code == 400
+    assert wrong.json()["code"] == "invalid_current_password"
     assert right.status_code == 204
     assert (await first.get("/api/v1/me")).status_code == 200
     assert (await second.get("/api/v1/me")).status_code == 401
+
+
+# --- Added for the feature catalog: criteria that had no test yet -------------------------
+
+
+async def test_profile_name_can_be_changed_and_is_audited(
+    app: FastAPI, owner_engine: AsyncEngine
+) -> None:
+    client = await _signed_up(app)
+
+    updated = await send(client, "PATCH", "/api/v1/me", json={"full_name": "  Ada Lovelace "})
+
+    assert updated.json()["full_name"] == "Ada Lovelace"
+    assert (await client.get("/api/v1/me")).json()["full_name"] == "Ada Lovelace"
+    async with owner_engine.begin() as conn:
+        actions = (
+            (await conn.execute(text("SELECT action FROM audit_log WHERE action = 'user.updated'")))
+            .scalars()
+            .all()
+        )
+    assert actions == ["user.updated"]
+
+
+async def test_reauth_with_a_wrong_password_is_refused_and_audited(
+    app: FastAPI, owner_engine: AsyncEngine
+) -> None:
+    client = await _signed_up(app)
+
+    wrong = await send(client, "POST", "/api/v1/auth/reauth", json={"password": "not it"})
+    right = await send(client, "POST", "/api/v1/auth/reauth", json={"password": PASSWORD})
+
+    assert wrong.status_code == 401
+    assert wrong.json()["code"] == "invalid_credentials"
+    assert right.status_code == 204
+    async with owner_engine.begin() as conn:
+        failed = (
+            await conn.execute(
+                text("SELECT count(*) FROM audit_log WHERE action = 'auth.reauth_failed'")
+            )
+        ).scalar_one()
+    assert failed == 1

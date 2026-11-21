@@ -27,6 +27,7 @@ STATUS_ONLY_TS = re.compile(
     r"expect\([^)]*(status\(\)|\.ok\(\))\)\.(toBe|toEqual)\([^)]*\)"
     r"|\.toBeTruthy\(\)|\.toBeDefined\(\)|\.not\.toBeNull\(\)"
 )
+IMPORT_WORDS = {"import", "type", "from", "as"}
 TS_ASSERT = re.compile(r"\bexpect(\.soft|\.poll)?\(|\bassert\(")
 
 
@@ -63,6 +64,37 @@ def _segment(source: str, node: ast.AST) -> str:
     lines = source.splitlines()
     start = min([d.lineno for d in getattr(node, "decorator_list", [])] + [node.lineno])  # type: ignore[attr-defined]
     return "\n".join(lines[start - 1 : node.end_lineno])  # type: ignore[attr-defined]
+
+
+def _module_file(path: Path, module: str) -> Path | None:
+    """`tests.helpers` imported from backend/tests/test_x.py -> backend/tests/helpers.py."""
+    relative = Path(*module.split(".")).with_suffix(".py")
+    for parent in path.parents:
+        if (parent / relative).exists():
+            return parent / relative
+    return None
+
+
+def _imported_helpers(path: Path, tree: ast.Module, used: set[str]) -> list[str]:
+    """Sources of used helper functions imported from other test modules (one level deep)."""
+    texts: list[str] = []
+    for node in tree.body:
+        if not isinstance(node, ast.ImportFrom) or not node.module:
+            continue
+        names = {a.name for a in node.names if (a.asname or a.name) in used}
+        if not names or node.module.split(".")[0] not in ("tests", "test"):
+            continue
+        file = _module_file(path, node.module)
+        if file is None:
+            continue
+        source = file.read_text(encoding="utf-8")
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", SyntaxWarning)
+            other = ast.parse(source)
+        for fn in other.body:
+            if isinstance(fn, ast.FunctionDef | ast.AsyncFunctionDef) and fn.name in names:
+                texts.append(_segment(source, fn))
+    return texts
 
 
 def python_test(path: Path, test: str) -> TestBody:
@@ -115,6 +147,7 @@ def python_test(path: Path, test: str) -> TestBody:
         for n in tree.body
         if isinstance(n, ast.ImportFrom) and {a.asname or a.name for a in n.names} & used
     ]
+    texts += _imported_helpers(path, tree, used)
     return TestBody(
         found=True,
         text="\n".join(texts),
@@ -180,6 +213,12 @@ def ts_test(path: Path, test: str) -> TestBody:
                     block = _block(source, helper.start())
                     texts.append(block)
                     todo.append(block)
+    # Imports of names the test uses show which modules it exercises.
+    joined = "\n".join(texts)
+    for line in re.findall(r"^import\s+[^;]+?from\s+['\"][^'\"]+['\"];?$", source, re.M):
+        names = re.findall(r"\b\w+\b", line.split("from")[0])
+        if any(re.search(rf"\b{re.escape(n)}\b", joined) for n in names if n not in IMPORT_WORDS):
+            texts.append(line)
     assertions = len(TS_ASSERT.findall(body))
     status = len(STATUS_ONLY_TS.findall(body))
     return TestBody(

@@ -14,7 +14,7 @@ from feature_catalog.model import Area, Feature
 from feature_catalog.testcode import TestBody, inspect_test
 
 Level = Literal["error", "warning", "info"]
-GENERIC_SEGMENTS = {"orgs", "projects", "portal", "api", "v1", "me", "app"}
+GENERIC_SEGMENTS = {"orgs", "projects", "portal", "api", "v1", "app"}
 # Error codes: snake_case with an underscore, UPPER_SNAKE or an HTTP status (`too_many_images`).
 CODE_IN_RULE = re.compile(r"`([a-z]+(?:_[a-z0-9]+)+|[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+|[1-5]\d\d)`")
 UNKNOWN_CODES = {
@@ -88,13 +88,17 @@ def _segments(path: str) -> list[str]:
 def related(feature: Feature, body: TestBody) -> bool:
     """Does the test body touch a part of the feature (N4)? Heuristic for a warning."""
     text = body.text
+
+    def has(word: str) -> bool:
+        return re.search(rf"(?<![A-Za-z0-9_]){re.escape(word)}(?![A-Za-z0-9_])", text) is not None
+
     for endpoint in feature.technical.endpoints:
         segments = _segments(endpoint.split(" ", 1)[1])
-        if segments and all(s in text for s in segments):
+        if segments and all(has(s) for s in segments):
             return True
     for route in feature.technical.uiRoutes:
         segments = _segments(route)
-        if segments and all(s in text for s in segments):
+        if segments and all(has(s) for s in segments):
             return True
     for component in feature.technical.components:
         if PurePosixPath(component).stem in text:
