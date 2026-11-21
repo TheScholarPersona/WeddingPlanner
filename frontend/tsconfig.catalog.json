@@ -1,0 +1,10 @@
+{
+  // Catalog export tests write files with Node APIs; the app itself gets no Node types.
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.catalog.tsbuildinfo",
+    "types": ["vitest/globals", "@testing-library/jest-dom", "node"]
+  },
+  "include": ["src/**/*.catalog.test.tsx", "src/vite-env.d.ts"],
+  "exclude": []
+}

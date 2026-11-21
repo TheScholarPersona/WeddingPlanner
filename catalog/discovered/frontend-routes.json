@@ -1,0 +1,257 @@
+{
+  "generatedBy": "frontend/src/app/routes.catalog.test.tsx",
+  "routes": [
+    {
+      "path": "/",
+      "component": "Navigate",
+      "file": null,
+      "guard": null
+    },
+    {
+      "path": "/*",
+      "component": "NotFoundPage",
+      "file": "frontend/src/app/NotFoundPage.tsx",
+      "guard": null
+    },
+    {
+      "path": "/admin",
+      "component": "AdminOrganizationsPage",
+      "file": "frontend/src/features/admin/AdminOrganizationsPage.tsx",
+      "guard": "RequireAdmin"
+    },
+    {
+      "path": "/admin/account",
+      "component": "AccountPage",
+      "file": "frontend/src/features/account/AccountPage.tsx",
+      "guard": "RequireAdmin"
+    },
+    {
+      "path": "/admin/organizations/:id",
+      "component": "AdminSupportPage",
+      "file": "frontend/src/features/admin/AdminSupportPage.tsx",
+      "guard": "RequireAdmin"
+    },
+    {
+      "path": "/app",
+      "component": "DashboardPage",
+      "file": "frontend/src/features/planner/DashboardPage.tsx",
+      "guard": "RequireTeam"
+    },
+    {
+      "path": "/app/account",
+      "component": "AccountPage",
+      "file": "frontend/src/features/account/AccountPage.tsx",
+      "guard": "RequireTeam"
+    },
+    {
+      "path": "/app/calendar",
+      "component": "CalendarPage",
+      "file": "frontend/src/features/calendar/CalendarPage.tsx",
+      "guard": "RequireTeam"
+    },
+    {
+      "path": "/app/clients",
+      "component": "ClientsPage",
+      "file": "frontend/src/features/clients/ClientsPage.tsx",
+      "guard": "RequireTeam"
+    },
+    {
+      "path": "/app/clients/:id",
+      "component": "ClientPage",
+      "file": "frontend/src/features/clients/ClientPage.tsx",
+      "guard": "RequireTeam"
+    },
+    {
+      "path": "/app/notifications",
+      "component": "NotificationsPage",
+      "file": "frontend/src/features/notifications/NotificationsPage.tsx",
+      "guard": "RequireTeam"
+    },
+    {
+      "path": "/app/settings",
+      "component": "SettingsPage",
+      "file": "frontend/src/features/settings/SettingsPage.tsx",
+      "guard": "RequireTeam"
+    },
+    {
+      "path": "/app/tasks",
+      "component": "MyTasksPage",
+      "file": "frontend/src/features/tasks/MyTasksPage.tsx",
+      "guard": "RequireTeam"
+    },
+    {
+      "path": "/app/team",
+      "component": "TeamPage",
+      "file": "frontend/src/features/team/TeamPage.tsx",
+      "guard": "RequireTeam"
+    },
+    {
+      "path": "/app/templates",
+      "component": "TemplatesPage",
+      "file": "frontend/src/features/templates/TemplatesPage.tsx",
+      "guard": "RequireTeam"
+    },
+    {
+      "path": "/app/templates/:id",
+      "component": "TemplatePage",
+      "file": "frontend/src/features/templates/TemplatePage.tsx",
+      "guard": "RequireTeam"
+    },
+    {
+      "path": "/app/vendors",
+      "component": "VendorsPage",
+      "file": "frontend/src/features/vendors/VendorsPage.tsx",
+      "guard": "RequireTeam"
+    },
+    {
+      "path": "/app/weddings",
+      "component": "WeddingsPage",
+      "file": "frontend/src/features/weddings/WeddingsPage.tsx",
+      "guard": "RequireTeam"
+    },
+    {
+      "path": "/app/weddings/:id",
+      "component": "WeddingPage",
+      "file": "frontend/src/features/weddings/WeddingPage.tsx",
+      "guard": "RequireTeam"
+    },
+    {
+      "path": "/app/weddings/:id/budget",
+      "component": "BudgetPage",
+      "file": "frontend/src/features/budget/BudgetPage.tsx",
+      "guard": "RequireTeam"
+    },
+    {
+      "path": "/app/weddings/:id/calendar",
+      "component": "WeddingCalendarPage",
+      "file": "frontend/src/features/calendar/WeddingCalendarPage.tsx",
+      "guard": "RequireTeam"
+    },
+    {
+      "path": "/app/weddings/:id/documents",
+      "component": "DocumentsPage",
+      "file": "frontend/src/features/documents/DocumentsPage.tsx",
+      "guard": "RequireTeam"
+    },
+    {
+      "path": "/app/weddings/:id/moodboards",
+      "component": "MoodboardsPage",
+      "file": "frontend/src/features/moodboards/pages.tsx",
+      "guard": "RequireTeam"
+    },
+    {
+      "path": "/app/weddings/:id/moodboards/:boardId",
+      "component": "MoodboardPage",
+      "file": "frontend/src/features/moodboards/pages.tsx",
+      "guard": "RequireTeam"
+    },
+    {
+      "path": "/app/weddings/:id/tasks",
+      "component": "WeddingTasksPage",
+      "file": "frontend/src/features/tasks/WeddingTasksPage.tsx",
+      "guard": "RequireTeam"
+    },
+    {
+      "path": "/app/weddings/new",
+      "component": "NewWeddingPage",
+      "file": "frontend/src/features/weddings/NewWeddingPage.tsx",
+      "guard": "RequireTeam"
+    },
+    {
+      "path": "/forgot-password",
+      "component": "ForgotPasswordPage",
+      "file": "frontend/src/features/auth/ForgotPasswordPage.tsx",
+      "guard": null
+    },
+    {
+      "path": "/invite/:token",
+      "component": "AcceptInvitationPage",
+      "file": "frontend/src/features/auth/AcceptInvitationPage.tsx",
+      "guard": null
+    },
+    {
+      "path": "/login",
+      "component": "LoginPage",
+      "file": "frontend/src/features/auth/LoginPage.tsx",
+      "guard": null
+    },
+    {
+      "path": "/no-access",
+      "component": "NoAccessPage",
+      "file": "frontend/src/features/auth/NoAccessPage.tsx",
+      "guard": null
+    },
+    {
+      "path": "/portal",
+      "component": "PortalHomePage",
+      "file": "frontend/src/features/portal/PortalHomePage.tsx",
+      "guard": "RequireClient"
+    },
+    {
+      "path": "/portal/account",
+      "component": "AccountPage",
+      "file": "frontend/src/features/account/AccountPage.tsx",
+      "guard": "RequireClient"
+    },
+    {
+      "path": "/portal/budget",
+      "component": "PortalBudgetPage",
+      "file": "frontend/src/features/portal/PortalBudgetPage.tsx",
+      "guard": "RequireClient"
+    },
+    {
+      "path": "/portal/calendar",
+      "component": "PortalCalendarPage",
+      "file": "frontend/src/features/portal/PortalCalendarPage.tsx",
+      "guard": "RequireClient"
+    },
+    {
+      "path": "/portal/files",
+      "component": "PortalFilesPage",
+      "file": "frontend/src/features/portal/PortalFilesPage.tsx",
+      "guard": "RequireClient"
+    },
+    {
+      "path": "/portal/inspiration",
+      "component": "PortalInspirationPage",
+      "file": "frontend/src/features/moodboards/pages.tsx",
+      "guard": "RequireClient"
+    },
+    {
+      "path": "/portal/inspiration/:boardId",
+      "component": "PortalBoardPage",
+      "file": "frontend/src/features/moodboards/pages.tsx",
+      "guard": "RequireClient"
+    },
+    {
+      "path": "/portal/more",
+      "component": "PortalMorePage",
+      "file": "frontend/src/features/moodboards/pages.tsx",
+      "guard": "RequireClient"
+    },
+    {
+      "path": "/portal/notifications",
+      "component": "PortalNotificationsPage",
+      "file": "frontend/src/features/portal/PortalNotificationsPage.tsx",
+      "guard": "RequireClient"
+    },
+    {
+      "path": "/portal/privacy",
+      "component": "PortalPrivacyPage",
+      "file": "frontend/src/features/portal/PortalPrivacyPage.tsx",
+      "guard": "RequireClient"
+    },
+    {
+      "path": "/portal/tasks",
+      "component": "PortalTasksPage",
+      "file": "frontend/src/features/portal/PortalTasksPage.tsx",
+      "guard": "RequireClient"
+    },
+    {
+      "path": "/reset-password",
+      "component": "ResetPasswordPage",
+      "file": "frontend/src/features/auth/ResetPasswordPage.tsx",
+      "guard": null
+    }
+  ]
+}

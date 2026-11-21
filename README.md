@@ -176,10 +176,19 @@ make typecheck   # mypy (strict), tsc
 make api-types   # regenerate the typed API client after backend changes
 make loadtest email=... password=...   # p95 per endpoint, 20 users for 30 s
 make migration m="describe change"
+make catalog     # check the feature catalog (docs/feature-katalog.md)
+make catalog-export  # after changing routes, jobs, commands or pages
 ```
 
 Run the frontend without Docker with `cd frontend && npm run dev`; it proxies `/api` to
 `http://localhost:8000`.
+
+### Feature catalog
+
+`catalog/` lists what the app can do, checked against the code and the test results: every
+feature has acceptance criteria and passing tests as evidence. CI publishes the view as artifact
+`feature-catalog`; locally `make catalog-full` builds `catalog/dist/index.html`. Rules and upkeep:
+[docs/feature-katalog.md](docs/feature-katalog.md).
 
 ## Security rules every change follows
 
@@ -198,5 +207,7 @@ Run the frontend without Docker with `cd frontend && npm run dev`; it proxies `/
 backend/    FastAPI app, Alembic migrations, tests
 frontend/   React app, unit tests, Playwright e2e tests
 docker/     Caddy, PostgreSQL init, SeaweedFS
+catalog/    Feature catalog (YAML) and the parts of the app discovered by tests
+tools/      Feature catalog tool (checks catalog/, builds the view)
 docs/adr/   Architecture decision records
 ```

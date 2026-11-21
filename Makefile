@@ -1,7 +1,7 @@
 .DEFAULT_GOAL := help
 COMPOSE := docker compose
 
-.PHONY: help setup up down logs org demo admin loadtest lan lan-off migrate migration test test-backend test-frontend e2e lint format typecheck api-types trust-cert clean
+.PHONY: help setup up down logs org demo admin loadtest lan lan-off catalog catalog-export catalog-full migrate migration test test-backend test-frontend e2e lint format typecheck api-types trust-cert clean
 
 help: ## Show available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}'
@@ -32,6 +32,24 @@ admin: ## Make an account a platform admin: make admin email=you@example.com
 
 loadtest: ## Load test against the stack: make loadtest email=... password=...
 	cd backend && uv run python scripts/loadtest.py --email "$(email)" --password "$(password)"
+
+CATALOG := cd tools/feature_catalog && uv run python -m feature_catalog
+
+catalog: ## Check the feature catalog against the code (static; see docs/feature-katalog.md)
+	$(CATALOG) check --root ../..
+
+catalog-export: ## Refresh catalog/discovered/ after changing routes, jobs, commands or pages
+	cd backend && UPDATE_SNAPSHOTS=1 uv run pytest -q tests/test_catalog_export.py
+	cd frontend && UPDATE_SNAPSHOTS=1 npx vitest run src/app/routes.catalog.test.tsx
+
+catalog-full: ## Run all tests with reports, check the catalog and build catalog/dist/index.html
+	rm -rf reports && mkdir -p reports
+	cd backend && uv run pytest -q -o junit_suite_name=backend --junitxml=../reports/backend.xml
+	cd frontend && JUNIT_DIR=$(CURDIR)/reports npm test
+	cd frontend && JUNIT_DIR=$(CURDIR)/reports npx playwright test --trace off
+	cd tools/feature_catalog && uv run pytest -q --junitxml=../../reports/catalog-tool.xml
+	$(CATALOG) build --root ../.. --reports ../../reports --out catalog/dist
+	$(CATALOG) check --root ../.. --reports ../../reports
 
 migrate: ## Apply database migrations
 	$(COMPOSE) exec api alembic upgrade head

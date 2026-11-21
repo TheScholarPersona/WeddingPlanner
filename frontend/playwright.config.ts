@@ -7,7 +7,13 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
-  reporter: process.env.CI ? 'github' : 'list',
+  reporter: [
+    [process.env.CI ? 'github' : 'list'],
+    // JUNIT_DIR=../reports also writes a JUnit report for the feature catalog check.
+    ...(process.env.JUNIT_DIR
+      ? [['junit', { outputFile: `${process.env.JUNIT_DIR}/e2e.xml` }] as const]
+      : []),
+  ],
   // Caddy's local CA is not trusted by the test browser; only relevant for https://localhost.
   use: { baseURL, trace: 'off', ignoreHTTPSErrors: baseURL.startsWith('https://localhost') },
   projects: [
