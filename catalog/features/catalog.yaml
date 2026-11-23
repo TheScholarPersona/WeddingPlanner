@@ -205,6 +205,9 @@ features:
         kind: rule
         text: A feature without evidence is reported.
         code: EVIDENCE_MISSING
+      - id: generic-paths
+        kind: effect
+        text: "A path of only generic segments (`/portal/projects`) counts when it appears as a whole, but not as part of a longer path."
       - id: imported-helpers
         kind: effect
         text: A test that calls the feature through a helper imported from another test module counts as touching the feature.
@@ -253,6 +256,10 @@ features:
         file: tools/feature_catalog/tests/test_check.py
         test: test_follows_helpers_imported_from_other_test_modules
         covers: [imported-helpers]
+      - kind: unit
+        file: tools/feature_catalog/tests/test_check.py
+        test: test_paths_of_only_generic_segments_are_matched_as_a_whole
+        covers: [generic-paths]
 
   - id: catalog.view
     title: Catalog view

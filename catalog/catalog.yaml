@@ -189,7 +189,7 @@ areas:
   - id: portal
     title: Couple's portal
     summary: Inviting the couple, their access and the portal's home page.
-    status: open
+    status: catalogued
     owns:
       endpoints: ["GET /portal/projects", "GET /portal/projects/{project_id}",
                   "/orgs/{org_id}/projects/{project_id}/client-access"]

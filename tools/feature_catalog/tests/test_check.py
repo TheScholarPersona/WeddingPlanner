@@ -256,3 +256,34 @@ def test_follows_helpers_imported_from_other_test_modules(repo: Repo) -> None:
     )
     repo.features(FEATURES.replace("test: test_saves_rsvp_with_plus_one", "test: test_unrelated"))
     assert "EVIDENCE_UNRELATED" not in codes(check(repo))
+
+
+def test_paths_of_only_generic_segments_are_matched_as_a_whole(repo: Repo) -> None:
+    data = dict(DISCOVERED)
+    data["endpoints"] = [
+        *DISCOVERED["endpoints"],
+        {
+            "method": "GET",
+            "path": "/portal/projects",
+            "summary": "",
+            "roles": ["couple"],
+            "permission": None,
+            "handler": "",
+        },
+    ]
+    repo.discovered(data)
+    repo.write(
+        "backend/tests/test_rsvp.py",
+        TESTS
+        + "\n\ndef test_portal(client):\n"
+        + "    assert client.get('/api/v1/portal/projects').json() == []\n"
+        + "\n\ndef test_portal_export(client):\n"
+        + "    assert client.get('/api/v1/portal/projects-export').json() == []\n",
+    )
+    text = FEATURES.replace('"GET /guests"]', '"GET /guests", "GET /portal/projects"]').replace(
+        '"POST /guests/{guest_id}/rsvp", ', ""
+    )
+    for test, related in (("test_portal", True), ("test_portal_export", False)):
+        repo.features(text.replace("test: test_saves_rsvp_with_plus_one", f"test: {test}"))
+        found = codes(check(repo))
+        assert ("EVIDENCE_UNRELATED" not in found) is related, test
