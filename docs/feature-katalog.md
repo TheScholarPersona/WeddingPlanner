@@ -17,9 +17,10 @@ Only features proven by passing tests are in the catalog. Everything else sits i
 |---|---|---|
 | Account & sign-in | catalogued | 12, all proven |
 | Data protection | catalogued | 7, all proven |
+| Couple's portal | catalogued | 6, all proven |
 | Moodboards | catalogued (pilot) | 14, all proven |
 | Feature catalog | catalogued | 5, all proven |
-| 11 other areas | open | – |
+| 10 other areas | open | – |
 
 All 236 parts of the app are already assigned to an area: 184 endpoints, 42 pages, 6 worker jobs
 and 4 CLI commands. In open areas, parts without a feature are only notes.
@@ -129,8 +130,7 @@ tool's own tests, checks the catalog against all reports and uploads the view as
 
 ## Next areas
 
-Suggested order: Couple's portal and Platform operations (access and security first), then the
-planning areas. "Organization requires two-factor authentication" belongs to Organization & team.
+Suggested order: Platform operations (access and security first), then the planning areas. "Organization requires two-factor authentication" belongs to Organization & team.
 
 Expect gaps like those found so far. Before the moodboards pilot, sections, team hearts, the
 couple's image access and the limits had no test (ten backend tests added). For Account & sign-in,
@@ -138,5 +138,6 @@ the profile, cancelling the code step, new recovery codes, a wrong password conf
 platform admins' mandatory two-factor authentication and the no-access page had none (six tests
 added, seven assertions of error codes added to existing tests). For Data protection, the
 cleanup of old reset links, invitations and the notification log and the erase dialog had none
-(two tests added, two error codes now asserted). Behaviour that only the full-stack
+(two tests added, two error codes now asserted). For the Couple's portal, withdrawing an open
+invitation, who may manage the couple's access and the More page had none (three tests added). Behaviour that only the full-stack
 Playwright tests check needs a CI job with the Docker stack before it counts.

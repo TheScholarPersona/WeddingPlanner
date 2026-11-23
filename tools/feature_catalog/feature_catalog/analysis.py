@@ -92,13 +92,21 @@ def related(feature: Feature, body: TestBody) -> bool:
     def has(word: str) -> bool:
         return re.search(rf"(?<![A-Za-z0-9_]){re.escape(word)}(?![A-Za-z0-9_])", text) is not None
 
+    def touches(path: str) -> bool:
+        segments = _segments(path)
+        if segments:
+            return all(has(s) for s in segments)
+        # Only generic segments (`/portal/projects/{id}`): look for the static path itself.
+        static = re.split(r"/[{:]", path, maxsplit=1)[0]
+        return (
+            bool(static) and re.search(re.escape(static) + r"(?![A-Za-z0-9_-])", text) is not None
+        )
+
     for endpoint in feature.technical.endpoints:
-        segments = _segments(endpoint.split(" ", 1)[1])
-        if segments and all(has(s) for s in segments):
+        if touches(endpoint.split(" ", 1)[1]):
             return True
     for route in feature.technical.uiRoutes:
-        segments = _segments(route)
-        if segments and all(has(s) for s in segments):
+        if touches(route):
             return True
     for component in feature.technical.components:
         if PurePosixPath(component).stem in text:

@@ -357,3 +357,45 @@ async def test_client_rls_in_sql(
         assert await count("SELECT count(*) FROM project_vendors") == 0
         # Own membership plus the wedding team (lead + viewer), not the rest of the org.
         assert await count("SELECT count(*) FROM memberships") == 3
+
+
+# --- Added for the feature catalog: criteria that had no test yet -------------------------
+
+
+async def test_revoking_a_pending_couple_invitation_voids_the_link(
+    app: FastAPI, world: World, wedding: dict[str, Any]
+) -> None:
+    lead = world["member"].client
+    invited = await send(
+        lead, "POST", P(world, wedding, "/client-access/invitations"), json={"email": COUPLE}
+    )
+    invitation = invited.json()["invitations"][0]
+    token = token_from_link(last_email_to(COUPLE), "invite")
+
+    revoked = await send(
+        lead, "DELETE", P(world, wedding, f"/client-access/invitations/{invitation['id']}")
+    )
+    access = (await lead.get(P(world, wedding, "/client-access"))).json()
+    link = await new_client(app).get(f"/api/v1/auth/invitations/{token}")
+
+    assert revoked.status_code == 204
+    assert access["invitations"] == []
+    assert link.status_code == 404
+    assert link.json()["code"] == "invitation_invalid"
+
+
+async def test_only_leads_and_admins_manage_couple_access(
+    world: World, wedding: dict[str, Any]
+) -> None:
+    viewer = world["member2"].client
+
+    listed = await viewer.get(P(world, wedding, "/client-access"))
+    invited = await send(
+        viewer, "POST", P(world, wedding, "/client-access/invitations"), json={"email": COUPLE}
+    )
+    admin = await world["org_admin"].client.get(P(world, wedding, "/client-access"))
+
+    assert listed.status_code == 403
+    assert invited.status_code == 403
+    assert admin.status_code == 200
+    assert admin.json() == {"logins": [], "invitations": []}

@@ -306,3 +306,21 @@ it('lets the couple decide on optional permissions', async () => {
   );
   expect(await screen.findByText('Your answer from 16.11.2026.')).toBeInTheDocument();
 });
+
+it('collects the less frequent portal pages under More', async () => {
+  mockApi({
+    'GET /me': [200, me],
+    'GET /portal/projects': [200, projects],
+  });
+  renderRoute('/portal/more');
+
+  await screen.findByRole('heading', { name: 'More' });
+  const links = within(screen.getByRole('list')).getAllByRole('link');
+  expect(links.map((link) => link.getAttribute('href'))).toEqual([
+    '/portal/calendar',
+    '/portal/files',
+    '/portal/notifications',
+    '/portal/privacy',
+    '/portal/account',
+  ]);
+});

@@ -1,0 +1,232 @@
+area: portal
+features:
+  # --- Access for the couple --------------------------------------------------------------
+  - id: portal.invite-couple
+    title: Invite the couple
+    group: portal.access
+    summary: "The wedding's lead invites the couple by email; with the link they open their own portal."
+    description: |
+      Each partner can get their own login. The couple joins with the link from the email and
+      sees only their wedding. Team members of the studio cannot be invited as the couple.
+    usage:
+      - channel: web
+        text: "Wedding overview → **Couple's access** → email → **Invite**."
+      - channel: email
+        text: "The couple receives a personal invitation link."
+      - channel: api
+        text: "`GET …/projects/{project_id}/client-access`, `POST …/client-access/invitations` with `email`."
+    rules:
+      - "Only org admins and the wedding's lead manage the couple's access (`403`)."
+      - "Team members cannot be invited as the couple (`team_member`)."
+    dependsOn: [account.join-invitation]
+    technical:
+      components:
+        - backend/app/projects/client_access.py
+        - frontend/src/features/weddings/CoupleAccess.tsx
+      endpoints:
+        - "GET /orgs/{org_id}/projects/{project_id}/client-access"
+        - "POST /orgs/{org_id}/projects/{project_id}/client-access/invitations"
+    acceptance:
+      - id: couple-joins
+        kind: effect
+        text: "After accepting the invitation the couple has a client membership, sees exactly this wedding in the portal, and the team sees their login."
+      - id: invite-ui
+        kind: effect
+        text: "On the wedding overview the lead enters the couple's email and sees the invitation with its expiry date."
+      - id: not-team
+        kind: rule
+        text: "Inviting a team member as the couple is refused."
+        code: team_member
+      - id: leads-only
+        kind: rule
+        text: "A viewer can neither see nor change the couple's access; an org admin can."
+        code: "403"
+    evidence:
+      - kind: integration
+        file: backend/tests/test_budget_portal.py
+        test: test_couple_invitation_opens_the_portal
+        covers: [couple-joins]
+      - kind: unit
+        file: frontend/src/features/budget/budget.test.tsx
+        test: invites the couple from the wedding overview
+        covers: [invite-ui]
+      - kind: integration
+        file: backend/tests/test_budget_portal.py
+        test: test_team_members_cannot_be_invited_as_the_couple
+        covers: [not-team]
+      - kind: integration
+        file: backend/tests/test_budget_portal.py
+        test: test_only_leads_and_admins_manage_couple_access
+        covers: [leads-only]
+
+  - id: portal.revoke-access
+    title: End the couple's access
+    group: portal.access
+    summary: "The lead withdraws an open invitation or ends a partner's login; the portal closes at once."
+    usage:
+      - channel: web
+        text: "Wedding overview → **Couple's access** → **Revoke**."
+      - channel: api
+        text: "`DELETE …/client-access/invitations/{invitation_id}`, `DELETE …/client-access/{member_id}`."
+    rules:
+      - "A withdrawn invitation link no longer works (`invitation_invalid`)."
+    technical:
+      components:
+        - backend/app/projects/client_access.py
+        - frontend/src/features/weddings/CoupleAccess.tsx
+      endpoints:
+        - "DELETE /orgs/{org_id}/projects/{project_id}/client-access/invitations/{invitation_id}"
+        - "DELETE /orgs/{org_id}/projects/{project_id}/client-access/{member_id}"
+    acceptance:
+      - id: login-ended
+        kind: effect
+        text: "After the lead revokes a login, the couple gets 'not found' for the wedding and has no membership left."
+      - id: invitation-withdrawn
+        kind: rule
+        text: "After withdrawing an open invitation it is no longer listed and its link is refused."
+        code: invitation_invalid
+    evidence:
+      - kind: integration
+        file: backend/tests/test_budget_portal.py
+        test: test_revoking_access_closes_the_portal
+        covers: [login-ended]
+      - kind: integration
+        file: backend/tests/test_budget_portal.py
+        test: test_revoking_a_pending_couple_invitation_voids_the_link
+        covers: [invitation-withdrawn]
+
+  - id: portal.isolation
+    title: Each couple sees only their wedding
+    group: portal.access
+    summary: "The portal shows a couple their own wedding and nothing else of the studio, enforced in the database."
+    description: |
+      Couples use their own portal API. The planner API stays closed to them, other couples and
+      other organizations get "not found", and row-level security in PostgreSQL hides internal
+      tasks, internal budget items, the audit log of others and the rest of the team.
+    usage:
+      - channel: portal
+        text: "Automatic for every couple."
+      - channel: api
+        text: "`GET /portal/projects` lists the couple's weddings."
+    rules:
+      - "Other couples and outsiders get `404`; signed-out visitors are refused too."
+      - "Couples cannot use the planner API (`403`)."
+    technical:
+      components:
+        - backend/app/portal/service.py
+        - backend/app/db/rls.py
+      endpoints:
+        - "GET /portal/projects"
+        - "GET /portal/projects/{project_id}"
+        - "GET /orgs/{org_id}/projects/{project_id}"
+      notes:
+        - "Restrictive `client_scope` policies limit the couple to shared rows of their own wedding."
+    acceptance:
+      - id: rls
+        kind: effect
+        text: "In the database, a couple's session sees no internal tasks, only the shared budget item, only their own audit entries, no invitations or vendors, and only their wedding's team."
+      - id: others-404
+        kind: rule
+        text: "Another couple and a user of another organization get 'not found' for the wedding; without signing in it is refused."
+        code: "404"
+      - id: no-planner-api
+        kind: rule
+        text: "The couple's requests to the planner API for the wedding, its tasks, budget and team are refused."
+        code: "403"
+    evidence:
+      - kind: integration
+        file: backend/tests/test_budget_portal.py
+        test: test_client_rls_in_sql
+        covers: [rls]
+      - kind: integration
+        file: backend/tests/test_budget_portal.py
+        test: test_other_couples_and_outsiders_cannot_open_the_portal
+        covers: [others-404]
+      - kind: integration
+        file: backend/tests/test_budget_portal.py
+        test: test_couples_cannot_use_the_planner_api
+        covers: [no-planner-api]
+
+  # --- Portal home ---------------------------------------------------------------------------
+  - id: portal.home
+    title: Portal home
+    group: portal.home
+    summary: "The couple's start page: countdown, planning progress, budget at a glance, their planners and the next steps."
+    description: |
+      Phone first. Only what the team shares appears: shared tasks and budget items, without
+      internal costs, notes or assignments.
+    usage:
+      - channel: portal
+        text: "**Home** in the bottom navigation (`/portal`)."
+      - channel: api
+        text: "`GET /portal/projects/{project_id}`."
+    rules:
+      - Internal tasks, internal costs, internal notes and assignments never reach the couple.
+    technical:
+      components:
+        - backend/app/portal/service.py
+        - frontend/src/features/portal/PortalHomePage.tsx
+      endpoints:
+        - "GET /portal/projects/{project_id}"
+      uiRoutes:
+        - /portal
+    acceptance:
+      - id: start-page
+        kind: effect
+        text: "The start page shows the days until the wedding, the greeting, the planning progress, the budget summary, the planners and the next steps, and the couple can tick off a step."
+      - id: only-shared
+        kind: rule
+        text: "With an internal task and an internal budget item, the portal shows neither of them and no internal fields at all."
+    evidence:
+      - kind: unit
+        file: frontend/src/features/portal/portal.test.tsx
+        test: shows the countdown, progress and next steps
+        covers: [start-page]
+      - kind: integration
+        file: backend/tests/test_budget_portal.py
+        test: test_portal_shows_only_what_is_shared
+        covers: [only-shared]
+
+  - id: portal.branding
+    title: Portal in the studio's colors
+    group: portal.home
+    summary: "The portal uses the studio's accent color and picks a readable text color for it."
+    usage:
+      - channel: portal
+        text: "Automatic; the color is set in the studio's settings."
+    technical:
+      components:
+        - frontend/src/features/portal/api.ts
+        - frontend/src/app/PortalLayout.tsx
+    acceptance:
+      - id: readable-text
+        kind: effect
+        text: "On a dark accent color the text is white, on a light one dark."
+    evidence:
+      - kind: unit
+        file: frontend/src/features/portal/portal.test.tsx
+        test: picks a readable text color for the brand color
+        covers: [readable-text]
+
+  - id: portal.more
+    title: More pages
+    group: portal.home
+    summary: "Calendar, files, notifications, privacy and account are one tap away under More, so the bottom navigation stays short."
+    usage:
+      - channel: portal
+        text: "**More** in the bottom navigation."
+    technical:
+      components:
+        - frontend/src/features/moodboards/pages.tsx
+        - frontend/src/app/PortalLayout.tsx
+      uiRoutes:
+        - /portal/more
+    acceptance:
+      - id: links
+        kind: effect
+        text: "The More page links calendar, files, notifications, privacy and account in this order."
+    evidence:
+      - kind: unit
+        file: frontend/src/features/portal/portal.test.tsx
+        test: collects the less frequent portal pages under More
+        covers: [links]
