@@ -132,6 +132,7 @@ async def test_reset_two_factor_for_a_locked_out_member(world: World, admin: Asy
 
     denied = await send(admin, "POST", "/api/v1/admin/users/reset-2fa", json=body)
     assert denied.status_code == 403
+    assert denied.json()["code"] == "no_support_access"
     await reauth(world["org_admin"].client)
     await send(
         world["org_admin"].client, "POST", f"/api/v1/orgs/{world.org_a}/support-access", json={}
@@ -140,3 +141,21 @@ async def test_reset_two_factor_for_a_locked_out_member(world: World, admin: Asy
 
     assert ok.status_code == 204, ok.text
     assert (await world["member"].client.get("/api/v1/me")).json()["two_factor_enabled"] is False
+
+
+async def test_two_factor_of_another_platform_admin_cannot_be_reset(
+    world: World, admin: AsyncClient, owner_engine: AsyncEngine
+) -> None:
+    await make_admin(owner_engine, "member@example.com")
+    await turn_on(world["member"].client)
+
+    response = await send(
+        admin,
+        "POST",
+        "/api/v1/admin/users/reset-2fa",
+        json={"email": "member@example.com", "reason": "Says they lost the phone"},
+    )
+
+    assert response.status_code == 409
+    assert response.json()["code"] == "not_allowed"
+    assert (await world["member"].client.get("/api/v1/me")).json()["two_factor_enabled"] is True

@@ -1,0 +1,301 @@
+area: platform
+features:
+  # --- Platform admin ---------------------------------------------------------------------
+  - id: platform.admin-area
+    title: Admin area for platform admins
+    group: platform.admin
+    summary: "Only platform admins with two-factor authentication on reach the admin area; for everyone else it does not exist."
+    usage:
+      - channel: web
+        text: "`/admin` after signing in as a platform admin."
+      - channel: api
+        text: "`/admin/…` endpoints."
+    rules:
+      - "Other accounts get `404`, as if the area did not exist; signed-out visitors are refused."
+      - "Platform admins without two-factor authentication are refused (`two_factor_required`)."
+    dependsOn: [account.two-factor-setup]
+    technical:
+      components:
+        - backend/app/admin/router.py
+        - frontend/src/features/admin/AdminLayout.tsx
+      endpoints:
+        - "GET /admin/organizations"
+      uiRoutes:
+        - /admin
+    acceptance:
+      - id: hidden
+        kind: rule
+        text: "Org admins, team members and couples get 'not found' for the admin area; without signing in it is refused."
+        code: "404"
+      - id: needs-2fa
+        kind: rule
+        text: "A platform admin without two-factor authentication is refused."
+        code: two_factor_required
+      - id: ui-hidden
+        kind: effect
+        text: "Someone who is not a platform admin is sent away from /admin in the app."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_admin.py
+        test: test_admin_area_is_hidden_from_everyone_else
+        covers: [hidden, needs-2fa]
+      - kind: unit
+        file: frontend/src/features/admin/admin.test.tsx
+        test: the admin area is not shown to other users
+        covers: [ui-hidden]
+
+  - id: platform.organizations
+    title: Manage organizations
+    group: platform.admin
+    summary: "Platform admins see all organizations with numbers only, create new ones and suspend or reactivate them."
+    description: |
+      The list shows names, status and counts, never customer data. A new organization gets an
+      invitation link for its first admin. Suspending closes the organization for its members
+      until it is reactivated; both are recorded in the organization's audit log.
+    usage:
+      - channel: web
+        text: "`/admin` → list, **New organization**, **Suspend** / **Reactivate**."
+      - channel: api
+        text: "`GET`/`POST /admin/organizations`, `POST /admin/organizations/{org_id}/suspend|reactivate`."
+    rules:
+      - The list holds names and counts only.
+      - Suspension is recorded in the organization's audit log.
+    technical:
+      components:
+        - backend/app/admin/service.py
+        - frontend/src/features/admin/AdminOrganizationsPage.tsx
+      endpoints:
+        - "GET /admin/organizations"
+        - "POST /admin/organizations"
+        - "POST /admin/organizations/{org_id}/suspend"
+        - "POST /admin/organizations/{org_id}/reactivate"
+    acceptance:
+      - id: numbers-only
+        kind: effect
+        text: "The list shows each organization with member and couple counts and no other fields."
+      - id: create
+        kind: effect
+        text: "Creating an organization returns an invitation link for its first admin."
+      - id: suspend
+        kind: effect
+        text: "After suspending, members can no longer open their organization; after reactivating they can again, and the suspension is in the audit log."
+      - id: list-ui
+        kind: effect
+        text: "The admin page lists organizations with the support period, a link to open them and a suspend button."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_admin.py
+        test: test_list_create_and_suspend_organizations
+        covers: [numbers-only, create, suspend]
+      - kind: unit
+        file: frontend/src/features/admin/admin.test.tsx
+        test: platform admins see organizations with numbers only
+        covers: [list-ui]
+
+  - id: platform.reset-two-factor
+    title: Reset two-factor authentication for a locked-out person
+    group: platform.admin
+    summary: "When someone lost their phone and recovery codes, a platform admin turns their two-factor authentication off, once their organization granted support access."
+    usage:
+      - channel: api
+        text: "`POST /admin/users/reset-2fa` with `email` and `reason`."
+    rules:
+      - "Needs an active support grant of the person's organization (`no_support_access`)."
+      - "Another platform admin's setup cannot be reset (`not_allowed`)."
+      - The reset is recorded in the organization's audit log.
+    dependsOn: [platform.grant-support]
+    technical:
+      components:
+        - backend/app/admin/service.py
+      endpoints:
+        - "POST /admin/users/reset-2fa"
+    acceptance:
+      - id: reset
+        kind: effect
+        text: "With a support grant, the member's two-factor authentication is off afterwards."
+      - id: needs-grant
+        kind: rule
+        text: "Without a support grant the reset is refused."
+        code: no_support_access
+      - id: not-other-admins
+        kind: rule
+        text: "Resetting another platform admin is refused and their setup stays on."
+        code: not_allowed
+    evidence:
+      - kind: integration
+        file: backend/tests/test_admin.py
+        test: test_reset_two_factor_for_a_locked_out_member
+        covers: [reset, needs-grant]
+      - kind: integration
+        file: backend/tests/test_admin.py
+        test: test_two_factor_of_another_platform_admin_cannot_be_reset
+        covers: [not-other-admins]
+
+  # --- Support access ---------------------------------------------------------------------
+  - id: platform.grant-support
+    title: Grant support access
+    group: platform.support
+    summary: "An org admin lets platform support look in for a few days, read-only, and can end it at any time."
+    usage:
+      - channel: web
+        text: "Settings → **Support access** → duration, reason, **Grant access**; **End now**."
+      - channel: api
+        text: "`GET`/`POST /orgs/{org_id}/support-access`, `DELETE …/support-access/{grant_id}`."
+    rules:
+      - "Only org admins grant access (`403` for team members)."
+    technical:
+      components:
+        - backend/app/admin/router.py
+        - frontend/src/features/settings/SecuritySettings.tsx
+      endpoints:
+        - "GET /orgs/{org_id}/support-access"
+        - "POST /orgs/{org_id}/support-access"
+        - "DELETE /orgs/{org_id}/support-access/{grant_id}"
+    acceptance:
+      - id: grant-and-end
+        kind: effect
+        text: "After granting, support can open the organization; after ending it, support is refused and the grant is listed as ended."
+      - id: admins-only
+        kind: rule
+        text: "A team member who is not an org admin cannot grant access."
+        code: "403"
+      - id: grant-ui
+        kind: effect
+        text: "In the settings the admin chooses 7 days and a reason, grants access and sees until when it is active with an End now button."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_admin.py
+        test: test_support_view_needs_a_grant
+        covers: [grant-and-end, admins-only]
+      - kind: unit
+        file: frontend/src/features/settings/supportAccess.test.tsx
+        test: org admins grant support access for a few days with a reason
+        covers: [grant-ui]
+
+  - id: platform.support-view
+    title: Read-only support view
+    group: platform.support
+    summary: "During a grant, platform support sees the organization's team, weddings and audit log, read-only and recorded."
+    description: |
+      The view runs in a read-only database transaction, so it cannot change anything even by
+      mistake. Every look is recorded in the organization's audit log.
+    usage:
+      - channel: web
+        text: "`/admin` → organization → **Open**."
+      - channel: api
+        text: "`GET /admin/organizations/{org_id}/support`."
+    rules:
+      - "Without an active grant the view is refused (`no_support_access`)."
+      - Every look is recorded in the organization's audit log.
+    dependsOn: [platform.grant-support]
+    technical:
+      components:
+        - backend/app/admin/service.py
+        - frontend/src/features/admin/AdminSupportPage.tsx
+      endpoints:
+        - "GET /admin/organizations/{org_id}/support"
+      uiRoutes:
+        - /admin/organizations/:id
+      notes:
+        - "`SET LOCAL transaction_read_only = on` with the database role `support`."
+    acceptance:
+      - id: view
+        kind: effect
+        text: "With a grant, support sees the organization's members, and the look is the newest entry of its audit log."
+      - id: needs-grant
+        kind: rule
+        text: "Without a grant the view is refused."
+        code: no_support_access
+      - id: read-only
+        kind: rule
+        text: "Even a write attempt inside the support view fails because the transaction is read-only."
+      - id: view-ui
+        kind: effect
+        text: "The page shows the read-only period, team with two-factor status, weddings and audit log, without buttons to change anything."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_admin.py
+        test: test_support_view_needs_a_grant
+        covers: [view, needs-grant]
+      - kind: integration
+        file: backend/tests/test_admin.py
+        test: test_support_view_cannot_write
+        covers: [read-only]
+      - kind: unit
+        file: frontend/src/features/admin/admin.test.tsx
+        test: the support view shows team, weddings and audit log read-only
+        covers: [view-ui]
+
+  # --- Setup and demo -----------------------------------------------------------------------
+  - id: platform.create-organization
+    title: Set up an organization from the command line
+    group: platform.setup
+    summary: "Operators create an organization during the pilot and get the invitation link for its first admin."
+    usage:
+      - channel: development
+        text: "`make org name=\"Atelier Example\" email=admin@example.com` (`python -m app.cli create-organization`)."
+    technical:
+      components:
+        - backend/app/cli.py
+        - backend/app/organizations/service.py
+      commands: [create-organization]
+    acceptance:
+      - id: printed-link
+        kind: effect
+        text: "The command prints the invitation link; whoever accepts it is the organization's admin."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_cli.py
+        test: test_create_organization_prints_the_admin_invitation
+        covers: [printed-link]
+
+  - id: platform.grant-platform-admin
+    title: Make someone a platform admin
+    group: platform.setup
+    summary: "Operators make an existing account a platform admin from the command line."
+    usage:
+      - channel: development
+        text: "`make admin email=you@example.com` (`python -m app.cli grant-platform-admin`)."
+    rules:
+      - Unknown email addresses are reported and nothing changes.
+      - The new platform admin must turn on two-factor authentication before using the admin area.
+    technical:
+      components:
+        - backend/app/cli.py
+      commands: [grant-platform-admin]
+    acceptance:
+      - id: granted
+        kind: effect
+        text: "After the command the account is a platform admin; the email may be written in any case."
+      - id: unknown
+        kind: rule
+        text: "For an unknown email the command stops with a message."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_cli.py
+        test: test_grant_platform_admin
+        covers: [granted, unknown]
+
+  - id: platform.demo
+    title: Demo organization
+    group: platform.setup
+    summary: "One command creates a studio with three weddings, budgets, appointments, documents, moodboards and logins for admin, planner and couple, all invented."
+    usage:
+      - channel: development
+        text: "`make demo` (`python -m app.cli seed-demo`) prints the sign-in details."
+    rules:
+      - Only invented data; email addresses use example.com and receive nothing.
+    technical:
+      components:
+        - backend/app/demo.py
+        - backend/app/cli.py
+      commands: [seed-demo]
+    acceptance:
+      - id: demo-works
+        kind: effect
+        text: "The planner login sees the three demo weddings, and the couple login sees their shared timeline document."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_demo.py
+        test: test_seed_demo
+        covers: [demo-works]
