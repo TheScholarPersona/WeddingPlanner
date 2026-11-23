@@ -217,7 +217,7 @@ areas:
   - id: platform
     title: Platform operations
     summary: Platform admins, support access, organization setup and demo data.
-    status: open
+    status: catalogued
     owns:
       endpoints: ["/admin", "/orgs/{org_id}/support-access"]
       commands: ["create-organization", "grant-platform-admin", "seed-demo"]
