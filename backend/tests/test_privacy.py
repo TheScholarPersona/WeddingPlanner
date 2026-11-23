@@ -69,6 +69,7 @@ async def test_erase_client_removes_everything(
 
     mismatch = await send(admin, "POST", path, json={"confirm": "Mia"})
     assert mismatch.status_code == 422
+    assert mismatch.json()["code"] == "confirmation_mismatch"
     response = await send(admin, "POST", path, json={"confirm": "Mia & Tom"})
 
     assert response.status_code == 200, response.text
@@ -152,6 +153,7 @@ async def test_delete_account(app: FastAPI, world: World, wedding: dict[str, Any
     )
 
     assert wrong.status_code == 400
+    assert wrong.json()["code"] == "invalid_current_password"
     assert ok.status_code == 204
     assert (await member.get("/api/v1/me")).status_code == 401
     relogin = await new_client(app).post(
@@ -251,3 +253,62 @@ async def test_retention_removes_expired_sessions(world: World, owner_engine: As
     removed = await purge({})
 
     assert removed["sessions"] == 1
+
+
+# --- Added for the feature catalog: criteria that had no test yet -------------------------
+
+
+async def test_retention_removes_stale_links_and_old_notification_log(
+    app: FastAPI, world: World, owner_engine: AsyncEngine
+) -> None:
+    from app.jobs.retention import purge
+
+    admin = world["org_admin"].client
+    invited = await send(
+        admin,
+        "POST",
+        org(world, "/invitations"),
+        json={"email": "late@example.com", "role": "member"},
+    )
+    assert invited.status_code == 201, invited.text
+    await new_client(app).post("/api/v1/auth/password/forgot", json={"email": "member@example.com"})
+    async with owner_engine.begin() as conn:
+        user_id = (
+            await conn.execute(text("SELECT id FROM users WHERE email = 'member@example.com'"))
+        ).scalar_one()
+        await conn.execute(
+            text(
+                "UPDATE invitations SET expires_at = now() - interval '91 days' "
+                "WHERE email = 'late@example.com'"
+            )
+        )
+        await conn.execute(
+            text("UPDATE password_reset_tokens SET expires_at = now() - interval '8 days'")
+        )
+        await conn.execute(
+            text(
+                "INSERT INTO notification_log (id, organization_id, user_id, kind, ref, created_at)"
+                " VALUES (gen_random_uuid(), :o, :u, 'digest', 'old', now() - interval '91 days'), "
+                "(gen_random_uuid(), :o, :u, 'digest', 'recent', now() - interval '10 days')"
+            ),
+            {"o": world.org_a, "u": user_id},
+        )
+
+    removed = await purge({})
+
+    assert removed["invitations"] == 1
+    assert removed["password_reset_tokens"] == 1
+    assert removed["notification_log"] == 1
+    async with owner_engine.begin() as conn:
+        left = (
+            (await conn.execute(text("SELECT ref FROM notification_log ORDER BY ref")))
+            .scalars()
+            .all()
+        )
+        pending = (
+            await conn.execute(
+                text("SELECT count(*) FROM invitations WHERE email = 'late@example.com'")
+            )
+        ).scalar_one()
+    assert left == ["recent"]
+    assert pending == 0

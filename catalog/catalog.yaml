@@ -201,7 +201,7 @@ areas:
   - id: privacy
     title: Data protection
     summary: Data export, erasure, consents and retention periods.
-    status: open
+    status: catalogued
     owns:
       endpoints: ["GET /me/export", "POST /me/delete", "/orgs/{org_id}/clients/{client_id}/export",
                   "/orgs/{org_id}/clients/{client_id}/erase",
