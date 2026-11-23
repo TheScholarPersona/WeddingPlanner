@@ -1,0 +1,291 @@
+area: privacy
+features:
+  # --- Export and erasure ----------------------------------------------------------------
+  - id: privacy.client-export
+    title: Export a client's data
+    group: privacy.rights
+    summary: "Org admins download everything stored about a client as a ZIP, for a data access request (Art. 15/20 GDPR)."
+    description: |
+      The archive holds a `data.json` with the client, contacts, weddings with tasks, budget,
+      appointments and documents, the couple's portal accounts, and the files themselves. Internal
+      storage keys are left out.
+    usage:
+      - channel: web
+        text: "Client → **Data protection** → **Export client data**."
+      - channel: api
+        text: "`GET /orgs/{org_id}/clients/{client_id}/export` (ZIP)."
+    rules:
+      - "Only org admins may export (`403` for team members)."
+      - Every export is recorded in the audit log.
+    technical:
+      components:
+        - backend/app/privacy/service.py
+        - backend/app/privacy/router.py
+        - frontend/src/features/clients/ClientPrivacyCard.tsx
+      endpoints:
+        - "GET /orgs/{org_id}/clients/{client_id}/export"
+    acceptance:
+      - id: zip-content
+        kind: effect
+        text: "The ZIP contains the client, the wedding's tasks and documents, the couple's portal account and the uploaded file, without storage keys."
+      - id: admins-only
+        kind: rule
+        text: "A team member who is not an org admin cannot export."
+        code: "403"
+      - id: export-link
+        kind: effect
+        text: "The client page offers the export as a download link."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_privacy.py
+        test: test_client_export_contains_data_and_files
+        covers: [zip-content, admins-only]
+      - kind: unit
+        file: frontend/src/features/clients/clientPrivacy.test.tsx
+        test: erasing a client needs the exact name and then leaves the deleted client
+        covers: [export-link]
+
+  - id: privacy.client-erase
+    title: Erase a client
+    group: privacy.rights
+    summary: "Org admins erase a client with all weddings, files and the couple's portal access (Art. 17 GDPR)."
+    description: |
+      Erasing cannot be undone. The admin types the client's name and confirms their password
+      if the last confirmation is older than a few minutes. Only a record that the erasure
+      happened stays in the audit log.
+    usage:
+      - channel: web
+        text: "Client → **Data protection** → **Erase client**, type the name, **Erase for good**."
+      - channel: api
+        text: "`POST /orgs/{org_id}/clients/{client_id}/erase` with `confirm` (the client's name)."
+    rules:
+      - "The typed name must match exactly (`confirmation_mismatch`)."
+      - "Needs a recent password confirmation (`reauth_required`)."
+    dependsOn: [account.reauth]
+    technical:
+      components:
+        - backend/app/privacy/service.py
+        - frontend/src/features/clients/ClientPrivacyCard.tsx
+      endpoints:
+        - "POST /orgs/{org_id}/clients/{client_id}/erase"
+    acceptance:
+      - id: everything-gone
+        kind: effect
+        text: "After erasing, no client, contact, wedding, task, document or budget row of the client remains, the files are deleted, the couple sees no wedding and the erasure is in the audit log."
+      - id: name-must-match
+        kind: rule
+        text: "A confirmation with only part of the name is refused."
+        code: confirmation_mismatch
+      - id: recent-confirmation
+        kind: rule
+        text: "Without a recent password confirmation the erasure is refused."
+        code: reauth_required
+      - id: dialog
+        kind: effect
+        text: "The erase button stays disabled until the exact name is typed; afterwards the app returns to the client list."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_privacy.py
+        test: test_erase_client_removes_everything
+        covers: [everything-gone, name-must-match]
+      - kind: integration
+        file: backend/tests/test_privacy.py
+        test: test_erase_needs_a_recent_password_confirmation
+        covers: [recent-confirmation]
+      - kind: unit
+        file: frontend/src/features/clients/clientPrivacy.test.tsx
+        test: erasing a client needs the exact name and then leaves the deleted client
+        covers: [dialog]
+
+  - id: privacy.personal-export
+    title: Download my data
+    group: privacy.rights
+    summary: "Everyone downloads what is stored about them: account, memberships, own comments, sessions and own activity."
+    usage:
+      - channel: web
+        text: "Account → **Download my data**."
+      - channel: portal
+        text: "More → Account → **Download my data**."
+      - channel: api
+        text: "`GET /me/export` (JSON attachment)."
+    rules:
+      - "Couples see only their own entries of the audit log; the organization's log stays closed (`403`)."
+    technical:
+      components:
+        - backend/app/privacy/service.py
+        - frontend/src/features/account/AccountPage.tsx
+      endpoints:
+        - "GET /me/export"
+    acceptance:
+      - id: export-content
+        kind: effect
+        text: "The download contains the email, the organization, the comments the person wrote and their own activity."
+      - id: couple-own-activity
+        kind: rule
+        text: "A couple's export contains their own activity while the organization's audit log is refused."
+        code: "403"
+    evidence:
+      - kind: integration
+        file: backend/tests/test_privacy.py
+        test: test_personal_export
+        covers: [export-content]
+      - kind: integration
+        file: backend/tests/test_privacy.py
+        test: test_couples_read_only_their_own_audit_entries
+        covers: [couple-own-activity]
+
+  - id: privacy.delete-account
+    title: Delete my account
+    group: privacy.rights
+    summary: "Everyone deletes their own account with password and the word DELETE; the last admin of an organization cannot."
+    usage:
+      - channel: web
+        text: "Account → **Delete account**."
+      - channel: portal
+        text: "More → Account → **Delete account**."
+      - channel: api
+        text: "`POST /me/delete` with `password` and `confirm: DELETE`."
+    rules:
+      - "A wrong password is refused (`invalid_current_password`)."
+      - "The last admin of an organization must first make someone else admin (`last_admin`)."
+    technical:
+      components:
+        - backend/app/privacy/router.py
+        - backend/app/privacy/service.py
+        - frontend/src/features/account/AccountPage.tsx
+      endpoints:
+        - "POST /me/delete"
+    acceptance:
+      - id: account-gone
+        kind: effect
+        text: "After deleting, the session ends, the account cannot sign in again and no longer appears in the team."
+      - id: wrong-password
+        kind: rule
+        text: "Deleting with a wrong password is refused."
+        code: invalid_current_password
+      - id: last-admin
+        kind: rule
+        text: "The only org admin cannot delete their account."
+        code: last_admin
+    evidence:
+      - kind: integration
+        file: backend/tests/test_privacy.py
+        test: test_delete_account
+        covers: [account-gone, wrong-password]
+      - kind: integration
+        file: backend/tests/test_privacy.py
+        test: test_last_admin_cannot_delete_their_account
+        covers: [last-admin]
+
+  # --- Consents --------------------------------------------------------------------------
+  - id: privacy.consents
+    title: Couple's permissions
+    group: privacy.consents
+    summary: "The couple decides whether their wedding may be shown as a reference or used for reviews; the team sees the answer."
+    description: |
+      Nothing is assumed: until the couple answers, the permission counts as not given. They can
+      change their answer at any time; every grant and withdrawal is recorded.
+    usage:
+      - channel: portal
+        text: "More → **Privacy** → Yes / No per permission."
+      - channel: web
+        text: "Wedding page → **Couple's permissions** (read only)."
+      - channel: api
+        text: "`GET`/`PUT /portal/projects/{project_id}/consents`; team: `GET …/projects/{project_id}/consents`."
+    rules:
+      - Undecided means not given.
+      - Grants and withdrawals are recorded in the audit log.
+    technical:
+      components:
+        - backend/app/privacy/service.py
+        - frontend/src/features/portal/PortalPrivacyPage.tsx
+        - frontend/src/features/weddings/CoupleConsents.tsx
+      endpoints:
+        - "GET /portal/projects/{project_id}/consents"
+        - "PUT /portal/projects/{project_id}/consents"
+        - "GET /orgs/{org_id}/projects/{project_id}/consents"
+      uiRoutes:
+        - /portal/privacy
+    acceptance:
+      - id: decide-and-change
+        kind: effect
+        text: "Both permissions start undecided; after granting and then withdrawing the portfolio permission it is no, the team sees the couple's answer, and both steps are in the audit log."
+      - id: portal-ui
+        kind: effect
+        text: "In the portal, answering No sends the decision and shows the date of the answer."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_privacy.py
+        test: test_consents
+        covers: [decide-and-change]
+      - kind: unit
+        file: frontend/src/features/portal/portal.test.tsx
+        test: lets the couple decide on optional permissions
+        covers: [portal-ui]
+
+  # --- Retention -------------------------------------------------------------------------
+  - id: privacy.retention
+    title: Delete data that is no longer needed
+    group: privacy.retention
+    summary: "A nightly job removes expired sessions, old reset links, stale invitations and the old notification log (storage limitation, Art. 5 GDPR)."
+    usage:
+      - channel: batch
+        text: "Job `purge` runs every night at 03:17."
+    rules:
+      - Expired or revoked sessions are removed.
+      - Password reset links go 7 days after they expired, unused invitations 90 days after.
+      - The log of sent notifications is kept for 90 days.
+    technical:
+      components:
+        - backend/app/jobs/retention.py
+      jobs: [purge]
+      notes:
+        - "Cross-tenant cleanup runs in the SECURITY DEFINER function `app_purge_expired()`, the rest per organization under row-level security."
+    acceptance:
+      - id: sessions
+        kind: effect
+        text: "An expired session is removed."
+      - id: links-and-log
+        kind: effect
+        text: "An invitation expired 91 days ago and a reset link expired 8 days ago are removed; of two notification log entries only the one younger than 90 days stays."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_privacy.py
+        test: test_retention_removes_expired_sessions
+        covers: [sessions]
+      - kind: integration
+        file: backend/tests/test_privacy.py
+        test: test_retention_removes_stale_links_and_old_notification_log
+        covers: [links-and-log]
+
+  - id: privacy.couple-access-end
+    title: Couple access ends after the wedding
+    group: privacy.retention
+    summary: "After a wedding is archived the couple keeps portal access for a set number of days (90 by default), then it ends."
+    usage:
+      - channel: portal
+        text: "Automatic; the wedding disappears from the portal."
+      - channel: batch
+        text: "Job `purge` removes the couple's access entries."
+    rules:
+      - Access ends immediately once the period is over; the nightly job then removes the entries.
+    technical:
+      components:
+        - backend/app/jobs/retention.py
+        - backend/app/portal/service.py
+      jobs: [purge]
+      settings:
+        - "`client_access_days_after_archive` per organization."
+    acceptance:
+      - id: access-ends
+        kind: effect
+        text: "Within the period the couple still sees the archived wedding; 91 days after archiving it is gone from their list and the job removes one access entry."
+      - id: wedding-404
+        kind: rule
+        text: "After the period the couple gets 'not found' for the wedding."
+        code: "404"
+    evidence:
+      - kind: integration
+        file: backend/tests/test_privacy.py
+        test: test_couple_access_ends_after_the_archive_period
+        covers: [access-ends, wedding-404]
