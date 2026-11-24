@@ -110,13 +110,14 @@ def python_test(path: Path, test: str) -> TestBody:
         for n in tree.body
         if isinstance(n, ast.FunctionDef | ast.AsyncFunctionDef) and not n.name.startswith("test")
     }
-    constants = {
-        target.id: node
-        for node in tree.body
-        if isinstance(node, ast.Assign)
-        for target in node.targets
-        if isinstance(target, ast.Name)
-    }
+    constants: dict[str, ast.stmt] = {}
+    for stmt in tree.body:
+        if isinstance(stmt, ast.Assign):
+            for target in stmt.targets:
+                if isinstance(target, ast.Name):
+                    constants[target.id] = stmt
+        elif isinstance(stmt, ast.AnnAssign) and isinstance(stmt.target, ast.Name):
+            constants[stmt.target.id] = stmt  # `MATRIX: list[Case] = [...]`
     seen: list[str] = []
     todo: list[ast.AST] = [node]
     while todo:
@@ -213,6 +214,10 @@ def ts_test(path: Path, test: str) -> TestBody:
                     block = _block(source, helper.start())
                     texts.append(block)
                     todo.append(block)
+    # Top-level constants the test uses (`const O = `/orgs/${ORG_ID}`;`).
+    for name, value in re.findall(r"^const\s+(\w+)\s*=\s*([^;]*);", source, re.M):
+        if re.search(rf"\b{re.escape(name)}\b", "\n".join(texts)):
+            texts.append(f"const {name} = {value};")
     # Imports of names the test uses show which modules it exercises.
     joined = "\n".join(texts)
     for line in re.findall(r"^import\s+[^;]+?from\s+['\"][^'\"]+['\"];?$", source, re.M):

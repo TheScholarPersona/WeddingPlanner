@@ -131,6 +131,7 @@ async def test_client_roles_cannot_be_promoted_to_team_roles(world: World) -> No
     )
 
     assert response.status_code == 422
+    assert response.json()["code"] == "client_role_fixed"
 
 
 async def test_audit_log_is_paginated_newest_first(world: World) -> None:
@@ -168,3 +169,24 @@ async def test_memberships_of_other_tenants_are_invisible_in_sql(
             await conn.execute(text("SELECT DISTINCT organization_id FROM memberships"))
         ).scalars()
         assert set(orgs) == {world.org_b}
+
+
+# --- Added for the feature catalog: criteria that had no test yet -------------------------
+
+
+async def test_revoking_a_team_invitation_voids_the_link(app: FastAPI, world: World) -> None:
+    admin = world["org_admin"].client
+    created = (
+        await send(admin, "POST", org(world, "/invitations"), json={"email": "late@example.com"})
+    ).json()
+    token = token_from_link(last_email_to("late@example.com"), "invite")
+
+    revoked = await send(admin, "DELETE", org(world, f"/invitations/{created['id']}"))
+    pending = (await admin.get(org(world, "/invitations"))).json()
+    link = await new_client(app).get(f"/api/v1/auth/invitations/{token}")
+    log = (await admin.get(org(world, "/audit-log"), params={"action": "invitation."})).json()
+
+    assert revoked.status_code == 204
+    assert pending == []
+    assert link.json()["code"] == "invitation_invalid"
+    assert log["items"][0]["action"] == "invitation.revoked"

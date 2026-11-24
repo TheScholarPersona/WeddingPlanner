@@ -208,6 +208,9 @@ features:
       - id: generic-paths
         kind: effect
         text: "A path of only generic segments (`/portal/projects`) counts when it appears as a whole, but not as part of a longer path."
+      - id: constants
+        kind: effect
+        text: "Annotated Python constants (`MATRIX: list[Case] = …`) and top-level TypeScript constants the test uses count as part of the test."
       - id: imported-helpers
         kind: effect
         text: A test that calls the feature through a helper imported from another test module counts as touching the feature.
@@ -260,6 +263,10 @@ features:
         file: tools/feature_catalog/tests/test_check.py
         test: test_paths_of_only_generic_segments_are_matched_as_a_whole
         covers: [generic-paths]
+      - kind: unit
+        file: tools/feature_catalog/tests/test_check.py
+        test: test_reads_annotated_python_and_typescript_constants
+        covers: [constants]
 
   - id: catalog.view
     title: Catalog view
