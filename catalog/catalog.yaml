@@ -103,7 +103,7 @@ areas:
   - id: budget
     title: Budget
     summary: Budget with categories, items and payments; a view for the couple.
-    status: open
+    status: catalogued
     owns:
       endpoints: ["/orgs/{org_id}/projects/{project_id}/budget",
                   "/portal/projects/{project_id}/budget"]
