@@ -1,0 +1,405 @@
+area: organization
+features:
+  # --- Organization settings --------------------------------------------------------------
+  - id: organization.settings
+    title: Organization settings
+    group: organization.settings
+    summary: "Org admins set the studio's name, portal color, date format, time zone and how long couples keep access after a wedding."
+    usage:
+      - channel: web
+        text: "**Settings** (`/app/settings`); team members see the values read only."
+      - channel: api
+        text: "`GET`/`PATCH /orgs/{org_id}`."
+    rules:
+      - "Only org admins change settings (`403` for team members and couples)."
+      - Every change is recorded in the audit log with old and new value.
+    technical:
+      components:
+        - backend/app/organizations/router.py
+        - backend/app/organizations/service.py
+        - frontend/src/features/settings/SettingsPage.tsx
+      endpoints:
+        - "GET /orgs/{org_id}"
+        - "PATCH /orgs/{org_id}"
+      uiRoutes:
+        - /app/settings
+    acceptance:
+      - id: saved-and-audited
+        kind: effect
+        text: "A new accent color is saved and the audit log records who changed it from which old to which new value."
+      - id: settings-ui
+        kind: effect
+        text: "An admin renames the studio in the settings, sees 'Changes saved.' and the form sends all settings."
+      - id: read-only-for-team
+        kind: rule
+        text: "Team members see the settings without a save button and without the audit log."
+      - id: admins-only
+        kind: rule
+        text: "Only org admins may change the settings; members and couples are refused, other organizations get 'not found'."
+        code: "403"
+    evidence:
+      - kind: integration
+        file: backend/tests/test_organizations.py
+        test: test_update_organization_is_audited
+        covers: [saved-and-audited]
+      - kind: unit
+        file: frontend/src/features/settings/settings.test.tsx
+        test: org admins rename the organization and read the audit log
+        covers: [settings-ui]
+      - kind: unit
+        file: frontend/src/features/settings/settings.test.tsx
+        test: team members see the settings read only
+        covers: [read-only-for-team]
+      - kind: integration
+        file: backend/tests/test_authorization_matrix.py
+        test: test_rights_matrix
+        covers: [admins-only]
+
+  - id: organization.require-two-factor
+    title: Require two-factor authentication for the team
+    group: organization.settings
+    summary: "An org admin can make two-factor authentication mandatory for the whole team; couples are not affected."
+    usage:
+      - channel: web
+        text: "Settings → **Security** → **Require two-factor authentication for the team**."
+      - channel: api
+        text: "`PATCH /orgs/{org_id}` with `require_2fa`."
+    rules:
+      - "The admin needs two-factor authentication first (`enable_own_2fa_first`)."
+      - "Team members without it are stopped until they set it up (`two_factor_required`); their account page stays reachable."
+    dependsOn: [account.two-factor-setup]
+    technical:
+      components:
+        - backend/app/organizations/service.py
+        - backend/app/authz/deps.py
+        - frontend/src/features/settings/SecuritySettings.tsx
+      endpoints:
+        - "PATCH /orgs/{org_id}"
+    acceptance:
+      - id: policy
+        kind: effect
+        text: "With the policy on, a member without two-factor authentication is stopped, couples still reach the portal, and after setting it up the member continues."
+      - id: admin-first
+        kind: rule
+        text: "An admin without two-factor authentication cannot turn the policy on."
+        code: enable_own_2fa_first
+      - id: member-stopped
+        kind: rule
+        text: "A team member without two-factor authentication is refused organization data."
+        code: two_factor_required
+      - id: switch-ui
+        kind: effect
+        text: "The settings show the policy as a switch."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_two_factor.py
+        test: test_organization_can_require_two_factor
+        covers: [policy, admin-first, member-stopped]
+      - kind: unit
+        file: frontend/src/features/settings/settings.test.tsx
+        test: org admins rename the organization and read the audit log
+        covers: [switch-ui]
+
+  # --- Team and roles -----------------------------------------------------------------------
+  - id: organization.invite-team
+    title: Invite team members
+    group: organization.team
+    summary: "Org admins invite planners by email with a role; the link adds them to the studio."
+    usage:
+      - channel: web
+        text: "**Team** (`/app/team`) → email and role → **Send invitation**."
+      - channel: email
+        text: "The invitation email holds a personal link valid for a limited time."
+      - channel: api
+        text: "`GET`/`POST /orgs/{org_id}/invitations` with `email` and `role`."
+    rules:
+      - "People who are already members cannot be invited again (`already_member`)."
+      - Email addresses are stored in lower case.
+    dependsOn: [account.join-invitation]
+    technical:
+      components:
+        - backend/app/organizations/service.py
+        - frontend/src/features/team/TeamPage.tsx
+      endpoints:
+        - "GET /orgs/{org_id}/invitations"
+        - "POST /orgs/{org_id}/invitations"
+      uiRoutes:
+        - /app/team
+    acceptance:
+      - id: invited-joins
+        kind: effect
+        text: "An invitation to New@Example.com is stored in lower case, the person joins with the emailed link and the open invitation disappears."
+      - id: already-member
+        kind: rule
+        text: "Inviting an existing member is refused."
+        code: already_member
+      - id: invite-ui
+        kind: effect
+        text: "On the team page the admin sends an invitation and sees the confirmation; open invitations are listed with their expiry date."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_organizations.py
+        test: test_invitation_email_and_acceptance
+        covers: [invited-joins]
+      - kind: integration
+        file: backend/tests/test_organizations.py
+        test: test_inviting_an_existing_member_is_rejected
+        covers: [already-member]
+      - kind: unit
+        file: frontend/src/features/team/TeamPage.test.tsx
+        test: invites a team member
+        covers: [invite-ui]
+      - kind: unit
+        file: frontend/src/features/team/TeamPage.test.tsx
+        test: lists members and pending invitations
+        covers: [invite-ui]
+
+  - id: organization.manage-invitations
+    title: Resend or withdraw an invitation
+    group: organization.team
+    summary: "Admins send an invitation again with a new link, or withdraw it; old links stop working."
+    usage:
+      - channel: web
+        text: "Team → open invitation → **Resend** or **Revoke**."
+      - channel: api
+        text: "`POST …/invitations/{invitation_id}/resend`, `DELETE …/invitations/{invitation_id}`."
+    rules:
+      - "Resending replaces the link; withdrawing voids it (`invitation_invalid`)."
+      - Withdrawing is recorded in the audit log.
+    technical:
+      components:
+        - backend/app/organizations/service.py
+        - frontend/src/features/team/TeamPage.tsx
+      endpoints:
+        - "POST /orgs/{org_id}/invitations/{invitation_id}/resend"
+        - "DELETE /orgs/{org_id}/invitations/{invitation_id}"
+    acceptance:
+      - id: resend
+        kind: effect
+        text: "After resending, the new link works and the previous one does not."
+      - id: withdraw
+        kind: rule
+        text: "A withdrawn invitation is no longer listed, its link is refused and the audit log records it."
+        code: invitation_invalid
+    evidence:
+      - kind: integration
+        file: backend/tests/test_organizations.py
+        test: test_resending_invalidates_the_previous_link
+        covers: [resend]
+      - kind: integration
+        file: backend/tests/test_organizations.py
+        test: test_revoking_a_team_invitation_voids_the_link
+        covers: [withdraw]
+
+  - id: organization.members
+    title: Team roles and access
+    group: organization.team
+    summary: "Org admins change roles and deactivate team members; access changes at once."
+    description: |
+      The team page lists everyone in the studio. Team members do not see the couples' logins.
+      Role changes need a recent password confirmation, nobody changes their own role, and the
+      couples' logins are managed per wedding.
+    usage:
+      - channel: web
+        text: "Team → member → role, **Deactivate**."
+      - channel: api
+        text: "`GET /orgs/{org_id}/members`, `PATCH /orgs/{org_id}/members/{membership_id}` with `role` or `status`."
+    rules:
+      - "Role changes need a recent password confirmation (`reauth_required`)."
+      - "Nobody changes their own membership (`cannot_change_self`)."
+      - "Couple logins cannot become team roles (`client_role_fixed`)."
+      - Deactivated members lose access immediately.
+    dependsOn: [account.reauth]
+    technical:
+      components:
+        - backend/app/organizations/service.py
+        - frontend/src/features/team/TeamPage.tsx
+        - frontend/src/features/team/useReauth.tsx
+      endpoints:
+        - "GET /orgs/{org_id}/members"
+        - "PATCH /orgs/{org_id}/members/{membership_id}"
+    acceptance:
+      - id: list
+        kind: effect
+        text: "Admins see team members and couples' logins; team members see only the team."
+      - id: role-change
+        kind: rule
+        text: "A role change with an old password confirmation is refused, after confirming it succeeds."
+        code: reauth_required
+      - id: not-self
+        kind: rule
+        text: "An admin cannot change their own role."
+        code: cannot_change_self
+      - id: client-fixed
+        kind: rule
+        text: "A couple's login cannot be turned into a team member."
+        code: client_role_fixed
+      - id: deactivate
+        kind: effect
+        text: "A deactivated member gets 'not found' for the organization immediately and has no membership left."
+      - id: reauth-ui
+        kind: effect
+        text: "When the server asks for the password, the team page shows the dialog and then repeats the change."
+      - id: planners-no-tools
+        kind: rule
+        text: "Planners see the team without invitation or deactivation buttons."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_organizations.py
+        test: test_team_members_do_not_see_client_logins
+        covers: [list]
+      - kind: integration
+        file: backend/tests/test_organizations.py
+        test: test_role_changes_need_a_recent_password_confirmation
+        covers: [role-change]
+      - kind: integration
+        file: backend/tests/test_organizations.py
+        test: test_admins_cannot_change_their_own_membership
+        covers: [not-self]
+      - kind: integration
+        file: backend/tests/test_organizations.py
+        test: test_client_roles_cannot_be_promoted_to_team_roles
+        covers: [client-fixed]
+      - kind: integration
+        file: backend/tests/test_authorization_matrix.py
+        test: test_disabled_member_loses_access_immediately
+        covers: [deactivate]
+      - kind: unit
+        file: frontend/src/features/team/TeamPage.test.tsx
+        test: asks for the password again before a sensitive change, then retries it
+        covers: [reauth-ui]
+      - kind: unit
+        file: frontend/src/features/team/TeamPage.test.tsx
+        test: hides admin tools from planners
+        covers: [planners-no-tools]
+
+  - id: organization.tenant-isolation
+    title: Strict separation of studios
+    group: organization.team
+    summary: "Each studio sees only its own data; other studios' records do not exist for it, enforced by row-level security."
+    usage:
+      - channel: api
+        text: "Applies to every request under `/orgs/{org_id}`."
+    rules:
+      - "Other organizations' records give `404`, never a hint that they exist."
+      - Row-level security in PostgreSQL limits every query to the current organization.
+    technical:
+      components:
+        - backend/app/authz/deps.py
+        - backend/app/db/rls.py
+        - backend/app/authz/permissions.py
+      endpoints:
+        - "GET /orgs/{org_id}/members"
+        - "PATCH /orgs/{org_id}/members/{membership_id}"
+        - "DELETE /orgs/{org_id}/invitations/{invitation_id}"
+    acceptance:
+      - id: foreign-ids
+        kind: rule
+        text: "An admin of another studio who uses this studio's ids through their own studio gets 'not found' and sees only their own team."
+        code: "404"
+      - id: sql
+        kind: effect
+        text: "In the database, a session of one studio sees only that studio's memberships."
+      - id: matrix
+        kind: effect
+        text: "For every organization endpoint, admin, member, couple, outsider and anonymous get exactly the status the rights matrix defines."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_authorization_matrix.py
+        test: test_outsider_cannot_reach_foreign_resources_through_own_org
+        covers: [foreign-ids]
+      - kind: integration
+        file: backend/tests/test_organizations.py
+        test: test_memberships_of_other_tenants_are_invisible_in_sql
+        covers: [sql]
+      - kind: integration
+        file: backend/tests/test_authorization_matrix.py
+        test: test_rights_matrix
+        covers: [matrix]
+
+  # --- Dashboard and audit log ----------------------------------------------------------------
+  - id: organization.audit-log
+    title: Audit log
+    group: organization.overview
+    summary: "Admins see important changes of their studio, newest first; the application itself cannot change or delete entries."
+    usage:
+      - channel: web
+        text: "Settings → **Audit log**."
+      - channel: api
+        text: "`GET /orgs/{org_id}/audit-log?limit=&cursor=&action=`."
+    rules:
+      - Only org admins read the audit log.
+      - The database user of the app may only add entries, never change or delete them.
+    technical:
+      components:
+        - backend/app/audit
+        - frontend/src/features/settings/SettingsPage.tsx
+      endpoints:
+        - "GET /orgs/{org_id}/audit-log"
+    acceptance:
+      - id: paginated
+        kind: effect
+        text: "Three renames appear newest first, two per page, with the third on the next page."
+      - id: append-only
+        kind: rule
+        text: "Deleting audit entries as the app's database user is refused."
+      - id: log-ui
+        kind: effect
+        text: "The settings list the entries with actor and a readable action."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_organizations.py
+        test: test_audit_log_is_paginated_newest_first
+        covers: [paginated]
+      - kind: integration
+        file: backend/tests/test_organizations.py
+        test: test_audit_log_cannot_be_modified_by_the_app
+        covers: [append-only]
+      - kind: unit
+        file: frontend/src/features/settings/settings.test.tsx
+        test: org admins rename the organization and read the audit log
+        covers: [log-ui]
+
+  - id: organization.dashboard
+    title: Planner dashboard
+    group: organization.overview
+    summary: "The start page for planners: active weddings, weddings in the next six months, overdue tasks and the upcoming weddings."
+    usage:
+      - channel: web
+        text: "`/app` after signing in."
+      - channel: api
+        text: "`GET /orgs/{org_id}/dashboard`."
+    rules:
+      - "Couples cannot open the dashboard (`403`)."
+    technical:
+      components:
+        - backend/app/projects/service.py
+        - frontend/src/features/planner/DashboardPage.tsx
+      endpoints:
+        - "GET /orgs/{org_id}/dashboard"
+      uiRoutes:
+        - /app
+    acceptance:
+      - id: figures
+        kind: effect
+        text: "With one wedding in 120 days the dashboard counts one active wedding, one within six months, its overdue tasks and lists it with 120 days to go."
+      - id: dashboard-ui
+        kind: effect
+        text: "The page shows the key figures and links each upcoming wedding with days to go, venue, guests and lead."
+      - id: couples-out
+        kind: rule
+        text: "A couple's login is refused the dashboard."
+        code: "403"
+    evidence:
+      - kind: integration
+        file: backend/tests/test_projects.py
+        test: test_dashboard_counts_overdue_and_upcoming
+        covers: [figures]
+      - kind: unit
+        file: frontend/src/features/weddings/weddings.test.tsx
+        test: shows key figures and upcoming weddings on the dashboard
+        covers: [dashboard-ui]
+      - kind: integration
+        file: backend/tests/test_projects.py
+        test: test_client_logins_cannot_use_the_planner_api
+        covers: [couples-out]

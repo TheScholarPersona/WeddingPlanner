@@ -287,3 +287,28 @@ def test_paths_of_only_generic_segments_are_matched_as_a_whole(repo: Repo) -> No
         repo.features(text.replace("test: test_saves_rsvp_with_plus_one", f"test: {test}"))
         found = codes(check(repo))
         assert ("EVIDENCE_UNRELATED" not in found) is related, test
+
+
+def test_reads_annotated_python_and_typescript_constants(repo: Repo) -> None:
+    repo.write(
+        "backend/tests/test_rsvp.py",
+        TESTS
+        + "\n\nCLOSED: tuple[str, ...] = ('/api/v1/guests/g1/rsvp', 'rsvp_closed')\n"
+        + "\n\ndef test_closed(client):\n"
+        + "    response = client.post(CLOSED[0], json={})\n"
+        + "    assert response.json()['code'] == CLOSED[1]\n",
+    )
+    repo.features(
+        FEATURES.replace("test: test_rejects_changes_after_deadline", "test: test_closed")
+    )
+    assert codes(check(repo)).keys() & {"RULE_CODE_NOT_ASSERTED", "EVIDENCE_UNRELATED"} == set()
+
+    spec = repo.write(
+        "frontend/src/guests.test.tsx",
+        "const G = `/guests/${id}/rsvp`;\n"
+        "it('replies', async () => {\n  render(G);\n"
+        "  expect(screen.getByText('2')).toBeTruthy();\n});\n",
+    )
+    from feature_catalog.testcode import inspect_test
+
+    assert "/guests/${id}/rsvp" in inspect_test(spec, "replies").text
