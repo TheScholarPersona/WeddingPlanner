@@ -103,6 +103,7 @@ async def test_updates_need_the_current_version(world: World) -> None:
     )
 
     assert missing.status_code == 428
+    assert missing.json()["code"] == "precondition_required"
     assert ok.status_code == 200
     assert ok.headers["etag"] == '"2"'
     assert ok.json()["guest_count_planned"] == 120
@@ -207,3 +208,81 @@ async def test_rls_hides_unassigned_weddings_in_sql(world: World, app_engine: As
         clients = (await conn.execute(text("SELECT count(*) FROM clients"))).scalar_one()
 
     assert (projects, tasks, clients) == (0, 0, 0)
+
+
+# --- Added for the feature catalog: criteria that had no test yet -------------------------
+
+
+async def test_restoring_an_archived_wedding(world: World) -> None:
+    client = world["member"].client
+    wedding = await create_wedding(client, world)
+    base = url(world, f"/projects/{wedding['id']}")
+    await send(client, "POST", f"{base}/archive")
+
+    restored = await send(client, "POST", f"{base}/restore")
+    listed = (await client.get(url(world, "/projects"))).json()
+
+    # Restoring brings the wedding back as completed (archiving usually follows the wedding).
+    assert restored.json()["status"] == "completed"
+    assert [w["id"] for w in listed] == [wedding["id"]]
+
+
+async def test_milestones_are_added_changed_and_removed(world: World) -> None:
+    client = world["member"].client
+    wedding = await create_wedding(client, world)
+    base = url(world, f"/projects/{wedding['id']}/milestones")
+
+    added = await send(
+        client, "POST", base, json={"title": "Rehearsal dinner", "due_date": "2027-06-11"}
+    )
+    new = next(m for m in added.json() if m["title"] == "Rehearsal dinner")
+    renamed = await send(client, "PATCH", f"{base}/{new['id']}", json={"title": "Welcome dinner"})
+    first = renamed.json()[0]
+    tasks = (
+        await client.get(
+            url(world, f"/projects/{wedding['id']}/tasks"), params={"milestone_id": first["id"]}
+        )
+    ).json()
+    removed = await send(client, "DELETE", f"{base}/{first['id']}")
+    after = (await client.get(base)).json()
+    all_tasks = (await client.get(url(world, f"/projects/{wedding['id']}/tasks"))).json()
+
+    assert added.status_code == 201 and len(added.json()) == 7
+    assert "Welcome dinner" in [m["title"] for m in renamed.json()]
+    assert removed.status_code == 204
+    assert first["id"] not in [m["id"] for m in after] and len(after) == 6
+    assert len(all_tasks) == 19  # tasks of a removed milestone stay, without milestone
+    assert {t["id"] for t in tasks} <= {t["id"] for t in all_tasks if t["milestone_id"] is None}
+
+
+async def test_wedding_team_roles_change_and_members_leave(world: World) -> None:
+    lead = world["member"].client
+    wedding = await create_wedding(lead, world)
+    base = url(world, f"/projects/{wedding['id']}")
+    added = await send(
+        lead,
+        "POST",
+        f"{base}/members",
+        json={"membership_id": str(world["member2"].membership_id), "project_role": "planner"},
+    )
+    again = await send(
+        lead,
+        "POST",
+        f"{base}/members",
+        json={"membership_id": str(world["member2"].membership_id)},
+    )
+    entry = next(m for m in added.json() if m["full_name"] == "Mira Second")
+
+    changed = await send(
+        lead, "PATCH", f"{base}/members/{entry['id']}", json={"project_role": "viewer"}
+    )
+    as_viewer = (await world["member2"].client.get(base)).json()
+    removed = await send(lead, "DELETE", f"{base}/members/{entry['id']}")
+
+    assert again.json()["code"] == "already_assigned"
+    assert changed.status_code == 200
+    assert as_viewer["my_role"] == "viewer"
+    assert removed.status_code == 204
+    assert (await world["member2"].client.get(base)).status_code == 404
+    team = (await lead.get(f"{base}/members")).json()
+    assert [m["full_name"] for m in team] == ["Max Member"]
