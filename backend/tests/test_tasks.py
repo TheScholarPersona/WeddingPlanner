@@ -144,6 +144,7 @@ async def test_task_updates_need_the_current_version(world: World, wedding: dict
     assert first.status_code == 200
     assert first.headers["etag"] == '"2"'
     assert stale.status_code == 412
+    assert stale.json()["code"] == "stale_version"
 
 
 async def test_completing_all_tasks_completes_the_milestone(
@@ -308,3 +309,51 @@ async def test_checklists_comments_and_activity_are_protected_by_rls(
         ]
 
     assert counts == [0, 0, 0]
+
+
+# --- Added for the feature catalog: criteria that had no test yet -------------------------
+
+
+async def test_reorder_and_delete_tasks(world: World, wedding: dict[str, Any]) -> None:
+    client = world["member"].client
+    first = await new_task(client, world, wedding, title="First", due_date="2027-02-01")
+    second = await new_task(client, world, wedding, title="Second", due_date="2027-02-01")
+
+    reordered = await send(
+        client,
+        "POST",
+        P(world, wedding, "/tasks/reorder"),
+        json={"items": [{"id": second["id"], "position": 0}, {"id": first["id"], "position": 1}]},
+    )
+    same_day = [
+        t["title"]
+        for t in (await client.get(P(world, wedding, "/tasks"))).json()
+        if t["due_date"] == "2027-02-01"
+    ]
+    deleted = await send(client, "DELETE", P(world, wedding, f"/tasks/{first['id']}"))
+    gone = await client.get(P(world, wedding, f"/tasks/{first['id']}"))
+
+    assert reordered.status_code == 204
+    assert same_day == ["Second", "First"]
+    assert deleted.status_code == 204
+    assert gone.status_code == 404
+    titles = [t["title"] for t in (await client.get(P(world, wedding, "/tasks"))).json()]
+    assert "First" not in titles and "Second" in titles
+
+
+async def test_checklist_items_are_renamed_and_removed(
+    world: World, wedding: dict[str, Any]
+) -> None:
+    client = world["member"].client
+    task = await new_task(client, world, wedding, checklist=["Call venue", "Email band"])
+    first, second = task["checklist"]
+    base = P(world, wedding, f"/tasks/{task['id']}/checklist")
+
+    renamed = await send(client, "PATCH", f"{base}/{first['id']}", json={"title": "Call venue!"})
+    removed = await send(client, "DELETE", f"{base}/{second['id']}")
+
+    assert [i["title"] for i in renamed.json()["checklist"]] == ["Call venue!", "Email band"]
+    assert [i["title"] for i in removed.json()["checklist"]] == ["Call venue!"]
+    after = (await client.get(P(world, wedding, f"/tasks/{task['id']}"))).json()
+    assert [i["title"] for i in after["checklist"]] == ["Call venue!"]
+    assert after["checklist_total"] == 1
