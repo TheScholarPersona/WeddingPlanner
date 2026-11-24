@@ -169,3 +169,25 @@ it('shows viewers the wedding without edit controls', async () => {
   expect(screen.queryByRole('button', { name: 'Archive' })).not.toBeInTheDocument();
   expect(screen.queryByRole('button', { name: 'Delete' })).not.toBeInTheDocument();
 });
+
+it('lists weddings with progress and switches to the archive', async () => {
+  const { calls } = mockApi({
+    'GET /me': [200, meFixture()],
+    [`GET ${O}/projects?scope=all`]: [200, [summary]],
+    [`GET ${O}/projects?status=archived`]: [200, []],
+  });
+  const user = userEvent.setup();
+  renderRoute('/app/weddings');
+
+  const link = (await screen.findByText('Mia & Tom')).closest('a')!;
+  expect(link).toHaveAttribute('href', '/app/weddings/w1');
+  expect(within(link).getByText('47 % complete')).toBeInTheDocument();
+  expect(within(link).getByText('209 days')).toBeInTheDocument();
+
+  await user.click(screen.getByRole('button', { name: 'Archived' }));
+
+  // Only the `?status=archived` handler answers with an empty list.
+  expect(await screen.findByText('No weddings yet')).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Archived' })).toHaveAttribute('aria-pressed', 'true');
+  expect(calls.filter((c) => c.path === `${O}/projects`)).toHaveLength(2);
+});

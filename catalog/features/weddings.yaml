@@ -1,0 +1,315 @@
+area: weddings
+features:
+  # --- Weddings ----------------------------------------------------------------------------
+  - id: weddings.create
+    title: Create a wedding
+    group: weddings.records
+    summary: "A new wedding gets its milestones and tasks from the studio's template, scheduled backwards from the wedding date."
+    description: |
+      The planner picks an existing client or enters the couple's name for a new one. The
+      default template creates six milestones with 19 tasks; due dates count back from the
+      wedding date. Whoever creates the wedding becomes its lead.
+    usage:
+      - channel: web
+        text: "**Weddings** → **New wedding** (`/app/weddings/new`)."
+      - channel: api
+        text: "`POST /orgs/{org_id}/projects` with `client_id` or `new_client_name`, date, venue, template."
+    technical:
+      components:
+        - backend/app/projects/service.py
+        - frontend/src/features/weddings/NewWeddingPage.tsx
+      endpoints:
+        - "POST /orgs/{org_id}/projects"
+      uiRoutes:
+        - /app/weddings/new
+    acceptance:
+      - id: from-template
+        kind: effect
+        text: "A wedding for 'Mia & Tom' in 400 days gets a new client, six milestones with 19 open tasks, the last milestone on the wedding date and its creator as lead."
+      - id: create-ui
+        kind: effect
+        text: "The form creates the wedding for a new couple with the default template and opens the new wedding."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_projects.py
+        test: test_new_wedding_uses_the_default_template
+        covers: [from-template]
+      - kind: unit
+        file: frontend/src/features/weddings/weddings.test.tsx
+        test: creates a wedding for a new couple with the default template
+        covers: [create-ui]
+
+  - id: weddings.list
+    title: Wedding list
+    group: weddings.records
+    summary: "Planners see the weddings they work on with date, days to go and progress; admins see all."
+    usage:
+      - channel: web
+        text: "**Weddings** (`/app/weddings`) with the filters All, Mine and Archived."
+      - channel: api
+        text: "`GET /orgs/{org_id}/projects?scope=all|mine&status=`."
+    rules:
+      - Team members see only the weddings they are assigned to; this holds in the database, too.
+      - Archived weddings appear only under Archived.
+    technical:
+      components:
+        - backend/app/projects/service.py
+        - frontend/src/features/weddings/WeddingsPage.tsx
+      endpoints:
+        - "GET /orgs/{org_id}/projects"
+      uiRoutes:
+        - /app/weddings
+    acceptance:
+      - id: own-weddings
+        kind: rule
+        text: "A wedding is visible to its lead and the org admin; another team member and other studios get 'not found' and an empty list."
+        code: "404"
+      - id: rls
+        kind: effect
+        text: "In the database, a team member who is on no wedding sees no weddings, tasks or clients."
+      - id: list-ui
+        kind: effect
+        text: "The list links each wedding with progress and days to go; the Archived filter loads the archived weddings."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_projects.py
+        test: test_weddings_are_visible_only_to_their_team
+        covers: [own-weddings]
+      - kind: integration
+        file: backend/tests/test_projects.py
+        test: test_rls_hides_unassigned_weddings_in_sql
+        covers: [rls]
+      - kind: unit
+        file: frontend/src/features/weddings/weddings.test.tsx
+        test: lists weddings with progress and switches to the archive
+        covers: [list-ui]
+
+  - id: weddings.details
+    title: Wedding details
+    group: weddings.records
+    summary: "The wedding page shows date, venue, guests, style, milestones and team; leads and planners edit the details."
+    usage:
+      - channel: web
+        text: "Wedding page (`/app/weddings/:id`) → **Edit details**."
+      - channel: api
+        text: "`GET`/`PATCH /orgs/{org_id}/projects/{project_id}` with `If-Match`."
+    rules:
+      - "Changes need the version they are based on (`precondition_required`), otherwise two people overwrite each other (`stale_version`)."
+      - Viewers see the wedding without edit controls.
+    technical:
+      components:
+        - backend/app/projects/service.py
+        - backend/app/core/versioning.py
+        - frontend/src/features/weddings/WeddingPage.tsx
+      endpoints:
+        - "GET /orgs/{org_id}/projects/{project_id}"
+        - "PATCH /orgs/{org_id}/projects/{project_id}"
+      uiRoutes:
+        - /app/weddings/:id
+    acceptance:
+      - id: saved-with-version
+        kind: effect
+        text: "With the current version, the planned guests are saved and the version goes up."
+      - id: version-required
+        kind: rule
+        text: "A change without a version is refused."
+        code: precondition_required
+      - id: stale
+        kind: rule
+        text: "A change based on an outdated version is refused."
+        code: stale_version
+      - id: edit-ui
+        kind: effect
+        text: "The page shows the milestones with their progress; a lead edits the guests and the app sends the version it is based on."
+      - id: viewers-read
+        kind: rule
+        text: "Viewers see the wedding without edit, archive and delete buttons."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_projects.py
+        test: test_updates_need_the_current_version
+        covers: [saved-with-version, version-required, stale]
+      - kind: unit
+        file: frontend/src/features/weddings/weddings.test.tsx
+        test: lets leads edit details and sends the version it is based on
+        covers: [edit-ui]
+      - kind: unit
+        file: frontend/src/features/weddings/weddings.test.tsx
+        test: shows viewers the wedding without edit controls
+        covers: [viewers-read]
+
+  - id: weddings.archive
+    title: Archive, restore and delete a wedding
+    group: weddings.records
+    summary: "After the wedding, leads archive it; it can be restored, and only org admins delete it."
+    usage:
+      - channel: web
+        text: "Wedding page → **Archive** / **Restore** / **Delete**."
+      - channel: api
+        text: "`POST …/archive`, `POST …/restore`, `DELETE /orgs/{org_id}/projects/{project_id}`."
+    rules:
+      - Archived weddings leave the default list; the couple keeps access for the studio's period.
+      - Restoring brings the wedding back as completed.
+      - "Only org admins delete weddings (`403` for leads)."
+    dependsOn: [privacy.couple-access-end]
+    technical:
+      components:
+        - backend/app/projects/service.py
+        - frontend/src/features/weddings/WeddingPage.tsx
+      endpoints:
+        - "POST /orgs/{org_id}/projects/{project_id}/archive"
+        - "POST /orgs/{org_id}/projects/{project_id}/restore"
+        - "DELETE /orgs/{org_id}/projects/{project_id}"
+    acceptance:
+      - id: archived
+        kind: effect
+        text: "An archived wedding is missing from the default list and listed under archived."
+      - id: restored
+        kind: effect
+        text: "A restored wedding is completed and back in the default list."
+      - id: admins-delete
+        kind: rule
+        text: "A lead cannot delete the wedding; an org admin can, and then it is gone."
+        code: "403"
+    evidence:
+      - kind: integration
+        file: backend/tests/test_projects.py
+        test: test_only_admins_delete_and_archived_weddings_leave_the_list
+        covers: [archived, admins-delete]
+      - kind: integration
+        file: backend/tests/test_projects.py
+        test: test_restoring_an_archived_wedding
+        covers: [restored]
+
+  # --- Wedding team ------------------------------------------------------------------------
+  - id: weddings.team
+    title: Wedding team
+    group: weddings.team
+    summary: "Leads put team members on a wedding as lead, planner or viewer; only they get access to it."
+    usage:
+      - channel: web
+        text: "Wedding page → **Team** → add, change role, remove."
+      - channel: api
+        text: "`GET`/`POST …/members`, `PATCH`/`DELETE …/members/{member_id}`."
+    rules:
+      - "Every wedding keeps at least one lead (`last_lead`)."
+      - "Each person is on a wedding once (`already_assigned`)."
+      - Viewers read and comment but do not edit.
+    technical:
+      components:
+        - backend/app/projects/service.py
+        - frontend/src/features/weddings/WeddingPage.tsx
+      endpoints:
+        - "GET /orgs/{org_id}/projects/{project_id}/members"
+        - "POST /orgs/{org_id}/projects/{project_id}/members"
+        - "PATCH /orgs/{org_id}/projects/{project_id}/members/{member_id}"
+        - "DELETE /orgs/{org_id}/projects/{project_id}/members/{member_id}"
+    acceptance:
+      - id: assign
+        kind: effect
+        text: "A team member added as viewer opens the wedding with the role viewer and cannot change it."
+      - id: change-and-remove
+        kind: effect
+        text: "Changing a planner to viewer takes effect; after removal the person gets 'not found' and the team lists only the lead."
+      - id: once
+        kind: rule
+        text: "Adding the same person twice is refused."
+        code: already_assigned
+      - id: keep-lead
+        kind: rule
+        text: "The only lead cannot be changed to planner."
+        code: last_lead
+    evidence:
+      - kind: integration
+        file: backend/tests/test_projects.py
+        test: test_assigning_a_planner_grants_access
+        covers: [assign]
+      - kind: integration
+        file: backend/tests/test_projects.py
+        test: test_wedding_team_roles_change_and_members_leave
+        covers: [change-and-remove, once]
+      - kind: integration
+        file: backend/tests/test_projects.py
+        test: test_every_wedding_keeps_a_lead
+        covers: [keep-lead]
+
+  # --- Milestones and activity -----------------------------------------------------------------
+  - id: weddings.milestones
+    title: Milestones
+    group: weddings.milestones
+    summary: "Milestones structure the planning; they complete themselves when all their tasks are done."
+    usage:
+      - channel: web
+        text: "Wedding → **Tasks** → milestones with their tasks."
+      - channel: api
+        text: "`GET`/`POST …/milestones`, `PATCH`/`DELETE …/milestones/{milestone_id}`."
+    rules:
+      - A milestone is completed when all its tasks are done, and open again when one is reopened.
+      - Removing a milestone keeps its tasks.
+    technical:
+      components:
+        - backend/app/tasks/service.py
+        - frontend/src/features/tasks/WeddingTasksPage.tsx
+      endpoints:
+        - "GET /orgs/{org_id}/projects/{project_id}/milestones"
+        - "POST /orgs/{org_id}/projects/{project_id}/milestones"
+        - "PATCH /orgs/{org_id}/projects/{project_id}/milestones/{milestone_id}"
+        - "DELETE /orgs/{org_id}/projects/{project_id}/milestones/{milestone_id}"
+    acceptance:
+      - id: manage
+        kind: effect
+        text: "A milestone is added and renamed; after removing a milestone, its tasks stay without milestone."
+      - id: auto-complete
+        kind: effect
+        text: "Completing all tasks of a milestone completes it; reopening one task opens it again."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_projects.py
+        test: test_milestones_are_added_changed_and_removed
+        covers: [manage]
+      - kind: integration
+        file: backend/tests/test_tasks.py
+        test: test_completing_all_tasks_completes_the_milestone
+        covers: [auto-complete]
+
+  - id: weddings.activity
+    title: Activity feed
+    group: weddings.milestones
+    summary: "Each wedding shows what happened, by whom: tasks done or reopened, milestones reached, the couple's steps."
+    usage:
+      - channel: web
+        text: "Wedding page → **Activity**."
+      - channel: api
+        text: "`GET …/projects/{project_id}/activity`."
+    rules:
+      - Only the wedding's team sees its activity, enforced in the database.
+    technical:
+      components:
+        - backend/app/tasks/service.py
+        - backend/app/db/rls.py
+        - frontend/src/features/tasks/ActivityFeed.tsx
+      endpoints:
+        - "GET /orgs/{org_id}/projects/{project_id}/activity"
+    acceptance:
+      - id: events
+        kind: effect
+        text: "Completing tasks, reaching a milestone and reopening a task appear in the feed."
+      - id: couple-steps
+        kind: effect
+        text: "When the couple completes a task, the feed shows it first with the couple's name."
+      - id: rls
+        kind: rule
+        text: "In the database, someone outside the wedding sees no activity, checklist items or comments."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_tasks.py
+        test: test_completing_all_tasks_completes_the_milestone
+        covers: [events]
+      - kind: integration
+        file: backend/tests/test_budget_portal.py
+        test: test_couple_completes_only_their_own_tasks
+        covers: [couple-steps]
+      - kind: integration
+        file: backend/tests/test_tasks.py
+        test: test_checklists_comments_and_activity_are_protected_by_rls
+        covers: [rls]

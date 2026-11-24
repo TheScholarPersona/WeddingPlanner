@@ -78,7 +78,7 @@ areas:
   - id: weddings
     title: Weddings
     summary: Weddings with date, venue, team, milestones, activity and archive.
-    status: open
+    status: catalogued
     owns:
       endpoints: ["/orgs/{org_id}/projects"]
       uiRoutes: ["/app/weddings"]
