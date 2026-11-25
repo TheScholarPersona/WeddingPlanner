@@ -1,0 +1,130 @@
+area: clients
+features:
+  - id: clients.records
+    title: Clients
+    group: clients.records
+    summary: "Couples and enquiries with status from inquiry to completed, their contacts and their weddings."
+    description: |
+      A client is usually a couple. Planners record enquiries before there is a wedding; clients
+      also come into being when a wedding is created for a new couple. A client is visible to
+      org admins, its creator and the teams of its weddings.
+    usage:
+      - channel: web
+        text: "**Clients** (`/app/clients`) → search, filter by status, **New client**; open a client."
+      - channel: api
+        text: "`GET`/`POST /orgs/{org_id}/clients?q=&status=`, `GET`/`PATCH …/clients/{client_id}`."
+    rules:
+      - The first contact becomes the primary contact unless another one is marked.
+      - "A client is private to its creator until linked to a wedding; others get `404`."
+    technical:
+      components:
+        - backend/app/clients/service.py
+        - frontend/src/features/clients/ClientsPage.tsx
+        - frontend/src/features/clients/ClientPage.tsx
+      endpoints:
+        - "GET /orgs/{org_id}/clients"
+        - "POST /orgs/{org_id}/clients"
+        - "GET /orgs/{org_id}/clients/{client_id}"
+        - "PATCH /orgs/{org_id}/clients/{client_id}"
+      uiRoutes:
+        - /app/clients
+        - /app/clients/:id
+    acceptance:
+      - id: create-and-search
+        kind: effect
+        text: "A client with two contacts gets the first as primary; searching 'anna' finds it with the primary contact and email."
+      - id: private
+        kind: rule
+        text: "Another team member gets 'not found' for a client someone else created; the org admin sees it."
+        code: "404"
+      - id: edit
+        kind: effect
+        text: "Renaming a client and setting it to booked is saved."
+      - id: page-ui
+        kind: effect
+        text: "The client list shows status and primary contact; creating a client with a first name sends one contact and opens the new client."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_clients_vendors_templates.py
+        test: test_client_with_contacts
+        covers: [create-and-search]
+      - kind: integration
+        file: backend/tests/test_clients_vendors_templates.py
+        test: test_clients_are_private_to_their_creator_until_linked
+        covers: [private]
+      - kind: integration
+        file: backend/tests/test_clients_vendors_templates.py
+        test: test_client_details_and_contacts_are_edited
+        covers: [edit]
+      - kind: unit
+        file: frontend/src/features/clients/clients.test.tsx
+        test: lists clients and creates a new enquiry with its primary contact
+        covers: [page-ui]
+
+  - id: clients.contacts
+    title: Client contacts
+    group: clients.records
+    summary: "Each client holds its people – partners, family – with email and phone; one of them is the primary contact."
+    usage:
+      - channel: web
+        text: "Client page → **Contacts** → **Add contact**, edit or remove."
+      - channel: api
+        text: "`POST …/clients/{client_id}/contacts`, `PATCH`/`DELETE …/contacts/{contact_id}`."
+    technical:
+      components:
+        - backend/app/clients/service.py
+        - frontend/src/features/clients/ClientPage.tsx
+      endpoints:
+        - "POST /orgs/{org_id}/clients/{client_id}/contacts"
+        - "PATCH /orgs/{org_id}/clients/{client_id}/contacts/{contact_id}"
+        - "DELETE /orgs/{org_id}/clients/{client_id}/contacts/{contact_id}"
+    acceptance:
+      - id: manage
+        kind: effect
+        text: "A second contact added as primary takes over; the first one's phone is edited, then removed, leaving the new primary contact."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_clients_vendors_templates.py
+        test: test_client_details_and_contacts_are_edited
+        covers: [manage]
+
+  - id: clients.delete
+    title: Delete a client
+    group: clients.records
+    summary: "Org admins delete clients that have no weddings; to remove everything about a client, use erasure."
+    usage:
+      - channel: web
+        text: "Client page → **Delete**."
+      - channel: api
+        text: "`DELETE /orgs/{org_id}/clients/{client_id}`."
+    rules:
+      - "Only org admins delete clients (`403`)."
+      - "Clients with weddings cannot be deleted (`client_has_projects`)."
+    dependsOn: [privacy.client-erase]
+    technical:
+      components:
+        - backend/app/clients/service.py
+        - frontend/src/features/clients/ClientPage.tsx
+      endpoints:
+        - "DELETE /orgs/{org_id}/clients/{client_id}"
+    acceptance:
+      - id: deleted
+        kind: effect
+        text: "A client without weddings is deleted by the org admin and no longer listed."
+      - id: admins-only
+        kind: rule
+        text: "A team member cannot delete a client."
+        code: "403"
+      - id: blocked
+        kind: rule
+        text: "Deleting a client that still has a wedding is refused."
+        code: client_has_projects
+    evidence:
+      - kind: integration
+        file: backend/tests/test_clients_vendors_templates.py
+        test: test_clients_without_weddings_are_deleted_by_admins
+        covers: [deleted]
+      - kind: integration
+        file: backend/tests/test_clients_vendors_templates.py
+        test: test_clients_with_weddings_cannot_be_deleted
+        covers: [admins-only, blocked]

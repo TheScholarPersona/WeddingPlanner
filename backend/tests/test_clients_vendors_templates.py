@@ -65,6 +65,7 @@ async def test_clients_with_weddings_cannot_be_deleted(world: World) -> None:
 
     assert member_delete.status_code == 403
     assert blocked.status_code == 409
+    assert blocked.json()["code"] == "client_has_projects"
 
 
 async def test_vendor_directory(world: World) -> None:
@@ -173,3 +174,79 @@ async def test_templates_are_edited_made_default_and_deleted(world: World) -> No
     assert after_item["items"] == []
     assert deleted.status_code == 204
     assert (await admin.get(base)).status_code == 404
+
+
+async def test_client_details_and_contacts_are_edited(world: World) -> None:
+    member = world["member"].client
+    created = (
+        await send(
+            member,
+            "POST",
+            url(world, "/clients"),
+            json={"display_name": "Anna & Lukas", "contacts": [{"first_name": "Anna"}]},
+        )
+    ).json()
+    base = url(world, f"/clients/{created['id']}")
+
+    updated = await send(
+        member, "PATCH", base, json={"display_name": "Anna & Lukas B.", "status": "booked"}
+    )
+    added = await send(
+        member,
+        "POST",
+        f"{base}/contacts",
+        json={"first_name": "Lukas", "email": "lukas@example.com", "is_primary": True},
+    )
+    anna = created["contacts"][0]
+    edited = await send(
+        member, "PATCH", f"{base}/contacts/{anna['id']}", json={"phone": "+49 30 1234"}
+    )
+    removed = await send(member, "DELETE", f"{base}/contacts/{anna['id']}")
+    detail = (await member.get(base)).json()
+
+    assert (updated.json()["display_name"], updated.json()["status"]) == (
+        "Anna & Lukas B.",
+        "booked",
+    )
+    assert added.status_code == 201
+    assert edited.json()["phone"] == "+49 30 1234"
+    assert removed.status_code == 204
+    assert [(c["first_name"], c["is_primary"]) for c in detail["contacts"]] == [("Lukas", True)]
+
+
+async def test_clients_without_weddings_are_deleted_by_admins(world: World) -> None:
+    created = (
+        await send(
+            world["member"].client, "POST", url(world, "/clients"), json={"display_name": "E & F"}
+        )
+    ).json()
+    path = url(world, f"/clients/{created['id']}")
+
+    deleted = await send(world["org_admin"].client, "DELETE", path)
+
+    assert deleted.status_code == 204
+    assert (await world["org_admin"].client.get(path)).status_code == 404
+    names = [
+        c["display_name"]
+        for c in (await world["org_admin"].client.get(url(world, "/clients"))).json()
+    ]
+    assert "E & F" not in names
+
+
+async def test_vendor_details_change(world: World) -> None:
+    member = world["member"].client
+    vendor = (
+        await send(
+            member,
+            "POST",
+            url(world, "/vendors"),
+            json={"name": "Blumenwerk", "category": "flowers"},
+        )
+    ).json()
+    path = url(world, f"/vendors/{vendor['id']}")
+
+    updated = await send(member, "PATCH", path, json={"rating": 4, "contact_name": "Jana Blum"})
+    detail = (await member.get(path)).json()
+
+    assert updated.status_code == 200
+    assert (detail["rating"], detail["contact_name"]) == (4, "Jana Blum")

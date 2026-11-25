@@ -1,0 +1,94 @@
+area: vendors
+features:
+  - id: vendors.directory
+    title: Vendor directory
+    group: vendors.directory
+    summary: "The studio's trusted photographers, florists, caterers and others with contact, category and rating, reused for every wedding."
+    usage:
+      - channel: web
+        text: "**Vendors** (`/app/vendors`) → filter by category, **New vendor**, **Edit**."
+      - channel: api
+        text: "`GET`/`POST /orgs/{org_id}/vendors?category=`, `GET`/`PATCH`/`DELETE …/vendors/{vendor_id}`."
+    rules:
+      - "Only known categories are accepted (`422`)."
+    technical:
+      components:
+        - backend/app/vendors/service.py
+        - frontend/src/features/vendors/VendorsPage.tsx
+      endpoints:
+        - "GET /orgs/{org_id}/vendors"
+        - "POST /orgs/{org_id}/vendors"
+        - "GET /orgs/{org_id}/vendors/{vendor_id}"
+        - "PATCH /orgs/{org_id}/vendors/{vendor_id}"
+        - "DELETE /orgs/{org_id}/vendors/{vendor_id}"
+      uiRoutes:
+        - /app/vendors
+    acceptance:
+      - id: create-filter-delete
+        kind: effect
+        text: "A photographer is created, found under the photo category and deleted again."
+      - id: category
+        kind: rule
+        text: "An unknown category is refused."
+        code: "422"
+      - id: edit
+        kind: effect
+        text: "A vendor's rating and contact person are changed."
+      - id: page-ui
+        kind: effect
+        text: "The directory shows usage and rating, filters by category and saves a new rating."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_clients_vendors_templates.py
+        test: test_vendor_directory
+        covers: [create-filter-delete, category]
+      - kind: integration
+        file: backend/tests/test_clients_vendors_templates.py
+        test: test_vendor_details_change
+        covers: [edit]
+      - kind: unit
+        file: frontend/src/features/vendors/vendors.test.tsx
+        test: filters the vendor directory and rates a vendor
+        covers: [page-ui]
+
+  - id: vendors.wedding-vendors
+    title: Vendors of a wedding
+    group: vendors.wedding
+    summary: "Planners link vendors from the directory to a wedding and track them from considered to booked."
+    usage:
+      - channel: web
+        text: "Wedding overview → **Vendors** → add from the directory, set status."
+      - channel: api
+        text: "`GET`/`POST …/projects/{project_id}/vendors`, `PATCH`/`DELETE …/vendors/{link_id}`."
+    rules:
+      - "A vendor is linked to a wedding once (`already_linked`)."
+    dependsOn: [vendors.directory]
+    technical:
+      components:
+        - backend/app/projects/service.py
+        - frontend/src/features/weddings/WeddingPage.tsx
+      endpoints:
+        - "GET /orgs/{org_id}/projects/{project_id}/vendors"
+        - "POST /orgs/{org_id}/projects/{project_id}/vendors"
+        - "PATCH /orgs/{org_id}/projects/{project_id}/vendors/{link_id}"
+        - "DELETE /orgs/{org_id}/projects/{project_id}/vendors/{link_id}"
+    acceptance:
+      - id: link-and-book
+        kind: effect
+        text: "A florist linked to a wedding can be set to booked, and the directory counts one wedding for it."
+      - id: once
+        kind: rule
+        text: "Linking the same vendor twice is refused."
+        code: already_linked
+      - id: remove
+        kind: effect
+        text: "After removing the link the wedding lists no vendors and the directory counts none."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_projects.py
+        test: test_wedding_vendors
+        covers: [link-and-book, once]
+      - kind: integration
+        file: backend/tests/test_projects.py
+        test: test_a_vendor_is_removed_from_a_wedding
+        covers: [remove]
