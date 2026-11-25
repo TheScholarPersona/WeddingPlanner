@@ -1,0 +1,209 @@
+area: budget
+features:
+  # --- Budget planning --------------------------------------------------------------------
+  - id: budget.overview
+    title: Budget overview
+    group: budget.planning
+    summary: "Each wedding has a budget with a total, category sums, a forecast and warnings when plans, quotes or payments go off track."
+    description: |
+      New weddings start with the usual categories (venue, catering, photography, …). The
+      forecast takes the contracted amount where there is one, else the quote, else the plan.
+      Warnings name quotes above plan, a forecast above the total and overdue payments.
+    usage:
+      - channel: web
+        text: "Wedding → **Budget** (`/app/weddings/:id/budget`)."
+      - channel: api
+        text: "`GET …/budget`; the lead sets the total with `PATCH …/budget` and `If-Match`."
+    rules:
+      - "Only the lead and org admins set the total; viewers read only (`403`)."
+      - Amounts are stored in cents.
+    technical:
+      components:
+        - backend/app/budget/service.py
+        - frontend/src/features/budget/BudgetPage.tsx
+      endpoints:
+        - "GET /orgs/{org_id}/projects/{project_id}/budget"
+        - "PATCH /orgs/{org_id}/projects/{project_id}/budget"
+      uiRoutes:
+        - /app/weddings/:id/budget
+    acceptance:
+      - id: default-categories
+        kind: effect
+        text: "A new wedding's budget starts with Venue, Catering and Photography, no amounts and no warnings."
+      - id: totals-and-warnings
+        kind: effect
+        text: "With a total of 38,000 € and three items, the sums, forecast and unplanned rest are right; a quote above plan and a forecast above the total are warned about."
+      - id: viewers-read
+        kind: rule
+        text: "A viewer reads the budget but can neither add a category nor set the total."
+        code: "403"
+      - id: page-ui
+        kind: effect
+        text: "The budget page shows totals, warnings and items including internal cost."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_budget_portal.py
+        test: test_new_weddings_get_default_budget_categories
+        covers: [default-categories]
+      - kind: integration
+        file: backend/tests/test_budget_portal.py
+        test: test_totals_forecast_and_warnings
+        covers: [totals-and-warnings]
+      - kind: integration
+        file: backend/tests/test_budget_portal.py
+        test: test_budget_permissions_and_versions
+        covers: [viewers-read]
+      - kind: unit
+        file: frontend/src/features/budget/budget.test.tsx
+        test: shows totals, warnings and items with internal cost
+        covers: [page-ui]
+
+  - id: budget.categories
+    title: Budget categories
+    group: budget.planning
+    summary: "Planners add, rename and remove categories; a category with items cannot be removed."
+    usage:
+      - channel: web
+        text: "Budget → **Add category**, or the category's menu."
+      - channel: api
+        text: "`POST …/budget/categories`, `PATCH`/`DELETE …/categories/{category_id}`."
+    rules:
+      - "Categories with items cannot be removed (`category_not_empty`)."
+    technical:
+      components:
+        - backend/app/budget/service.py
+        - frontend/src/features/budget/BudgetPage.tsx
+      endpoints:
+        - "POST /orgs/{org_id}/projects/{project_id}/budget/categories"
+        - "PATCH /orgs/{org_id}/projects/{project_id}/budget/categories/{category_id}"
+        - "DELETE /orgs/{org_id}/projects/{project_id}/budget/categories/{category_id}"
+    acceptance:
+      - id: add-rename-remove
+        kind: effect
+        text: "A category 'Rings' is added, renamed to 'Rings & jewellery' and removed again."
+      - id: not-empty
+        kind: rule
+        text: "Removing a category that holds an item is refused."
+        code: category_not_empty
+    evidence:
+      - kind: integration
+        file: backend/tests/test_budget_portal.py
+        test: test_budget_categories_are_added_renamed_and_removed
+        covers: [add-rename-remove, not-empty]
+
+  - id: budget.items
+    title: Budget items
+    group: budget.planning
+    summary: "Each item carries planned, quoted and contracted amounts, an internal cost for the studio and whether the couple sees it."
+    usage:
+      - channel: web
+        text: "Budget → **Add item**; open an item to edit."
+      - channel: api
+        text: "`POST …/budget/items`, `PATCH …/items/{item_id}` with `If-Match`, `DELETE …/items/{item_id}`."
+    rules:
+      - "Edits need the current version (`stale_version`)."
+      - Deleting an item is recorded in the audit log.
+    technical:
+      components:
+        - backend/app/budget/service.py
+        - frontend/src/features/budget/BudgetPage.tsx
+      endpoints:
+        - "POST /orgs/{org_id}/projects/{project_id}/budget/items"
+        - "PATCH /orgs/{org_id}/projects/{project_id}/budget/items/{item_id}"
+        - "DELETE /orgs/{org_id}/projects/{project_id}/budget/items/{item_id}"
+    acceptance:
+      - id: versioned
+        kind: rule
+        text: "Changing an item with an outdated version is refused."
+        code: stale_version
+      - id: removed
+        kind: effect
+        text: "A deleted item no longer counts in the totals and its deletion is in the audit log."
+      - id: add-ui
+        kind: effect
+        text: "The form sends the amount in cents."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_budget_portal.py
+        test: test_budget_permissions_and_versions
+        covers: [versioned]
+      - kind: integration
+        file: backend/tests/test_budget_portal.py
+        test: test_budget_items_and_payments_are_removed
+        covers: [removed]
+      - kind: unit
+        file: frontend/src/features/budget/budget.test.tsx
+        test: adds an item with the amount in cents
+        covers: [add-ui]
+
+  - id: budget.payments
+    title: Payments
+    group: budget.planning
+    summary: "Deposits and instalments per item with due dates; paid amounts add up and overdue payments are flagged."
+    usage:
+      - channel: web
+        text: "Open a budget item → **Payments**."
+      - channel: api
+        text: "`POST …/items/{item_id}/payments`, `PATCH`/`DELETE …/payments/{payment_id}`."
+    technical:
+      components:
+        - backend/app/budget/service.py
+        - frontend/src/features/budget/BudgetPage.tsx
+      endpoints:
+        - "POST /orgs/{org_id}/projects/{project_id}/budget/items/{item_id}/payments"
+        - "PATCH /orgs/{org_id}/projects/{project_id}/budget/items/{item_id}/payments/{payment_id}"
+        - "DELETE /orgs/{org_id}/projects/{project_id}/budget/items/{item_id}/payments/{payment_id}"
+    acceptance:
+      - id: paid-and-overdue
+        kind: effect
+        text: "A paid deposit counts as paid; an unpaid instalment with a past due date is upcoming, overdue and warned about; once paid, nothing is upcoming."
+      - id: removed
+        kind: effect
+        text: "Removing a paid payment lowers the paid sum to zero."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_budget_portal.py
+        test: test_payments_and_overdue_warning
+        covers: [paid-and-overdue]
+      - kind: integration
+        file: backend/tests/test_budget_portal.py
+        test: test_budget_items_and_payments_are_removed
+        covers: [removed]
+
+  # --- Budget for the couple -----------------------------------------------------------------
+  - id: budget.couple-view
+    title: Budget for the couple
+    group: budget.couple
+    summary: "The couple sees the items the planner shares, with amounts and payments, but never internal costs or notes."
+    usage:
+      - channel: portal
+        text: "**Budget** (`/portal/budget`)."
+      - channel: api
+        text: "`GET /portal/projects/{project_id}/budget`."
+    rules:
+      - Only shared items appear; internal cost and internal notes never reach the couple.
+    dependsOn: [portal.isolation]
+    technical:
+      components:
+        - backend/app/portal/service.py
+        - frontend/src/features/portal/PortalBudgetPage.tsx
+      endpoints:
+        - "GET /portal/projects/{project_id}/budget"
+      uiRoutes:
+        - /portal/budget
+    acceptance:
+      - id: shared-only
+        kind: rule
+        text: "Of a shared and an internal item, the couple's budget lists only the shared category and no internal fields."
+      - id: portal-ui
+        kind: effect
+        text: "The portal shows the shared items with status and upcoming payments, without anything internal."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_budget_portal.py
+        test: test_portal_shows_only_what_is_shared
+        covers: [shared-only]
+      - kind: unit
+        file: frontend/src/features/portal/portal.test.tsx
+        test: shows the shared budget without internal details
+        covers: [portal-ui]

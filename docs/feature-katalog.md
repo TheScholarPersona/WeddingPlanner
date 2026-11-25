@@ -22,9 +22,10 @@ Only features proven by passing tests are in the catalog. Everything else sits i
 | Organization & team | catalogued | 8, all proven |
 | Weddings | catalogued | 7, all proven |
 | Tasks & templates | catalogued | 6, all proven |
+| Budget | catalogued | 5, all proven |
 | Moodboards | catalogued (pilot) | 14, all proven |
 | Feature catalog | catalogued | 5, all proven |
-| 6 other areas | open | – |
+| 5 other areas | open | – |
 
 All 236 parts of the app are already assigned to an area: 184 endpoints, 42 pages, 6 worker jobs
 and 4 CLI commands. In open areas, parts without a feature are only notes.
@@ -134,7 +135,7 @@ tool's own tests, checks the catalog against all reports and uploads the view as
 
 ## Next areas
 
-Suggested order: the remaining planning areas – Budget, Vendors, Clients, Documents, Calendar,
+Suggested order: the remaining planning areas – Vendors, Clients, Documents, Calendar,
 Comments & notifications. "Organization requires two-factor authentication" belongs to Organization & team.
 
 Expect gaps like those found so far. Before the moodboards pilot, sections, team hearts, the
@@ -153,5 +154,6 @@ removing team members had none, and the wedding list page had no frontend test (
 one error code asserted). Restoring sets the status to completed, which is noted as current
 behaviour. For Tasks & templates, sorting and deleting tasks, editing checklist items, the
 couple's checklist and reopening, and editing or deleting templates had none (four tests added, two
-error codes asserted). Behaviour that only the full-stack
+error codes asserted). For Budget, categories and removing items and payments had none (two tests
+added, one error code asserted). Behaviour that only the full-stack
 Playwright tests check needs a CI job with the Docker stack before it counts.

@@ -173,6 +173,7 @@ async def test_budget_permissions_and_versions(world: World, wedding: dict[str, 
     assert write.status_code == 403
     assert frame.status_code == 403
     assert stale.status_code == 412
+    assert stale.json()["code"] == "stale_version"
 
 
 # --- Couple access ---------------------------------------------------------------------------
@@ -432,3 +433,74 @@ async def test_couple_ticks_checklist_items_and_reopens_their_task(
     assert [i["is_done"] for i in mine["checklist"]] == [True, False]
     assert next(t for t in reopened.json() if t["id"] == task["id"])["status"] != "done"
     assert planner_view["checklist_done"] == 1
+
+
+# --- Added for the feature catalog: criteria that had no test yet (budget) -----------------
+
+
+async def test_budget_categories_are_added_renamed_and_removed(
+    world: World, wedding: dict[str, Any]
+) -> None:
+    lead = world["member"].client
+    added = await send(
+        lead, "POST", P(world, wedding, "/budget/categories"), json={"name": "Rings"}
+    )
+    rings = next(c for c in added.json()["categories"] if c["name"] == "Rings")
+    renamed = await send(
+        lead,
+        "PATCH",
+        P(world, wedding, f"/budget/categories/{rings['id']}"),
+        json={"name": "Rings & jewellery"},
+    )
+    await add_item(lead, world, wedding, "Venue", planned_cents=100_00)
+    venue = next(c for c in renamed.json()["categories"] if c["name"] == "Venue")
+
+    not_empty = await send(lead, "DELETE", P(world, wedding, f"/budget/categories/{venue['id']}"))
+    removed = await send(lead, "DELETE", P(world, wedding, f"/budget/categories/{rings['id']}"))
+    names = [c["name"] for c in (await budget(lead, world, wedding))["categories"]]
+
+    assert added.status_code == 201
+    assert "Rings & jewellery" in [c["name"] for c in renamed.json()["categories"]]
+    assert not_empty.status_code == 409
+    assert not_empty.json()["code"] == "category_not_empty"
+    assert removed.status_code == 204
+    assert "Rings & jewellery" not in names and "Venue" in names
+
+
+async def test_budget_items_and_payments_are_removed(
+    world: World, wedding: dict[str, Any], owner_engine: AsyncEngine
+) -> None:
+    lead = world["member"].client
+    view = await add_item(lead, world, wedding, "Venue", planned_cents=10_000_00)
+    item = item_named(view, "Venue")
+    base = P(world, wedding, f"/budget/items/{item['id']}")
+    paid = await send(
+        lead,
+        "POST",
+        f"{base}/payments",
+        json={"label": "Deposit", "amount_cents": 2_000_00, "paid": True},
+    )
+    payment = paid.json()["categories"][0]["items"][0]["payments"][0]
+
+    removed_payment = await send(lead, "DELETE", f"{base}/payments/{payment['id']}")
+    after_payment = await budget(lead, world, wedding)
+    removed_item = await send(lead, "DELETE", base)
+    after_item = await budget(lead, world, wedding)
+
+    assert paid.json()["totals"]["paid_cents"] == 2_000_00
+    assert removed_payment.status_code == 204
+    assert after_payment["totals"]["paid_cents"] == 0
+    assert removed_item.status_code == 204
+    assert after_item["totals"]["planned_cents"] == 0
+    assert all(not c["items"] for c in after_item["categories"])
+    async with owner_engine.begin() as conn:
+        actions = (
+            (
+                await conn.execute(
+                    text("SELECT action FROM audit_log WHERE action = 'budget_item.deleted'")
+                )
+            )
+            .scalars()
+            .all()
+        )
+    assert actions == ["budget_item.deleted"]
