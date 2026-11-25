@@ -21,9 +21,10 @@ Only features proven by passing tests are in the catalog. Everything else sits i
 | Platform operations | catalogued | 8, all proven |
 | Organization & team | catalogued | 8, all proven |
 | Weddings | catalogued | 7, all proven |
+| Tasks & templates | catalogued | 6, all proven |
 | Moodboards | catalogued (pilot) | 14, all proven |
 | Feature catalog | catalogued | 5, all proven |
-| 7 other areas | open | – |
+| 6 other areas | open | – |
 
 All 236 parts of the app are already assigned to an area: 184 endpoints, 42 pages, 6 worker jobs
 and 4 CLI commands. In open areas, parts without a feature are only notes.
@@ -133,8 +134,8 @@ tool's own tests, checks the catalog against all reports and uploads the view as
 
 ## Next areas
 
-Suggested order: the remaining planning areas – Tasks & templates, Budget, Vendors, Clients,
-Documents, Calendar, Comments & notifications. "Organization requires two-factor authentication" belongs to Organization & team.
+Suggested order: the remaining planning areas – Budget, Vendors, Clients, Documents, Calendar,
+Comments & notifications. "Organization requires two-factor authentication" belongs to Organization & team.
 
 Expect gaps like those found so far. Before the moodboards pilot, sections, team hearts, the
 couple's image access and the limits had no test (ten backend tests added). For Account & sign-in,
@@ -150,5 +151,7 @@ For Organization & team, withdrawing a team invitation and the settings page had
 added, one error code asserted). For Weddings, restoring from the archive, milestones and changing or
 removing team members had none, and the wedding list page had no frontend test (four tests added,
 one error code asserted). Restoring sets the status to completed, which is noted as current
-behaviour. Behaviour that only the full-stack
+behaviour. For Tasks & templates, sorting and deleting tasks, editing checklist items, the
+couple's checklist and reopening, and editing or deleting templates had none (four tests added, two
+error codes asserted). Behaviour that only the full-stack
 Playwright tests check needs a CI job with the Docker stack before it counts.

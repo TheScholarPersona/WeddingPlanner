@@ -14,6 +14,7 @@ features:
         text: "**Weddings** → **New wedding** (`/app/weddings/new`)."
       - channel: api
         text: "`POST /orgs/{org_id}/projects` with `client_id` or `new_client_name`, date, venue, template."
+    dependsOn: [tasks.templates]
     technical:
       components:
         - backend/app/projects/service.py

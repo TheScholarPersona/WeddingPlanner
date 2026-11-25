@@ -90,7 +90,7 @@ areas:
   - id: tasks
     title: Tasks & templates
     summary: Tasks with checklists for team and couple, my tasks, and reusable templates.
-    status: open
+    status: catalogued
     owns:
       endpoints: ["/orgs/{org_id}/projects/{project_id}/tasks", "/orgs/{org_id}/tasks",
                   "/orgs/{org_id}/templates", "/portal/projects/{project_id}/tasks"]

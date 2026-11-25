@@ -262,6 +262,7 @@ async def test_couple_completes_only_their_own_tasks(
 
     assert next(t for t in done.json() if t["id"] == theirs["id"])["status"] == "done"
     assert blocked.status_code == 403
+    assert blocked.json()["code"] == "not_your_task"
     assert hidden.status_code == 404
     assert feed[0]["verb"] == "task.completed"
     assert feed[0]["actor_name"] == "Mia Becker"
@@ -282,7 +283,10 @@ async def test_couple_comments_reach_the_planner(
         )
     ).json()
 
+    own = (await couple.get(f"{K}/tasks/{task['id']}/comments")).json()
+
     assert posted.status_code == 201
+    assert [c["body"] for c in own] == ["Done by Friday!"]
     assert [(c["author_name"], c["visibility"]) for c in seen] == [("Mia Becker", "client")]
 
 
@@ -399,3 +403,32 @@ async def test_only_leads_and_admins_manage_couple_access(
     assert invited.status_code == 403
     assert admin.status_code == 200
     assert admin.json() == {"logins": [], "invitations": []}
+
+
+async def test_couple_ticks_checklist_items_and_reopens_their_task(
+    world: World, wedding: dict[str, Any], couple: AsyncClient
+) -> None:
+    lead = world["member"].client
+    task = await new_task(
+        lead,
+        world,
+        wedding,
+        title="Choose the menu",
+        visibility="client",
+        assignee_type="client",
+        checklist=["Taste starters", "Pick dessert"],
+    )
+    K = f"/api/v1/portal/projects/{wedding['id']}"
+    item = task["checklist"][0]
+
+    ticked = await send(
+        couple, "PATCH", f"{K}/tasks/{task['id']}/checklist/{item['id']}", json={"is_done": True}
+    )
+    await send(couple, "POST", f"{K}/tasks/{task['id']}/complete")
+    reopened = await send(couple, "POST", f"{K}/tasks/{task['id']}/reopen")
+    planner_view = (await lead.get(P(world, wedding, f"/tasks/{task['id']}"))).json()
+
+    mine = next(t for t in ticked.json() if t["id"] == task["id"])
+    assert [i["is_done"] for i in mine["checklist"]] == [True, False]
+    assert next(t for t in reopened.json() if t["id"] == task["id"])["status"] != "done"
+    assert planner_view["checklist_done"] == 1

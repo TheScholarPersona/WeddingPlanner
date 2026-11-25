@@ -137,3 +137,39 @@ async def test_template_tasks_must_belong_to_a_milestone_of_the_same_template(wo
 
     assert response.status_code == 422
     assert response.json()["code"] == "invalid_parent"
+
+
+# --- Added for the feature catalog: criteria that had no test yet -------------------------
+
+
+async def test_templates_are_edited_made_default_and_deleted(world: World) -> None:
+    admin = world["org_admin"].client
+    template = (
+        await send(admin, "POST", url(world, "/templates"), json={"name": "Small wedding"})
+    ).json()
+    base = url(world, f"/templates/{template['id']}")
+    milestone = (
+        await send(
+            admin,
+            "POST",
+            f"{base}/items",
+            json={"kind": "milestone", "title": "Venue", "offset_days": -180},
+        )
+    ).json()
+
+    renamed_item = await send(
+        admin, "PATCH", f"{base}/items/{milestone['id']}", json={"offset_days": -200}
+    )
+    default = await send(admin, "PATCH", base, json={"name": "Intimate", "is_default": True})
+    listed = (await admin.get(url(world, "/templates"))).json()
+    removed_item = await send(admin, "DELETE", f"{base}/items/{milestone['id']}")
+    after_item = (await admin.get(base)).json()
+    deleted = await send(admin, "DELETE", base)
+
+    assert renamed_item.json()["offset_days"] == -200
+    assert default.json()["name"] == "Intimate"
+    assert [t["name"] for t in listed if t["is_default"]] == ["Intimate"]
+    assert removed_item.status_code == 204
+    assert after_item["items"] == []
+    assert deleted.status_code == 204
+    assert (await admin.get(base)).status_code == 404
