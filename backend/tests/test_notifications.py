@@ -250,3 +250,67 @@ async def test_digest_runs_at_the_local_hour(world: World, wedding: dict[str, An
 
     assert await send_daily_digests({}, now=berlin_seven - timedelta(hours=1)) == 0
     assert await send_daily_digests({}, now=berlin_seven) >= 1
+
+
+# --- Added for the feature catalog: criteria that had no test yet -------------------------
+
+
+async def test_couple_preferences_are_respected(
+    world: World, wedding: dict[str, Any], couple: AsyncClient
+) -> None:
+    from tests.test_documents import upload
+
+    path = f"/api/v1/portal/projects/{wedding['id']}/notification-preferences"
+    assert (await couple.get(path)).json()["documents"] is True
+
+    updated = await send(couple, "PATCH", path, json={"documents": False})
+    OUTBOX.clear()
+    await upload(world["member"].client, world, wedding, title="Seating plan", visibility="client")
+
+    assert updated.json()["documents"] is False
+    assert to(COUPLE) == []
+
+
+async def test_worker_hands_emails_to_smtp(monkeypatch: Any) -> None:
+    import aiosmtplib
+
+    from app.core.config import get_settings
+    from app.notifications.mailer import send_email_job
+
+    sent: list[tuple[Any, dict[str, Any]]] = []
+
+    async def fake_send(message: Any, **kwargs: Any) -> None:
+        sent.append((message, kwargs))
+
+    monkeypatch.setattr(aiosmtplib, "send", fake_send)
+
+    await send_email_job(
+        {}, {"to": "mia@example.com", "subject": "New task for you", "text": "Hello Mia"}
+    )
+
+    message, kwargs = sent[0]
+    settings = get_settings()
+    assert message["To"] == "mia@example.com"
+    assert message["Subject"] == "New task for you"
+    assert message["From"] == settings.email_from
+    assert message.get_content().strip() == "Hello Mia"
+    assert kwargs == {"hostname": settings.smtp_host, "port": settings.smtp_port}
+
+
+async def test_send_digests_command(world: World, wedding: dict[str, Any], capsys: Any) -> None:
+    from app import cli
+
+    await new_task(
+        world["member"].client,
+        world,
+        wedding,
+        title="Call the band",
+        due_date=date.today().isoformat(),
+        assignee_membership_id=str(world["member"].membership_id),
+    )
+    OUTBOX.clear()
+
+    await cli._send_digests()
+
+    assert "Queued" in capsys.readouterr().out
+    assert any("Call the band" in e.text for e in to("member@example.com"))

@@ -174,7 +174,7 @@ areas:
   - id: communication
     title: Comments & notifications
     summary: Comments, in-app and email notifications, the daily overview email.
-    status: open
+    status: catalogued
     owns:
       endpoints: ["/orgs/{org_id}/projects/{project_id}/comments",
                   "/orgs/{org_id}/notification-preferences",

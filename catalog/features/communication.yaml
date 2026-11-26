@@ -1,0 +1,251 @@
+area: communication
+features:
+  # --- Comments ---------------------------------------------------------------------------
+  - id: communication.comments
+    title: Comments
+    group: communication.comments
+    summary: "Team and couple discuss tasks, milestones, the wedding and moodboard images; the team can also write notes only the team sees."
+    usage:
+      - channel: web
+        text: "Open a task or image → **Comments**; tick **Team only** for internal remarks."
+      - channel: portal
+        text: "Couples comment in their portal on shared tasks and images."
+      - channel: api
+        text: "`GET`/`POST …/projects/{project_id}/comments` with `target_type` and `target_id`; `PATCH`/`DELETE …/comments/{comment_id}`."
+    rules:
+      - Everyone edits only their own comments; org admins may delete any comment.
+      - Viewers may comment.
+      - Team-only comments never reach the couple, also in the database.
+    technical:
+      components:
+        - backend/app/tasks/service.py
+        - backend/app/tasks/router.py
+        - frontend/src/features/tasks/TaskDialog.tsx
+      endpoints:
+        - "GET /orgs/{org_id}/projects/{project_id}/comments"
+        - "POST /orgs/{org_id}/projects/{project_id}/comments"
+        - "PATCH /orgs/{org_id}/projects/{project_id}/comments/{comment_id}"
+        - "DELETE /orgs/{org_id}/projects/{project_id}/comments/{comment_id}"
+    acceptance:
+      - id: own-and-moderated
+        kind: rule
+        text: "The lead can neither edit nor delete someone else's comment; the author edits it, and the org admin deletes it."
+        code: "403"
+      - id: viewers-comment
+        kind: effect
+        text: "A viewer's comment is saved with their name."
+      - id: team-only
+        kind: rule
+        text: "Of a team-only and a shared comment on a shared image, the team sees both and the couple only the shared one."
+      - id: rls
+        kind: rule
+        text: "Someone outside the wedding sees no comments in the database."
+      - id: comment-ui
+        kind: effect
+        text: "In the task dialog a comment is posted for the task."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_tasks.py
+        test: test_comments_edit_own_and_admins_moderate
+        covers: [own-and-moderated]
+      - kind: integration
+        file: backend/tests/test_tasks.py
+        test: test_viewers_read_and_comment_but_do_not_edit
+        covers: [viewers-comment]
+      - kind: integration
+        file: backend/tests/test_moodboards.py
+        test: test_team_only_comments_stay_hidden_on_shared_boards
+        covers: [team-only]
+      - kind: integration
+        file: backend/tests/test_tasks.py
+        test: test_checklists_comments_and_activity_are_protected_by_rls
+        covers: [rls]
+      - kind: unit
+        file: frontend/src/features/tasks/tasks.test.tsx
+        test: edits a task with its version and posts a comment
+        covers: [comment-ui]
+
+  # --- Notifications and emails ------------------------------------------------------------
+  - id: communication.preferences
+    title: Notification settings
+    group: communication.notifications
+    summary: "Everyone chooses which emails they get: new tasks, comments, documents and the daily overview; all are on until switched off."
+    usage:
+      - channel: web
+        text: "**Notifications** (`/app/notifications`)."
+      - channel: portal
+        text: "More → **Notifications** (`/portal/notifications`)."
+      - channel: api
+        text: "`GET`/`PATCH /orgs/{org_id}/notification-preferences`; couples `…/portal/projects/{project_id}/notification-preferences`."
+    rules:
+      - Settings belong to each person, per organization.
+      - Important account emails such as invitations and password resets are always sent.
+    technical:
+      components:
+        - backend/app/notifications/service.py
+        - frontend/src/features/notifications/NotificationsPage.tsx
+        - frontend/src/features/notifications/NotificationSettings.tsx
+      endpoints:
+        - "GET /orgs/{org_id}/notification-preferences"
+        - "PATCH /orgs/{org_id}/notification-preferences"
+        - "GET /portal/projects/{project_id}/notification-preferences"
+        - "PATCH /portal/projects/{project_id}/notification-preferences"
+      uiRoutes:
+        - /app/notifications
+        - /portal/notifications
+    acceptance:
+      - id: defaults-per-user
+        kind: effect
+        text: "All settings start on; switching off the daily overview affects only that person."
+      - id: opt-out-team
+        kind: rule
+        text: "A planner who switched off task emails gets none when a task is assigned to them."
+      - id: opt-out-couple
+        kind: rule
+        text: "A couple who switched off document emails gets none when a document is shared."
+      - id: settings-ui
+        kind: effect
+        text: "Team members switch the daily overview off in the app; couples see only the settings that apply to them."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_notifications.py
+        test: test_preferences_default_on_and_are_per_user
+        covers: [defaults-per-user]
+      - kind: integration
+        file: backend/tests/test_notifications.py
+        test: test_opt_out_is_respected
+        covers: [opt-out-team]
+      - kind: integration
+        file: backend/tests/test_notifications.py
+        test: test_couple_preferences_are_respected
+        covers: [opt-out-couple]
+      - kind: unit
+        file: frontend/src/features/notifications/notifications.test.tsx
+        test: team members switch email notifications
+        covers: [settings-ui]
+      - kind: unit
+        file: frontend/src/features/notifications/notifications.test.tsx
+        test: couples see the settings that apply to them
+        covers: [settings-ui]
+
+  - id: communication.task-emails
+    title: Emails about tasks and comments
+    group: communication.notifications
+    summary: "People get an email when a task is assigned to them or someone comments on it; couple and planner reach each other the same way."
+    description: |
+      Emails link straight to the task. Comment emails do not contain the comment itself, so
+      nothing sensitive sits in inboxes. Nobody is emailed about their own actions.
+    usage:
+      - channel: email
+        text: "'New task for you: …' and 'New comment on “…”' with a link to the task."
+    rules:
+      - The person who acted gets no email.
+      - Reassigning notifies the new assignee once.
+      - Comment emails never include the comment text.
+    dependsOn: [communication.preferences]
+    technical:
+      components:
+        - backend/app/notifications/service.py
+        - backend/app/notifications/mailer.py
+      endpoints:
+        - "POST /orgs/{org_id}/projects/{project_id}/comments"
+    acceptance:
+      - id: assignment
+        kind: effect
+        text: "Assigning a task to a colleague sends them one email with a link to the task; assigning one to yourself sends none."
+      - id: reassign-once
+        kind: effect
+        text: "Reassigning and then renaming a task sends the new assignee exactly one email."
+      - id: comment-without-text
+        kind: rule
+        text: "A comment on a task emails the assignee without the comment's text."
+      - id: couple-and-lead
+        kind: effect
+        text: "A couple's comment emails the lead; the lead's shared reply emails the couple with a link to their portal."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_notifications.py
+        test: test_assignee_is_emailed_but_not_the_actor
+        covers: [assignment]
+      - kind: integration
+        file: backend/tests/test_notifications.py
+        test: test_reassigning_notifies_the_new_assignee_once
+        covers: [reassign-once]
+      - kind: integration
+        file: backend/tests/test_notifications.py
+        test: test_comments_reach_the_assignee_without_the_text
+        covers: [comment-without-text]
+      - kind: integration
+        file: backend/tests/test_notifications.py
+        test: test_couple_comments_reach_the_lead_and_replies_reach_the_couple
+        covers: [couple-and-lead]
+
+  - id: communication.daily-digest
+    title: Daily overview email
+    group: communication.notifications
+    summary: "Every morning at 07:00 local time, planners get today's appointments, tomorrow's tasks and their overdue tasks; couples get theirs."
+    usage:
+      - channel: batch
+        text: "Job `send_daily_digests` runs every hour and sends where it is 07:00."
+      - channel: email
+        text: "One overview per person and day."
+      - channel: development
+        text: "`python -m app.cli send-digests --now` sends today's overview right away."
+    rules:
+      - At most one overview per person and day.
+      - Couples see only what is shared with them.
+    dependsOn: [communication.preferences]
+    technical:
+      components:
+        - backend/app/notifications/digest.py
+        - backend/app/cli.py
+      jobs: [send_daily_digests]
+      commands: [send-digests]
+      settings:
+        - "`DIGEST_HOUR` and the organization's time zone."
+    acceptance:
+      - id: content
+        kind: effect
+        text: "The planner's overview lists today's tasting in Berlin time, tomorrow's task and one overdue task; the couple's lists their task only; someone who opted out gets none; a second run sends nothing."
+      - id: local-hour
+        kind: effect
+        text: "The job sends nothing an hour before 07:00 Berlin time and sends at 07:00."
+      - id: command
+        kind: effect
+        text: "The command queues today's overview right away."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_notifications.py
+        test: test_daily_digest
+        covers: [content]
+      - kind: integration
+        file: backend/tests/test_notifications.py
+        test: test_digest_runs_at_the_local_hour
+        covers: [local-hour]
+      - kind: integration
+        file: backend/tests/test_notifications.py
+        test: test_send_digests_command
+        covers: [command]
+
+  - id: communication.email-delivery
+    title: Email delivery
+    group: communication.notifications
+    summary: "Requests only queue emails; the worker sends them by SMTP, so a slow mail server never slows down the app."
+    usage:
+      - channel: batch
+        text: "Job `send_email` sends each queued email."
+    technical:
+      components:
+        - backend/app/notifications/mailer.py
+      jobs: [send_email]
+      settings:
+        - "`EMAIL_FROM`, `SMTP_HOST`, `SMTP_PORT`, `EMAIL_BACKEND`."
+    acceptance:
+      - id: smtp
+        kind: effect
+        text: "The job sends the email with sender, recipient, subject and text to the configured SMTP server."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_notifications.py
+        test: test_worker_hands_emails_to_smtp
+        covers: [smtp]

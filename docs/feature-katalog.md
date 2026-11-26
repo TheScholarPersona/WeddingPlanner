@@ -13,26 +13,29 @@ Only features proven by passing tests are in the catalog. Everything else sits i
 
 ## Current state
 
-| Area | Status | Features |
-|---|---|---|
-| Account & sign-in | catalogued | 12, all proven |
-| Data protection | catalogued | 7, all proven |
-| Couple's portal | catalogued | 6, all proven |
-| Platform operations | catalogued | 8, all proven |
-| Organization & team | catalogued | 8, all proven |
-| Weddings | catalogued | 7, all proven |
-| Tasks & templates | catalogued | 6, all proven |
-| Budget | catalogued | 5, all proven |
-| Clients | catalogued | 3, all proven |
-| Vendors | catalogued | 2, all proven |
-| Documents | catalogued | 6, all proven |
-| Calendar | catalogued | 5, all proven |
-| Moodboards | catalogued (pilot) | 14, all proven |
-| Feature catalog | catalogued | 5, all proven |
-| 1 other area | open | – |
+All 15 areas are catalogued: **99 features, every one proven by passing tests**.
 
-All 236 parts of the app are already assigned to an area: 184 endpoints, 42 pages, 6 worker jobs
-and 4 CLI commands. In open areas, parts without a feature are only notes.
+| Area | Features |
+|---|---|
+| Account & sign-in | 12 |
+| Organization & team | 8 |
+| Clients | 3 |
+| Weddings | 7 |
+| Tasks & templates | 6 |
+| Budget | 5 |
+| Vendors | 2 |
+| Documents | 6 |
+| Calendar | 5 |
+| Moodboards (pilot) | 14 |
+| Comments & notifications | 5 |
+| Couple's portal | 6 |
+| Data protection | 7 |
+| Platform operations | 8 |
+| Feature catalog | 5 |
+
+Of the 236 parts of the app, 232 belong to a feature. They are 184 endpoints, 42 pages, 6 worker
+jobs and 4 CLI commands. The other four are excluded with a reason: the health check, the worker
+heartbeat, the redirect from `/` and the not-found page.
 
 ## Layout
 
@@ -137,29 +140,37 @@ tool's own tests, checks the catalog against all reports and uploads the view as
 - **YAML:** quote values that contain `: ` or start with a backtick or `*`. Inside `{ … }`, also
   quote values with commas.
 
-## Next areas
+## Gaps found while cataloguing
 
-Remaining area: Comments & notifications. "Organization requires two-factor authentication" belongs to Organization & team.
+Cataloguing showed behaviour that no test checked. 50 tests were added along the way, and 19
+existing assertions now also check the error code, not only the status:
 
-Expect gaps like those found so far. Before the moodboards pilot, sections, team hearts, the
-couple's image access and the limits had no test (ten backend tests added). For Account & sign-in,
-the profile, cancelling the code step, new recovery codes, a wrong password confirmation, the
-platform admins' mandatory two-factor authentication and the no-access page had none (six tests
-added, seven assertions of error codes added to existing tests). For Data protection, the
-cleanup of old reset links, invitations and the notification log and the erase dialog had none
-(two tests added, two error codes now asserted). For the Couple's portal, withdrawing an open
-invitation, who may manage the couple's access and the More page had none (three tests added).
-For Platform operations, the CLI commands, resetting another platform admin, the support view
-page and granting support in the settings had none (five tests added, one error code asserted).
-For Organization & team, withdrawing a team invitation and the settings page had none (three tests
-added, one error code asserted). For Weddings, restoring from the archive, milestones and changing or
-removing team members had none, and the wedding list page had no frontend test (four tests added,
-one error code asserted). Restoring sets the status to completed, which is noted as current
-behaviour. For Tasks & templates, sorting and deleting tasks, editing checklist items, the
-couple's checklist and reopening, and editing or deleting templates had none (four tests added, two
-error codes asserted). For Budget, categories and removing items and payments had none (two tests
-added, one error code asserted). For Clients and Vendors, editing clients and contacts, deleting a client
-without weddings, editing vendors, removing a vendor from a wedding and all three pages had none
-(seven tests added, two error codes asserted). Documents were fully covered already; no test was missing. For Calendar, the couple checking and revoking their
-subscription had none (one test added, one error code asserted). Behaviour that only the full-stack
-Playwright tests check needs a CI job with the Docker stack before it counts.
+| Area | What had no test |
+|---|---|
+| Moodboards | sections, limits, team hearts, the couple's image access, arranging and deleting own boards, team-only comments |
+| Account & sign-in | profile, cancelling the code step, new recovery codes, a wrong password confirmation, platform admins keeping two-factor on, the no-access page |
+| Data protection | cleanup of old reset links, invitations and the notification log; the erase dialog |
+| Couple's portal | withdrawing an open invitation, who manages the couple's access, the More page |
+| Platform operations | the CLI commands, resetting another platform admin, the support view page, granting support in the settings |
+| Organization & team | withdrawing a team invitation, the settings page |
+| Weddings | restoring from the archive, milestones, changing or removing team members, the wedding list page |
+| Tasks & templates | sorting and deleting tasks, editing checklist items, the couple's checklist and reopening, editing or deleting templates |
+| Budget | categories, removing items and payments |
+| Clients and Vendors | editing clients and contacts, deleting a client without weddings, editing vendors, removing a vendor from a wedding, all three pages |
+| Calendar | the couple checking and revoking their subscription |
+| Comments & notifications | the couple's notification settings, sending by SMTP, the `send-digests` command |
+| Documents | nothing; the area was fully covered |
+
+Two findings were not about tests:
+
+- The route protection test had stopped checking anything after a FastAPI update. It now fails if
+  it sees fewer than 150 routes.
+- Restoring an archived wedding always sets its status to completed. The catalog records this as
+  current behaviour.
+
+## Next steps
+
+- Behaviour that only the full-stack Playwright tests check counts only once a CI job runs them
+  with the Docker stack. Today they are skipped in CI.
+- Keep the catalog current (see Upkeep): every new endpoint, page or job needs a feature or an
+  exclusion, otherwise CI fails.
