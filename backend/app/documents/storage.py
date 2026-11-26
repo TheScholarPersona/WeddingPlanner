@@ -36,6 +36,9 @@ class MemoryStorage:
         MEMORY.pop(key, None)
 
 
+_BUCKET_EXISTS = ("BucketAlreadyOwnedByYou", "BucketAlreadyExists")
+
+
 class S3Storage:
     def __init__(self) -> None:
         settings = get_settings()
@@ -56,7 +59,12 @@ class S3Storage:
         try:
             self._client.head_bucket(Bucket=self._bucket)
         except ClientError:
-            self._client.create_bucket(Bucket=self._bucket)
+            try:
+                self._client.create_bucket(Bucket=self._bucket)
+            except ClientError as error:
+                # Another process (a parallel CLI run, a second worker) created it first.
+                if error.response.get("Error", {}).get("Code") not in _BUCKET_EXISTS:
+                    raise
         self._bucket_ready = True
 
     def _put(self, key: str, data: bytes, content_type: str) -> None:
