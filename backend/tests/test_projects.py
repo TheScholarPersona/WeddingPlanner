@@ -187,6 +187,7 @@ async def test_wedding_vendors(world: World) -> None:
 
     assert linked.status_code == 201
     assert again.status_code == 409
+    assert again.json()["code"] == "already_linked"
     assert booked.json()["status"] == "booked"
     assert (await client.get(url(world, f"/vendors/{vendor['id']}"))).json()["project_count"] == 1
 
@@ -286,3 +287,23 @@ async def test_wedding_team_roles_change_and_members_leave(world: World) -> None
     assert (await world["member2"].client.get(base)).status_code == 404
     team = (await lead.get(f"{base}/members")).json()
     assert [m["full_name"] for m in team] == ["Max Member"]
+
+
+async def test_a_vendor_is_removed_from_a_wedding(world: World) -> None:
+    client = world["member"].client
+    vendor = (
+        await send(
+            client, "POST", url(world, "/vendors"), json={"name": "DJ Nord", "category": "music"}
+        )
+    ).json()
+    wedding = await create_wedding(client, world)
+    base = url(world, f"/projects/{wedding['id']}/vendors")
+    link = (await send(client, "POST", base, json={"vendor_id": vendor["id"]})).json()
+
+    listed = (await client.get(base)).json()
+    removed = await send(client, "DELETE", f"{base}/{link['id']}")
+
+    assert [v["name"] for v in listed] == ["DJ Nord"]
+    assert removed.status_code == 204
+    assert (await client.get(base)).json() == []
+    assert (await client.get(url(world, f"/vendors/{vendor['id']}"))).json()["project_count"] == 0

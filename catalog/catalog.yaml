@@ -68,7 +68,7 @@ areas:
   - id: clients
     title: Clients
     summary: Couples as clients with their contacts.
-    status: open
+    status: catalogued
     owns:
       endpoints: ["/orgs/{org_id}/clients"]
       uiRoutes: ["/app/clients"]
@@ -115,7 +115,7 @@ areas:
   - id: vendors
     title: Vendors
     summary: The studio's vendor directory and the vendors booked for a wedding.
-    status: open
+    status: catalogued
     owns:
       endpoints: ["/orgs/{org_id}/vendors", "/orgs/{org_id}/projects/{project_id}/vendors"]
       uiRoutes: ["/app/vendors"]
