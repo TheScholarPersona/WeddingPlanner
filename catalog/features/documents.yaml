@@ -1,0 +1,302 @@
+area: documents
+features:
+  # --- Files and versions -----------------------------------------------------------------
+  - id: documents.upload
+    title: Upload and download documents
+    group: documents.files
+    summary: "Contracts, menus and plans per wedding: uploaded with a category, checked by content, downloaded safely as attachments."
+    description: |
+      PDFs, office documents and images are accepted. The real file type is checked by its
+      content, not its name; names are cleaned of paths and odd characters. Files are stored per
+      organization and wedding and always downloaded as attachments with headers that stop the
+      browser from running them.
+    usage:
+      - channel: web
+        text: "Wedding → **Documents** (`/app/weddings/:id/documents`) → **Upload document**."
+      - channel: api
+        text: "`POST …/documents` (multipart), `GET …/documents`, `GET …/documents/{document_id}`, `GET …/download`."
+    rules:
+      - "Unsupported or disguised files are refused (`unsupported_file`)."
+      - "Files above the size limit are refused (`file_too_large`)."
+      - New documents are internal until shared with the couple.
+    technical:
+      components:
+        - backend/app/documents/service.py
+        - backend/app/documents/files.py
+        - backend/app/documents/storage.py
+        - frontend/src/features/documents/DocumentsPage.tsx
+        - frontend/src/features/documents/UploadDialog.tsx
+      endpoints:
+        - "POST /orgs/{org_id}/projects/{project_id}/documents"
+        - "GET /orgs/{org_id}/projects/{project_id}/documents"
+        - "GET /orgs/{org_id}/projects/{project_id}/documents/{document_id}"
+        - "GET /orgs/{org_id}/projects/{project_id}/documents/{document_id}/download"
+      uiRoutes:
+        - /app/weddings/:id/documents
+      settings:
+        - "`max_upload_mb` (25 MB by default)."
+    acceptance:
+      - id: upload-download
+        kind: effect
+        text: "An uploaded contract is internal, stored under its organization and wedding, listed, and downloads unchanged as an attachment with nosniff and a sandbox policy."
+      - id: content-check
+        kind: rule
+        text: "An .exe, a fake PDF, a PDF named .png and an empty file are refused and nothing is stored."
+        code: unsupported_file
+      - id: size-limit
+        kind: rule
+        text: "A file above the size limit is refused."
+        code: file_too_large
+      - id: safe-names
+        kind: effect
+        text: "A name with path parts and odd characters is stored and downloaded as a clean file name."
+      - id: page-ui
+        kind: effect
+        text: "The page lists documents with sharing and scan state, uploads with category and sharing, and refuses too large files before uploading."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_documents.py
+        test: test_upload_list_and_download
+        covers: [upload-download]
+      - kind: integration
+        file: backend/tests/test_documents.py
+        test: test_rejects_unsupported_or_disguised_files
+        covers: [content-check]
+      - kind: integration
+        file: backend/tests/test_documents.py
+        test: test_rejects_files_above_the_size_limit
+        covers: [size-limit]
+      - kind: integration
+        file: backend/tests/test_documents.py
+        test: test_file_names_are_sanitized
+        covers: [safe-names]
+      - kind: integration
+        file: backend/tests/test_documents.py
+        test: test_safe_filename_strips_paths_and_control_characters
+        covers: [safe-names]
+      - kind: unit
+        file: frontend/src/features/documents/documents.test.tsx
+        test: lists documents with sharing and scan state
+        covers: [page-ui]
+      - kind: unit
+        file: frontend/src/features/documents/documents.test.tsx
+        test: uploads a file with category and sharing
+        covers: [page-ui]
+      - kind: unit
+        file: frontend/src/features/documents/documents.test.tsx
+        test: rejects files above the size limit before uploading
+        covers: [page-ui]
+
+  - id: documents.versions
+    title: Document versions
+    group: documents.files
+    summary: "A new version of a contract replaces the current one; older versions stay available."
+    usage:
+      - channel: web
+        text: "Open a document → **New version**; older versions in its history."
+      - channel: api
+        text: "`POST …/documents/{document_id}/versions`; `GET …/download?version=`."
+    technical:
+      components:
+        - backend/app/documents/service.py
+        - frontend/src/features/documents/DocumentDialog.tsx
+      endpoints:
+        - "POST /orgs/{org_id}/projects/{project_id}/documents/{document_id}/versions"
+    acceptance:
+      - id: history
+        kind: effect
+        text: "After a second version the document has two versions, the newest is current, and the first one still downloads unchanged."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_documents.py
+        test: test_versions_keep_history
+        covers: [history]
+
+  - id: documents.share
+    title: Share documents with the couple
+    group: documents.files
+    summary: "Planners share single documents with the couple, who are told by email; unsharing hides them again."
+    usage:
+      - channel: web
+        text: "Open a document → **Share with couple**."
+      - channel: email
+        text: "The couple receives 'New document: …' with a link to their files."
+      - channel: api
+        text: "`PATCH …/documents/{document_id}` with `visibility` and `If-Match`."
+    rules:
+      - The couple only ever sees shared documents, through the portal API.
+    dependsOn: [portal.isolation]
+    technical:
+      components:
+        - backend/app/documents/service.py
+        - backend/app/notifications/service.py
+        - frontend/src/features/documents/DocumentDialog.tsx
+      endpoints:
+        - "PATCH /orgs/{org_id}/projects/{project_id}/documents/{document_id}"
+    acceptance:
+      - id: shared-only
+        kind: effect
+        text: "Of an internal and a shared document, the couple lists and downloads only the shared one; after unsharing their list is empty."
+      - id: notified
+        kind: effect
+        text: "Sharing a seating plan sends the couple one email 'New document: Seating plan' with a link to their files."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_documents.py
+        test: test_sharing_with_the_couple
+        covers: [shared-only]
+      - kind: integration
+        file: backend/tests/test_documents.py
+        test: test_couple_notified_when_a_document_is_shared
+        covers: [notified]
+
+  - id: documents.couple-files
+    title: Files in the couple's portal
+    group: documents.files
+    summary: "The couple downloads shared files and uploads their own, which the team sees at once; they delete only what they uploaded."
+    usage:
+      - channel: portal
+        text: "More → **Files** (`/portal/files`) → **Add file**."
+      - channel: api
+        text: "`GET`/`POST /portal/projects/{project_id}/documents`, `GET …/download`, `DELETE …/documents/{document_id}`."
+    rules:
+      - "The couple deletes only their own files; others are 'not found' for them (`404`)."
+    technical:
+      components:
+        - backend/app/portal/service.py
+        - frontend/src/features/portal/PortalFilesPage.tsx
+      endpoints:
+        - "GET /portal/projects/{project_id}/documents"
+        - "POST /portal/projects/{project_id}/documents"
+        - "DELETE /portal/projects/{project_id}/documents/{document_id}"
+        - "GET /portal/projects/{project_id}/documents/{document_id}/download"
+      uiRoutes:
+        - /portal/files
+    acceptance:
+      - id: couple-upload
+        kind: effect
+        text: "A file the couple uploads is marked as theirs, shared, and shows up for the team; they can delete it."
+      - id: own-only
+        kind: rule
+        text: "The couple cannot delete a team document."
+        code: "404"
+      - id: portal-ui
+        kind: effect
+        text: "The portal lists shared files and lets the couple add one."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_documents.py
+        test: test_couples_upload_and_delete_only_their_own
+        covers: [couple-upload, own-only]
+      - kind: unit
+        file: frontend/src/features/portal/portal.test.tsx
+        test: shows shared files and lets the couple add one
+        covers: [portal-ui]
+
+  - id: documents.delete
+    title: Delete documents and protect access
+    group: documents.files
+    summary: "Planners delete documents with all their files; viewers, other weddings and other studios cannot reach them."
+    usage:
+      - channel: web
+        text: "Open a document → **Delete**."
+      - channel: api
+        text: "`DELETE …/documents/{document_id}`."
+    rules:
+      - "Viewers read but cannot upload or delete (`403`)."
+      - Other studios and logins outside the wedding get 'not found'; row-level security hides the files.
+      - Uploads and deletions are recorded in the audit log.
+    technical:
+      components:
+        - backend/app/documents/service.py
+        - backend/app/db/rls.py
+      endpoints:
+        - "DELETE /orgs/{org_id}/projects/{project_id}/documents/{document_id}"
+    acceptance:
+      - id: deleted
+        kind: effect
+        text: "Deleting a document removes its file from storage and the list, and the audit log records upload and deletion."
+      - id: viewers
+        kind: rule
+        text: "A viewer lists documents but can neither upload nor delete."
+        code: "403"
+      - id: isolation
+        kind: rule
+        text: "Another studio and a couple outside the wedding get 'not found' for a download, and another studio's database session sees no versions."
+        code: "404"
+    evidence:
+      - kind: integration
+        file: backend/tests/test_documents.py
+        test: test_delete_removes_files_and_is_audited
+        covers: [deleted]
+      - kind: integration
+        file: backend/tests/test_documents.py
+        test: test_viewers_read_but_cannot_change
+        covers: [viewers]
+      - kind: integration
+        file: backend/tests/test_documents.py
+        test: test_other_tenants_and_weddings_cannot_reach_documents
+        covers: [isolation]
+
+  # --- Virus scan ---------------------------------------------------------------------------
+  - id: documents.virus-scan
+    title: Virus scan of uploads
+    group: documents.safety
+    summary: "Every upload is checked by ClamAV in the background; until it is clean it cannot be downloaded, infected files are deleted."
+    usage:
+      - channel: batch
+        text: "Job `scan_document` runs after each upload; an unreachable scanner is retried."
+      - channel: web
+        text: "Documents show 'Checking for viruses…' until the scan is done."
+    rules:
+      - "Infected files are removed and blocked (`file_infected`), with an audit entry."
+      - "If the scan fails, the file stays blocked (`file_failed`)."
+    technical:
+      components:
+        - backend/app/documents/scanner.py
+        - backend/app/documents/service.py
+        - frontend/src/features/documents/ScanStatus.tsx
+      endpoints:
+        - "GET /orgs/{org_id}/projects/{project_id}/documents/{document_id}/download"
+      jobs: [scan_document]
+      settings:
+        - "`virus_scan` (`clamav` or `off`), `clamav_host`, `clamav_port`."
+    acceptance:
+      - id: clean
+        kind: effect
+        text: "An upload starts as pending and not downloadable; after the scan it is clean and downloads."
+      - id: infected
+        kind: rule
+        text: "An infected file is marked infected, its download refused, its file deleted and the finding audited."
+        code: file_infected
+      - id: failed
+        kind: rule
+        text: "When the scanner fails, the download is refused."
+        code: file_failed
+      - id: clamd
+        kind: effect
+        text: "The scanner streams files to clamd in chunks and reads clean, infected and unreachable answers."
+      - id: retry
+        kind: effect
+        text: "An unreachable scanner is retried in the worker until the last attempt."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_documents.py
+        test: test_clean_files_become_downloadable_after_the_scan
+        covers: [clean]
+      - kind: integration
+        file: backend/tests/test_documents.py
+        test: test_infected_files_are_removed_and_blocked
+        covers: [infected]
+      - kind: integration
+        file: backend/tests/test_documents.py
+        test: test_failed_scans_block_the_download
+        covers: [failed]
+      - kind: integration
+        file: backend/tests/test_documents.py
+        test: test_clamd_protocol
+        covers: [clamd]
+      - kind: integration
+        file: backend/tests/test_documents.py
+        test: test_unreachable_scanner_is_retried_in_the_worker
+        covers: [retry]

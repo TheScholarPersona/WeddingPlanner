@@ -126,7 +126,7 @@ areas:
   - id: documents
     title: Documents
     summary: Contracts and files per wedding with versions and virus scan.
-    status: open
+    status: catalogued
     owns:
       endpoints: ["/orgs/{org_id}/projects/{project_id}/documents",
                   "/portal/projects/{project_id}/documents"]
