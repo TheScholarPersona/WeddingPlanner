@@ -140,6 +140,9 @@ features:
       - id: notified
         kind: effect
         text: "Sharing a seating plan sends the couple one email 'New document: Seating plan' with a link to their files."
+      - id: e2e-share
+        kind: effect
+        text: "In the browser, a shared menu is uploaded, downloaded and announced to the couple by email, a disguised file is refused, and the couple sees the menu."
     evidence:
       - kind: integration
         file: backend/tests/test_documents.py
@@ -149,6 +152,10 @@ features:
         file: backend/tests/test_documents.py
         test: test_couple_notified_when_a_document_is_shared
         covers: [notified]
+      - kind: e2e
+        file: frontend/e2e/documents-calendar.spec.ts
+        test: documents and appointments are shared with the couple
+        covers: [e2e-share]
 
   - id: documents.couple-files
     title: Files in the couple's portal

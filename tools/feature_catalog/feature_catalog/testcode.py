@@ -196,7 +196,11 @@ def ts_test(path: Path, test: str) -> TestBody:
     match = pattern.search(source)
     if match is None:
         return TestBody(found=False)
-    body = _block(source, match.start())
+    # The body is the block after the callback's arrow (or `function`), not the braces of
+    # destructured fixtures such as `async ({ page }) => {`.
+    arrow = re.compile(r"=>\s*\{|function\s*\([^)]*\)\s*\{").search(source, match.end())
+    body_start = arrow.end() - 1 if arrow else match.start()
+    body = source[match.start() : body_start] + _block(source, body_start)
     helper_names = set(re.findall(r"(?:async\s+)?function\s+(\w+)\s*\(", source))
     helper_names |= set(re.findall(r"const\s+(\w+)\s*=\s*(?:async\s*)?\(", source))
     seen: list[str] = []

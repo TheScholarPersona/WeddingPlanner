@@ -62,12 +62,12 @@ jobs:
           path: reports/
       - run: npm run build
 
+  # End-to-end tests against the whole platform (Caddy, API, worker, PostgreSQL, Redis, S3,
+  # Mailpit) started with Docker Compose, in desktop and phone viewports.
   e2e:
     runs-on: ubuntu-latest
     needs: frontend
-    defaults:
-      run:
-        working-directory: frontend
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -75,11 +75,40 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: frontend/package-lock.json
-      - run: npm ci
-      - run: npx playwright install --with-deps chromium
-      - run: npx playwright test --trace off
+      # Before the stack: the frontend container mounts a volume at frontend/node_modules and
+      # would otherwise create that folder as root.
+      - working-directory: frontend
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+      - name: Start the platform
+        run: |
+          cp .env.example .env
+          # All parallel tests sign in from one address; the default of 5 per minute would
+          # turn some sign-ins into 429 (production keeps the default).
+          echo "LOGIN_RATE_LIMIT_PER_MINUTE=500" >> .env
+          docker compose up --build -d
+      - name: Wait until API and app answer
+        run: |
+          for i in $(seq 1 120); do
+            if curl -skf https://localhost/api/v1/health >/dev/null && curl -skf https://localhost/login >/dev/null; then
+              echo "Platform is up"; exit 0
+            fi
+            sleep 5
+          done
+          docker compose ps
+          docker compose logs --tail=80
+          exit 1
+      - name: Playwright (full stack)
+        working-directory: frontend
+        run: npx playwright test --trace off
         env:
+          E2E_FULL_STACK: "1"
+          E2E_BASE_URL: https://localhost
           JUNIT_DIR: ${{ github.workspace }}/reports
+      - name: Service logs on failure
+        if: failure()
+        run: docker compose logs --tail=150 api worker frontend proxy
       - uses: actions/upload-artifact@v4
         if: always()
         with:

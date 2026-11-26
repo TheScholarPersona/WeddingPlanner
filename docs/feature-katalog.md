@@ -71,8 +71,8 @@ Both tests fail when the file is out of date. `make catalog-export` refreshes th
    an email, what the page shows) or the refused action with its code. A status code alone is
    enough only for a rule. Mock-based unit tests count for UI logic and pure calculations.
 5. **Never evidence:** smoke tests, skipped tests, tests that did not run, tests that only check
-   what they mocked. The Playwright tests that need the full Docker stack are skipped in CI, so
-   they do not count yet.
+   what they mocked. The Playwright tests run against the full Docker stack in CI and count as
+   evidence for the end-to-end flows (criteria `e2e-…`).
 6. **Review duty.** Whoever adds or changes evidence reads the test. Changes under
    `catalog/features/` need a review (CODEOWNERS).
 7. **The tool never adds features.** It reports unassigned parts, dead references and missing
@@ -170,7 +170,7 @@ Two findings were not about tests:
 
 ## Next steps
 
-- Behaviour that only the full-stack Playwright tests check counts only once a CI job runs them
-  with the Docker stack. Today they are skipped in CI.
 - Keep the catalog current (see Upkeep): every new endpoint, page or job needs a feature or an
   exclusion, otherwise CI fails.
+- New end-to-end flows in `frontend/e2e/` can be added as evidence (kind `e2e`) to the features
+  they walk through.

@@ -19,6 +19,9 @@ x-backend-env: &backend-env
   CLAMAV_PORT: 3310
   # "clamav" scans every upload (start the scanner with `--profile scan`); "off" for quick local runs.
   VIRUS_SCAN: ${VIRUS_SCAN:-off}
+  # Sign-ins per minute per IP and per email (default 5). Raised only for the CI end-to-end
+  # run, where all parallel tests sign in from the same address.
+  LOGIN_RATE_LIMIT_PER_MINUTE: ${LOGIN_RATE_LIMIT_PER_MINUTE:-5}
 
 services:
   proxy:

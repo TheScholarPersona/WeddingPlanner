@@ -108,6 +108,9 @@ features:
       - id: complete-ui
         kind: effect
         text: "Ticking a task in the list completes it; editing sends the version it is based on."
+      - id: e2e-tasks
+        kind: effect
+        text: "In the browser, a planner completes a template task, adds and shares a task, comments on it, sees both in the activity feed and finds the task under My tasks."
     evidence:
       - kind: integration
         file: backend/tests/test_tasks.py
@@ -133,6 +136,10 @@ features:
         file: frontend/src/features/tasks/tasks.test.tsx
         test: edits a task with its version and posts a comment
         covers: [complete-ui]
+      - kind: e2e
+        file: frontend/e2e/tasks.spec.ts
+        test: a planner works through tasks, shares one with the couple and comments
+        covers: [e2e-tasks]
 
   - id: tasks.checklists
     title: Checklists in tasks

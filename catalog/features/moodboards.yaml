@@ -533,6 +533,9 @@ features:
         - "DELETE /orgs/{org_id}/projects/{project_id}/moodboards/{board_id}/items/{item_id}/heart"
         - "PUT /portal/projects/{project_id}/moodboards/{board_id}/items/{item_id}/heart"
         - "DELETE /portal/projects/{project_id}/moodboards/{board_id}/items/{item_id}/heart"
+      uiRoutes:
+        - /app/weddings/:id/moodboards/:boardId
+        - /portal/inspiration/:boardId
     acceptance:
       - id: couple-hearts
         kind: effect
@@ -543,6 +546,9 @@ features:
       - id: couple-undoes
         kind: effect
         text: When the couple takes their heart back, the image is no longer hearted by them.
+      - id: e2e-moodboard
+        kind: effect
+        text: "In the browser, the planner adds an image, selects one and exports the PDF; the couple on the phone sees the selection, hearts and comments."
     evidence:
       - kind: integration
         file: backend/tests/test_moodboards.py
@@ -556,6 +562,10 @@ features:
         file: backend/tests/test_moodboards.py
         test: test_couple_takes_a_heart_back
         covers: [couple-undoes]
+      - kind: e2e
+        file: frontend/e2e/moodboards.spec.ts
+        test: planner and couple build a moodboard, the planner exports a PDF
+        covers: [e2e-moodboard]
 
   - id: moodboards.comments
     title: Comment on images

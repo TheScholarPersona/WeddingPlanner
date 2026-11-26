@@ -233,6 +233,9 @@ features:
       - id: invalid-link-message
         kind: effect
         text: "An invalid link shows a message asking for a new invitation."
+      - id: e2e-admin-onboarding
+        kind: effect
+        text: "In the browser, an invited admin creates the account, invites a planner, saves the settings, signs out and signs in again."
     evidence:
       - kind: integration
         file: backend/tests/test_auth.py
@@ -262,6 +265,10 @@ features:
         file: frontend/src/features/auth/auth.test.tsx
         test: explains when an invitation is no longer valid
         covers: [invalid-link-message]
+      - kind: e2e
+        file: frontend/e2e/auth-flow.spec.ts
+        test: an invited admin sets up the account, manages the team and signs in again
+        covers: [e2e-admin-onboarding]
 
   - id: account.password-reset
     title: Reset a forgotten password
@@ -457,6 +464,8 @@ features:
         - "GET /me/2fa"
         - "POST /me/2fa/setup"
         - "POST /me/2fa/enable"
+      uiRoutes:
+        - /app/account
     acceptance:
       - id: turned-on
         kind: effect
@@ -464,6 +473,9 @@ features:
       - id: shown-once
         kind: effect
         text: "The app shows the QR code during setup and the recovery codes once afterwards."
+      - id: e2e-two-factor
+        kind: effect
+        text: "In the browser, an admin turns on two-factor authentication, gets ten recovery codes and signs in again with password and code."
     evidence:
       - kind: integration
         file: backend/tests/test_two_factor.py
@@ -473,6 +485,10 @@ features:
         file: frontend/src/features/account/account.test.tsx
         test: turning on two-factor authentication shows the QR code and recovery codes once
         covers: [shown-once]
+      - kind: e2e
+        file: frontend/e2e/security-privacy.spec.ts
+        test: two-factor sign-in, support access and client data export
+        covers: [e2e-two-factor]
 
   - id: account.two-factor-sign-in
     title: Sign in with a second factor
