@@ -83,6 +83,9 @@ features:
       - id: dialog
         kind: effect
         text: "The erase button stays disabled until the exact name is typed; afterwards the app returns to the client list."
+      - id: e2e-export-erase
+        kind: effect
+        text: "In the browser, an admin downloads a client's data export and then erases the client for good."
     evidence:
       - kind: integration
         file: backend/tests/test_privacy.py
@@ -96,6 +99,10 @@ features:
         file: frontend/src/features/clients/clientPrivacy.test.tsx
         test: erasing a client needs the exact name and then leaves the deleted client
         covers: [dialog]
+      - kind: e2e
+        file: frontend/e2e/security-privacy.spec.ts
+        test: two-factor sign-in, support access and client data export
+        covers: [e2e-export-erase]
 
   - id: privacy.personal-export
     title: Download my data

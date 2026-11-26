@@ -30,6 +30,9 @@ features:
       - id: create-ui
         kind: effect
         text: "The form creates the wedding for a new couple with the default template and opens the new wedding."
+      - id: e2e-create
+        kind: effect
+        text: "In the browser, a planner creates a wedding from the template, books a vendor, edits the guests and finds it on the dashboard and in the client list."
     evidence:
       - kind: integration
         file: backend/tests/test_projects.py
@@ -39,6 +42,10 @@ features:
         file: frontend/src/features/weddings/weddings.test.tsx
         test: creates a wedding for a new couple with the default template
         covers: [create-ui]
+      - kind: e2e
+        file: frontend/e2e/weddings.spec.ts
+        test: a planner creates a wedding from the template and books a vendor
+        covers: [e2e-create]
 
   - id: weddings.list
     title: Wedding list

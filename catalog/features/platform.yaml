@@ -195,6 +195,7 @@ features:
       endpoints:
         - "GET /admin/organizations/{org_id}/support"
       uiRoutes:
+        - /admin
         - /admin/organizations/:id
       notes:
         - "`SET LOCAL transaction_read_only = on` with the database role `support`."
@@ -212,6 +213,9 @@ features:
       - id: view-ui
         kind: effect
         text: "The page shows the read-only period, team with two-factor status, weddings and audit log, without buttons to change anything."
+      - id: e2e-support
+        kind: effect
+        text: "In the browser, the organization grants support access and the platform admin opens the read-only support view."
     evidence:
       - kind: integration
         file: backend/tests/test_admin.py
@@ -225,6 +229,10 @@ features:
         file: frontend/src/features/admin/admin.test.tsx
         test: the support view shows team, weddings and audit log read-only
         covers: [view-ui]
+      - kind: e2e
+        file: frontend/e2e/security-privacy.spec.ts
+        test: two-factor sign-in, support access and client data export
+        covers: [e2e-support]
 
   # --- Setup and demo -----------------------------------------------------------------------
   - id: platform.create-organization

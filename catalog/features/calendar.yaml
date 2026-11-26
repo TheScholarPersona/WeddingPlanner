@@ -193,6 +193,9 @@ features:
       - id: dialog-ui
         kind: effect
         text: "The app creates a private link once and explains that it carries no notes or amounts."
+      - id: e2e-feed
+        kind: effect
+        text: "In the browser, a shared appointment appears in the studio calendar, the subscription link serves it as iCalendar, and the couple sees it."
     evidence:
       - kind: integration
         file: backend/tests/test_calendar.py
@@ -214,6 +217,10 @@ features:
         file: frontend/src/features/calendar/calendar.test.tsx
         test: creates a private subscription link and shows it once
         covers: [dialog-ui]
+      - kind: e2e
+        file: frontend/e2e/documents-calendar.spec.ts
+        test: documents and appointments are shared with the couple
+        covers: [e2e-feed]
 
   - id: calendar.couple-feed
     title: Calendar subscription for the couple

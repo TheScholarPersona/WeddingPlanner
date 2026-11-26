@@ -90,7 +90,9 @@ def related(feature: Feature, body: TestBody) -> bool:
     text = body.text
 
     def has(word: str) -> bool:
-        return re.search(rf"(?<![A-Za-z0-9_]){re.escape(word)}(?![A-Za-z0-9_])", text) is not None
+        # Case-insensitive: browser tests name pages by their link text ("Weddings").
+        pattern = rf"(?<![A-Za-z0-9_]){re.escape(word)}(?![A-Za-z0-9_])"
+        return re.search(pattern, text, re.IGNORECASE) is not None
 
     def touches(path: str) -> bool:
         segments = _segments(path)

@@ -312,3 +312,20 @@ def test_reads_annotated_python_and_typescript_constants(repo: Repo) -> None:
     from feature_catalog.testcode import inspect_test
 
     assert "/guests/${id}/rsvp" in inspect_test(spec, "replies").text
+
+
+def test_reads_the_body_of_playwright_tests_with_fixtures(repo: Repo) -> None:
+    from feature_catalog.testcode import inspect_test
+
+    spec = repo.write(
+        "frontend/e2e/guests.spec.ts",
+        "test('a guest replies', async ({\n  page,\n  browser,\n}) => {\n"
+        "  await page.goto('/guests');\n"
+        "  await expect(page.getByText('2 guests')).toBeVisible();\n"
+        "});\n",
+    )
+
+    body = inspect_test(spec, "a guest replies")
+
+    assert body.found and body.assertions == 1
+    assert "/guests" in body.text

@@ -26,6 +26,8 @@ features:
       endpoints:
         - "GET /orgs/{org_id}/projects/{project_id}/client-access"
         - "POST /orgs/{org_id}/projects/{project_id}/client-access/invitations"
+      uiRoutes:
+        - /invite/:token
     acceptance:
       - id: couple-joins
         kind: effect
@@ -41,6 +43,9 @@ features:
         kind: rule
         text: "A viewer can neither see nor change the couple's access; an org admin can."
         code: "403"
+      - id: e2e-portal
+        kind: effect
+        text: "In the browser, the planner invites the couple; the couple accepts, sees their next steps and the shared budget without internal costs, and the planner sees what they did."
     evidence:
       - kind: integration
         file: backend/tests/test_budget_portal.py
@@ -58,6 +63,10 @@ features:
         file: backend/tests/test_budget_portal.py
         test: test_only_leads_and_admins_manage_couple_access
         covers: [leads-only]
+      - kind: e2e
+        file: frontend/e2e/portal.spec.ts
+        test: the planner shares budget and tasks, the couple works in the portal
+        covers: [e2e-portal]
 
   - id: portal.revoke-access
     title: End the couple's access

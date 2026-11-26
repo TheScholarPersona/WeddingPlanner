@@ -84,6 +84,9 @@ jobs:
       - name: Start the platform
         run: |
           cp .env.example .env
+          # All parallel tests sign in from one address; the default of 5 per minute would
+          # turn some sign-ins into 429 (production keeps the default).
+          echo "LOGIN_RATE_LIMIT_PER_MINUTE=500" >> .env
           docker compose up --build -d
       - name: Wait until API and app answer
         run: |
