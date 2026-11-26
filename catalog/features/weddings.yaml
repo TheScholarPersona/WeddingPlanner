@@ -150,7 +150,7 @@ features:
         text: "`POST …/archive`, `POST …/restore`, `DELETE /orgs/{org_id}/projects/{project_id}`."
     rules:
       - Archived weddings leave the default list; the couple keeps access for the studio's period.
-      - Restoring brings the wedding back as completed.
+      - Restoring brings an upcoming wedding back to planning and a past one back as completed.
       - "Only org admins delete weddings (`403` for leads)."
     dependsOn: [privacy.couple-access-end]
     technical:
@@ -167,7 +167,7 @@ features:
         text: "An archived wedding is missing from the default list and listed under archived."
       - id: restored
         kind: effect
-        text: "A restored wedding is completed and back in the default list."
+        text: "A restored wedding is in planning when its day is still ahead and completed when it has passed; both are back in the default list."
       - id: admins-delete
         kind: rule
         text: "A lead cannot delete the wedding; an org admin can, and then it is gone."

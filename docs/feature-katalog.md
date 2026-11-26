@@ -165,8 +165,8 @@ Two findings were not about tests:
 
 - The route protection test had stopped checking anything after a FastAPI update. It now fails if
   it sees fewer than 150 routes.
-- Restoring an archived wedding always sets its status to completed. The catalog records this as
-  current behaviour.
+- Restoring an archived wedding always set its status to completed, even for a wedding still ahead.
+  It now follows the wedding date: planning if the day is still ahead, completed once it has passed.
 
 ## Next steps
 

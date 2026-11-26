@@ -216,16 +216,21 @@ async def test_rls_hides_unassigned_weddings_in_sql(world: World, app_engine: As
 
 async def test_restoring_an_archived_wedding(world: World) -> None:
     client = world["member"].client
-    wedding = await create_wedding(client, world)
-    base = url(world, f"/projects/{wedding['id']}")
-    await send(client, "POST", f"{base}/archive")
+    upcoming = await create_wedding(client, world, days_ahead=120)
+    past = await create_wedding(client, world, days_ahead=-10)
+    for wedding in (upcoming, past):
+        await send(client, "POST", url(world, f"/projects/{wedding['id']}/archive"))
 
-    restored = await send(client, "POST", f"{base}/restore")
+    restored_upcoming = await send(
+        client, "POST", url(world, f"/projects/{upcoming['id']}/restore")
+    )
+    restored_past = await send(client, "POST", url(world, f"/projects/{past['id']}/restore"))
     listed = (await client.get(url(world, "/projects"))).json()
 
-    # Restoring brings the wedding back as completed (archiving usually follows the wedding).
-    assert restored.json()["status"] == "completed"
-    assert [w["id"] for w in listed] == [wedding["id"]]
+    # The status follows the wedding date: still ahead means planning, passed means completed.
+    assert restored_upcoming.json()["status"] == "planning"
+    assert restored_past.json()["status"] == "completed"
+    assert {w["id"] for w in listed} == {upcoming["id"], past["id"]}
 
 
 async def test_milestones_are_added_changed_and_removed(world: World) -> None:
