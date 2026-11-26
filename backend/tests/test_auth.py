@@ -1,5 +1,6 @@
 from datetime import UTC, datetime, timedelta
 
+import pytest
 from fastapi import FastAPI
 from httpx import AsyncClient
 from sqlalchemy import text
@@ -84,7 +85,14 @@ async def test_account_locks_after_repeated_failures(app: FastAPI, monkeypatch) 
     assert await _login(client) == 401  # locked, even with the right password
 
 
-async def test_login_is_rate_limited(app: FastAPI) -> None:
+async def test_login_is_rate_limited(app: FastAPI, monkeypatch: pytest.MonkeyPatch) -> None:
+    # The limiter counts per fixed minute; pin its clock so the six attempts never straddle
+    # a minute boundary (which would start a fresh window and let the sixth one through).
+    from types import SimpleNamespace
+
+    from app.core import ratelimit
+
+    monkeypatch.setattr(ratelimit, "time", SimpleNamespace(time=lambda: 1_800_000_000.0))
     client = new_client(app)
     statuses = [await _login(client, "x", "someone@example.com") for _ in range(6)]
 
