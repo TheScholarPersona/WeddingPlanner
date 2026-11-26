@@ -307,9 +307,16 @@ async def update_project(
     await db.flush()
 
 
+def _restored_status(wedding_date: date | None) -> ProjectStatus:
+    """A restored wedding is completed once its day has passed, otherwise back in planning."""
+    if wedding_date is not None and wedding_date < datetime.now(UTC).date():
+        return ProjectStatus.COMPLETED
+    return ProjectStatus.PLANNING
+
+
 async def set_archived(db: AsyncSession, ctx: ProjectContext, archived: bool) -> None:
     project = ctx.project
-    project.status = ProjectStatus.ARCHIVED if archived else ProjectStatus.COMPLETED
+    project.status = ProjectStatus.ARCHIVED if archived else _restored_status(project.wedding_date)
     project.archived_at = datetime.now(UTC) if archived else None
     project.version += 1
     await audit.record(
