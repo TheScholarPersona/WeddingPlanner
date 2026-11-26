@@ -1,0 +1,253 @@
+area: calendar
+features:
+  # --- Appointments -------------------------------------------------------------------------
+  - id: calendar.appointments
+    title: Appointments of a wedding
+    group: calendar.events
+    summary: "Tastings, fittings and walkthroughs per wedding, with a time or for whole days, optionally shared with the couple."
+    usage:
+      - channel: web
+        text: "Wedding → **Calendar** (`/app/weddings/:id/calendar`) → **New appointment**."
+      - channel: api
+        text: "`GET`/`POST …/projects/{project_id}/events`, `PUT`/`DELETE …/events/{event_id}` with `If-Match`."
+    rules:
+      - "Times need a time zone, and the end may not lie before the start (`422`)."
+      - "Changes need the current version (`stale_version`)."
+      - Viewers cannot create appointments.
+    technical:
+      components:
+        - backend/app/events/service.py
+        - frontend/src/features/calendar/WeddingCalendarPage.tsx
+        - frontend/src/features/calendar/EventDialog.tsx
+      endpoints:
+        - "GET /orgs/{org_id}/projects/{project_id}/events"
+        - "POST /orgs/{org_id}/projects/{project_id}/events"
+        - "PUT /orgs/{org_id}/projects/{project_id}/events/{event_id}"
+        - "DELETE /orgs/{org_id}/projects/{project_id}/events/{event_id}"
+      uiRoutes:
+        - /app/weddings/:id/calendar
+    acceptance:
+      - id: timed-and-all-day
+        kind: effect
+        text: "A timed tasting and two-day dress fittings are created and listed in date order."
+      - id: validation
+        kind: rule
+        text: "A time without time zone, an end before the start and all-day appointments without or with reversed dates are refused."
+        code: "422"
+      - id: versioned
+        kind: rule
+        text: "An update based on an old version is refused; with the current version the move is saved, and the appointment can be deleted. A viewer cannot create one."
+        code: stale_version
+      - id: dialog-ui
+        kind: effect
+        text: "The app adds an appointment to a wedding with date, time and time zone."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_calendar.py
+        test: test_create_timed_and_all_day_events
+        covers: [timed-and-all-day]
+      - kind: integration
+        file: backend/tests/test_calendar.py
+        test: test_event_validation
+        covers: [validation]
+      - kind: integration
+        file: backend/tests/test_calendar.py
+        test: test_update_needs_current_version_and_viewers_cannot_write
+        covers: [versioned]
+      - kind: unit
+        file: frontend/src/features/calendar/calendar.test.tsx
+        test: adds an appointment to a wedding
+        covers: [dialog-ui]
+
+  - id: calendar.studio-calendar
+    title: Studio calendar
+    group: calendar.events
+    summary: "One calendar for all weddings a planner works on: wedding days, appointments, due tasks and payments; optionally only their own tasks."
+    usage:
+      - channel: web
+        text: "**Calendar** (`/app/calendar`), month view, filter **Mine**."
+      - channel: api
+        text: "`GET /orgs/{org_id}/calendar?start=&end=&mine=`."
+    rules:
+      - "Only weddings the person is on appear; couples cannot use it (`403`)."
+      - "A range may cover at most a few months (`422`)."
+    technical:
+      components:
+        - backend/app/events/service.py
+        - frontend/src/features/calendar/CalendarPage.tsx
+      endpoints:
+        - "GET /orgs/{org_id}/calendar"
+      uiRoutes:
+        - /app/calendar
+    acceptance:
+      - id: combined
+        kind: effect
+        text: "Appointments, the planner's tasks, payments and the wedding day appear sorted by date; 'mine' keeps only the planner's tasks."
+      - id: access
+        kind: rule
+        text: "Another studio sees nothing of this wedding and a couple is refused."
+        code: "403"
+      - id: range
+        kind: rule
+        text: "A range of 200 days is refused."
+        code: "422"
+      - id: month-ui
+        kind: effect
+        text: "The month view links weddings, appointments, tasks and payments."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_calendar.py
+        test: test_combined_calendar
+        covers: [combined]
+      - kind: integration
+        file: backend/tests/test_calendar.py
+        test: test_calendar_respects_wedding_access_and_ranges
+        covers: [access, range]
+      - kind: unit
+        file: frontend/src/features/calendar/calendar.test.tsx
+        test: shows the month with weddings, appointments, tasks and payments
+        covers: [month-ui]
+
+  - id: calendar.couple-calendar
+    title: Calendar for the couple
+    group: calendar.events
+    summary: "The couple sees their wedding day, shared appointments and their own due tasks in the portal."
+    usage:
+      - channel: portal
+        text: "More → **Calendar** (`/portal/calendar`)."
+      - channel: api
+        text: "`GET /portal/projects/{project_id}/calendar?start=&end=`."
+    rules:
+      - Internal appointments and team tasks never reach the couple.
+    dependsOn: [portal.isolation]
+    technical:
+      components:
+        - backend/app/events/service.py
+        - frontend/src/features/portal/PortalCalendarPage.tsx
+      endpoints:
+        - "GET /portal/projects/{project_id}/calendar"
+      uiRoutes:
+        - /portal/calendar
+    acceptance:
+      - id: shared-only
+        kind: rule
+        text: "The couple's calendar contains the shared walkthrough, their task and the wedding day, but neither the vendor briefing nor the internal task."
+      - id: portal-ui
+        kind: effect
+        text: "The portal lists the upcoming appointments."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_calendar.py
+        test: test_couples_see_only_shared_appointments
+        covers: [shared-only]
+      - kind: unit
+        file: frontend/src/features/portal/portal.test.tsx
+        test: lists upcoming appointments in the couple calendar
+        covers: [portal-ui]
+
+  # --- Calendar subscriptions ------------------------------------------------------------------
+  - id: calendar.feeds
+    title: Calendar subscription for planners
+    group: calendar.feeds
+    summary: "A private iCal link puts the planner's weddings, appointments and own tasks into Apple, Google or Outlook calendar."
+    description: |
+      The secret token in the link is the only credential, because calendar apps cannot sign in.
+      The feed holds titles, times and places only, never notes or amounts. Creating a new link
+      replaces the old one; the link stops working when it is revoked or the membership ends.
+    usage:
+      - channel: web
+        text: "Calendar → **Subscribe** → copy the private link."
+      - channel: calendar
+        text: "Calendar apps fetch `GET /calendar-feeds/{token}.ics`."
+      - channel: api
+        text: "`GET`/`POST`/`DELETE /orgs/{org_id}/calendar/feed`."
+    rules:
+      - Each person sees only their own link.
+      - A new link replaces the old one; revoked links and links of ended memberships return 404.
+    technical:
+      components:
+        - backend/app/events/router.py
+        - backend/app/events/ics.py
+        - frontend/src/features/calendar/FeedDialog.tsx
+      endpoints:
+        - "GET /orgs/{org_id}/calendar/feed"
+        - "POST /orgs/{org_id}/calendar/feed"
+        - "DELETE /orgs/{org_id}/calendar/feed"
+        - "GET /calendar-feeds/{token}.ics"
+      notes:
+        - "SECURITY DEFINER function `app_calendar_feed_by_token` resolves the token without a session."
+    acceptance:
+      - id: lifecycle
+        kind: effect
+        text: "The link serves an iCalendar with the appointment, the planner's own task and the wedding day but no descriptions; a new link replaces it and a revoked link is gone."
+      - id: private
+        kind: rule
+        text: "Neither a colleague nor the org admin sees another person's link."
+      - id: membership-ends
+        kind: rule
+        text: "When the membership is disabled, the link stops working."
+        code: "404"
+      - id: ics-format
+        kind: effect
+        text: "Long lines are folded within 75 bytes and commas, semicolons, backslashes and line breaks are escaped."
+      - id: dialog-ui
+        kind: effect
+        text: "The app creates a private link once and explains that it carries no notes or amounts."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_calendar.py
+        test: test_feed_lifecycle
+        covers: [lifecycle]
+      - kind: integration
+        file: backend/tests/test_calendar.py
+        test: test_feeds_are_private_to_their_owner
+        covers: [private]
+      - kind: integration
+        file: backend/tests/test_calendar.py
+        test: test_feed_stops_when_the_membership_ends
+        covers: [membership-ends]
+      - kind: integration
+        file: backend/tests/test_calendar.py
+        test: test_ics_folding_and_escaping
+        covers: [ics-format]
+      - kind: unit
+        file: frontend/src/features/calendar/calendar.test.tsx
+        test: creates a private subscription link and shows it once
+        covers: [dialog-ui]
+
+  - id: calendar.couple-feed
+    title: Calendar subscription for the couple
+    group: calendar.feeds
+    summary: "The couple subscribes to their shared appointments in their own calendar app and can revoke the link."
+    usage:
+      - channel: portal
+        text: "Calendar → **Add to my calendar**."
+      - channel: calendar
+        text: "Calendar apps fetch the private `.ics` link."
+      - channel: api
+        text: "`GET`/`POST`/`DELETE /portal/projects/{project_id}/calendar/feed`."
+    dependsOn: [calendar.feeds]
+    technical:
+      components:
+        - backend/app/events/router.py
+        - frontend/src/features/portal/PortalCalendarPage.tsx
+      endpoints:
+        - "GET /portal/projects/{project_id}/calendar/feed"
+        - "POST /portal/projects/{project_id}/calendar/feed"
+        - "DELETE /portal/projects/{project_id}/calendar/feed"
+    acceptance:
+      - id: shared-only
+        kind: rule
+        text: "The couple's feed contains the shared walkthrough but not the internal vendor briefing."
+      - id: revoke
+        kind: effect
+        text: "The couple sees their link as active after creating it; after revoking it, it is inactive and the link no longer works."
+    evidence:
+      - kind: integration
+        file: backend/tests/test_calendar.py
+        test: test_couple_feed_contains_only_shared_items
+        covers: [shared-only]
+      - kind: integration
+        file: backend/tests/test_calendar.py
+        test: test_couple_checks_and_revokes_their_feed
+        covers: [revoke]
