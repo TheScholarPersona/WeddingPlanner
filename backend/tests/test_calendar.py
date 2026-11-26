@@ -91,6 +91,7 @@ async def test_update_needs_current_version_and_viewers_cannot_write(
     viewer = await send(world["member2"].client, "POST", P(world, wedding, "/events"), json=body)
 
     assert stale.status_code == 412
+    assert stale.json()["code"] == "stale_version"
     assert ok.status_code == 200
     assert ok.json()["title"] == "Cake tasting (moved)"
     assert ok.json()["ends_at"] is None
@@ -304,3 +305,24 @@ def test_ics_folding_and_escaping() -> None:
     unfolded = text.replace("\r\n ", "")
     assert "SUMMARY:" + "Ü" * 60 + "\\, done\; \\\\ ok\\nnext" in unfolded
     assert "DTSTART;VALUE=DATE:20270612" in unfolded
+
+
+# --- Added for the feature catalog: criteria that had no test yet -------------------------
+
+
+async def test_couple_checks_and_revokes_their_feed(
+    world: World, wedding: dict[str, Any], couple: AsyncClient
+) -> None:
+    path = f"/api/v1/portal/projects/{wedding['id']}/calendar/feed"
+    before = (await couple.get(path)).json()
+    created = (await send(couple, "POST", path)).json()
+    url = created["url"].removeprefix("https://app.test")
+    active = (await couple.get(path)).json()
+
+    revoked = await send(couple, "DELETE", path)
+
+    assert before["active"] is False
+    assert active["active"] is True
+    assert revoked.status_code == 204
+    assert (await couple.get(path)).json()["active"] is False
+    assert (await world["anonymous"].client.get(url)).status_code == 404

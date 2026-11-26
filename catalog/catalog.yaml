@@ -139,7 +139,7 @@ areas:
   - id: calendar
     title: Calendar
     summary: Appointments per wedding, the studio calendar and calendar subscriptions.
-    status: open
+    status: catalogued
     owns:
       endpoints: ["/orgs/{org_id}/calendar", "/orgs/{org_id}/projects/{project_id}/events",
                   "/calendar-feeds", "/portal/projects/{project_id}/calendar"]
